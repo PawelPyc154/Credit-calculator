@@ -43,7 +43,7 @@ export const Checkbox = ({
   ref,
 }: CheckboxProps) => (
   <FieldWrapper
-    className={clsx(disabled && 'opacity-50 pointer-events-none', className)}
+    className={clsx(disabled && 'pointer-events-none opacity-50', className)}
     error={error}
     isRequired={isRequired}
     label={label}

@@ -1,10 +1,10 @@
-import { createElement, type ReactNode } from "react";
+import { createElement, type ReactNode } from 'react'
 
 interface TagProps {
-  tag: "div" | "h1" | "h2" | "h3" | "h4" | "h5";
-  children: ReactNode;
-  className: string;
+  tag: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5'
+  children: ReactNode
+  className: string
 }
 
 export const Tag = ({ tag, children, ...props }: TagProps) =>
-  createElement(tag || "div", { ...props }, children);
+  createElement(tag || 'div', { ...props }, children)

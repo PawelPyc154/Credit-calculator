@@ -51,7 +51,7 @@ export const FileInput = ({
               ref={ref}
             />
 
-            <AiOutlineFileAdd size={40} className={'text-gray-500 '} />
+            <AiOutlineFileAdd size={40} className={'text-gray-500'} />
             <TextWrapper>{text}</TextWrapper>
           </>
         ) : (

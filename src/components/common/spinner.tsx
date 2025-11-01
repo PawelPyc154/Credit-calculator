@@ -1,39 +1,39 @@
-import clsx from "clsx";
+import clsx from 'clsx'
 
-import tw from "tw-tailwind";
+import tw from 'tw-tailwind'
 
 const colors = {
   teal: tw`text-teal-700`,
   white: tw`text-white`,
-};
+}
 
 const sizes = {
   sm: tw`h-5 w-5`,
   base: tw`h-9 w-9`,
-};
+}
 
 const variants = {
   absoluteCenter: tw`absolute inset-0 flex justify-center items-center`,
   static: tw``,
-};
+}
 
 const overlays = {
   none: tw``,
   white: tw`bg-white bg-opacity-60`,
-};
+}
 
 interface SpinnerProps {
-  size?: keyof typeof sizes;
-  variant?: keyof typeof variants;
-  color?: keyof typeof colors;
-  overlay?: keyof typeof overlays;
+  size?: keyof typeof sizes
+  variant?: keyof typeof variants
+  color?: keyof typeof colors
+  overlay?: keyof typeof overlays
 }
 
 export const Spinner = ({
-  size = "base",
-  variant = "absoluteCenter",
-  color = "white",
-  overlay = "none",
+  size = 'base',
+  variant = 'absoluteCenter',
+  color = 'white',
+  overlay = 'none',
 }: SpinnerProps) => (
   <Container className={clsx(variants[variant], overlays[overlay])}>
     <SVG
@@ -49,9 +49,9 @@ export const Spinner = ({
       />
     </SVG>
   </Container>
-);
+)
 
-const Container = tw.div`z-40`;
-const SVG = tw.svg`animate-spin`;
-const Circle = tw.circle`opacity-25`;
-const Path = tw.path`opacity-75`;
+const Container = tw.div`z-40`
+const SVG = tw.svg`animate-spin`
+const Circle = tw.circle`opacity-25`
+const Path = tw.path`opacity-75`

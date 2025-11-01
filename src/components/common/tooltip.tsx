@@ -1,3 +1,3 @@
-import Tippy, { type TippyProps } from "@tippyjs/react";
+import Tippy, { type TippyProps } from '@tippyjs/react'
 
-export const Tooltip = (props: TippyProps) => <Tippy {...props} />;
+export const Tooltip = (props: TippyProps) => <Tippy {...props} />

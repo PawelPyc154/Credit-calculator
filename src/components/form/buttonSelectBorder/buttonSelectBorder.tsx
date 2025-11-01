@@ -35,7 +35,7 @@ export const ButtonSelectBorder = ({
   <FieldWrapper className={className} error={error} isRequired={isRequired} label={label}>
     <Wrapper className={classNameOptionsWrapper}>
       {options.map((option) => (
-        <Option key={option.value} className={value === option.value ? 'ring-blue-500 ring-4' : ''}>
+        <Option key={option.value} className={value === option.value ? 'ring-4 ring-blue-500' : ''}>
           {option.slot}
           <Input
             ref={ref}

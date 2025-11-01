@@ -24,7 +24,7 @@ export const Menu = ({ content, children, ...props }: TippyProps) => {
       interactive
       hideOnClick="toggle"
       trigger="click"
-      className="bg-white! shadow-lg! shadow-gray-150 p-0! rounded-lg!"
+      className="rounded-lg! bg-white! p-0! shadow-gray-150 shadow-lg!"
       content={<Content onClick={hide}>{content}</Content>}
     >
       {children && React.cloneElement(children, { onClick: visible ? hide : show })}
