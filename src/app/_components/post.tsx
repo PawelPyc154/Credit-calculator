@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import tw from "tw-tailwind";
 
 import { api } from "trpc/react";
 
@@ -17,34 +18,35 @@ export function LatestPost() {
   });
 
   return (
-    <div className="w-full max-w-xs">
+    <Container>
       {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
+        <PostText>Your most recent post: {latestPost.name}</PostText>
       ) : (
-        <p>You have no posts yet.</p>
+        <NoPostText>You have no posts yet.</NoPostText>
       )}
-      <form
+      <StyledForm
         onSubmit={(e) => {
           e.preventDefault();
           createPost.mutate({ name });
         }}
-        className="flex flex-col gap-2"
       >
-        <input
+        <StyledInput
           type="text"
           placeholder="Title"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-full bg-white/10 px-4 py-2 text-white"
         />
-        <button
-          type="submit"
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-          disabled={createPost.isPending}
-        >
+        <StyledButton type="submit" disabled={createPost.isPending}>
           {createPost.isPending ? "Submitting..." : "Submit"}
-        </button>
-      </form>
-    </div>
+        </StyledButton>
+      </StyledForm>
+    </Container>
   );
 }
+
+const Container = tw.div`w-full max-w-xs`;
+const PostText = tw.p`truncate`;
+const NoPostText = tw.p``;
+const StyledForm = tw.form`flex flex-col gap-2`;
+const StyledInput = tw.input`w-full rounded-full bg-white/10 px-4 py-2 text-white`;
+const StyledButton = tw.button`rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20`;

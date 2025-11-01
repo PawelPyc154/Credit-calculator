@@ -47,13 +47,64 @@ This is a credit calculator application built with modern web technologies.
 - Use Tailwind CSS utility classes
 - Follow mobile-first responsive design
 - Use semantic HTML elements
-
-### Code Quality
-- Run `yarn check` before committing
-- Use `yarn check:write` to auto-fix issues
-- Follow Biome configuration in `biome.jsonc`
+- Use `tw-tailwind` library for creating styled components with Tailwind classes
+- Follow the component pattern shown in the example below
+- For internal component styles, always create styled components using `tw` at the bottom of the file
+- Allow `className` prop in components to accept dynamic styles from parent components
+- Use `clsx()` to combine internal variants with external `className` prop
 
 ## Common Patterns
+
+### Creating Components with tw-tailwind:
+Use the pattern from `src/components/common/example.tsx`:
+
+```tsx
+import clsx from "clsx";
+import tw from "tw-tailwind";
+
+const sizes = {
+  sm: tw`text-sm`,
+  base: tw`text-base`,
+  lg: tw`text-lg`,
+};
+const colors = {
+  amber: tw`bg-amber-400`,
+  red: tw`bg-red-400`,
+  blue: tw`bg-blue-400`,
+  green: tw`bg-green-400`,
+};
+
+export type ExampleProps = {
+  color: keyof typeof colors;
+  size: keyof typeof sizes;
+  data: string[];
+  className?: string;
+};
+
+export const Example = ({ size, data, color, className }: ExampleProps) => {
+  return (
+    <Container className={clsx(sizes[size], colors[color], className)}>
+      {data.map((item) => (
+        <Item key={item}>{item}</Item>
+      ))}
+    </Container>
+  );
+};
+
+const Container = tw.div`text-white`;
+const Item = tw.div``;
+```
+
+Key points:
+- Use `tw-tailwind` for creating styled components for internal component structure
+- Define variant maps (sizes, colors, etc.) as const objects with `tw` template literals
+- Use `keyof typeof` for type-safe props
+- Accept optional `className` prop for external customization
+- Combine variants with external `className` using `clsx()`
+- Export component props type
+- Keep styled components at the bottom of the file
+- Create styled components for static internal styles instead of inline `className`
+- Use `className` prop to allow parent components to customize styling
 
 ### Creating a new tRPC router:
 1. Create router in `src/server/api/routers/`
