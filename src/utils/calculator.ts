@@ -1,0 +1,184 @@
+import type { BankOffer } from 'types/bank'
+import type { CalculationResult, CalculatorFormData } from 'types/calculator'
+
+/**
+ * Oblicza miesięczną ratę kredytu metodą annuitetową
+ */
+export function calculateMonthlyPayment(
+  amount: number,
+  annualInterestRate: number,
+  years: number,
+): number {
+  const monthlyRate = annualInterestRate / 100 / 12
+  const numberOfPayments = years * 12
+
+  if (monthlyRate === 0) {
+    return amount / numberOfPayments
+  }
+
+  const monthlyPayment =
+    (amount * monthlyRate * (1 + monthlyRate) ** numberOfPayments) /
+    ((1 + monthlyRate) ** numberOfPayments - 1)
+
+  return monthlyPayment
+}
+
+/**
+ * Oblicza całkowity koszt kredytu (suma wszystkich rat)
+ */
+export function calculateTotalCost(
+  monthlyPayment: number,
+  years: number,
+  commission: number,
+  insurance: number,
+): number {
+  const numberOfPayments = years * 12
+  return monthlyPayment * numberOfPayments + commission + insurance
+}
+
+/**
+ * Oblicza prowizję bankową
+ */
+export function calculateCommission(loanAmount: number, commissionRate: number): number {
+  return loanAmount * (commissionRate / 100)
+}
+
+/**
+ * Oblicza koszt ubezpieczenia
+ */
+export function calculateInsurance(
+  loanAmount: number,
+  insuranceRate: number,
+  years: number,
+): number {
+  return loanAmount * (insuranceRate / 100) * years
+}
+
+/**
+ * Oblicza całkowite odsetki
+ */
+export function calculateTotalInterest(
+  monthlyPayment: number,
+  years: number,
+  loanAmount: number,
+): number {
+  const numberOfPayments = years * 12
+  return monthlyPayment * numberOfPayments - loanAmount
+}
+
+/**
+ * Oblicza wynik (score) oferty bankowej
+ * Im niższy koszt całkowity i niższe oprocentowanie, tym wyższy score
+ */
+function calculateScore(
+  totalCost: number,
+  interestRate: number,
+  allResults: { totalCost: number; interestRate: number }[],
+): number {
+  // Znajdź min i max wartości
+  const costs = allResults.map((r) => r.totalCost)
+  const rates = allResults.map((r) => r.interestRate)
+
+  const minCost = Math.min(...costs)
+  const maxCost = Math.max(...costs)
+  const minRate = Math.min(...rates)
+  const maxRate = Math.max(...rates)
+
+  // Normalizuj wartości (0-100, gdzie 100 = najlepsze)
+  const costScore = maxCost === minCost ? 100 : ((maxCost - totalCost) / (maxCost - minCost)) * 50
+  const rateScore = maxRate === minRate ? 50 : ((maxRate - interestRate) / (maxRate - minRate)) * 50
+
+  return Math.round(costScore + rateScore)
+}
+
+/**
+ * Sprawdza czy bank spełnia wymagania kredytowe
+ */
+function isBankEligible(bank: BankOffer, formData: CalculatorFormData): boolean {
+  const { loanAmount, loanPeriod, downPayment, purpose } = formData
+  const propertyValue = loanAmount + downPayment
+  const downPaymentPercent = (downPayment / propertyValue) * 100
+
+  return (
+    loanAmount >= bank.minLoanAmount &&
+    loanAmount <= bank.maxLoanAmount &&
+    loanPeriod >= bank.minLoanPeriod &&
+    loanPeriod <= bank.maxLoanPeriod &&
+    downPaymentPercent >= bank.minDownPaymentPercent &&
+    bank.supportedPurposes.includes(purpose)
+  )
+}
+
+/**
+ * Główna funkcja kalkulująca oferty dla wszystkich banków
+ */
+export function calculateBankOffers(
+  formData: CalculatorFormData,
+  banks: BankOffer[],
+): CalculationResult[] {
+  const { loanAmount, loanPeriod } = formData
+
+  // Filtruj banki, które spełniają wymagania
+  const eligibleBanks = banks.filter((bank) => isBankEligible(bank, formData))
+
+  // Oblicz wyniki dla każdego banku
+  const results: CalculationResult[] = eligibleBanks.map((bank) => {
+    const monthlyPayment = calculateMonthlyPayment(loanAmount, bank.baseInterestRate, loanPeriod)
+
+    const commission = calculateCommission(loanAmount, bank.commissionRate)
+    const insurance = calculateInsurance(loanAmount, bank.insuranceRate, loanPeriod)
+
+    const totalInterest = calculateTotalInterest(monthlyPayment, loanPeriod, loanAmount)
+
+    const totalCost = calculateTotalCost(monthlyPayment, loanPeriod, commission, insurance)
+
+    return {
+      bankId: bank.id,
+      bankName: bank.name,
+      bankLogo: bank.logo,
+      monthlyPayment,
+      totalCost,
+      interestRate: bank.baseInterestRate,
+      totalInterest,
+      commission,
+      insurance,
+      score: 0, // Będzie obliczone później
+      isRecommended: false, // Będzie oznaczone później
+    }
+  })
+
+  // Oblicz score dla każdej oferty
+  const resultsWithScores = results.map((result) => ({
+    ...result,
+    score: calculateScore(result.totalCost, result.interestRate, results),
+  }))
+
+  // Sortuj po całkowitym koszcie (najlepsze pierwsze)
+  resultsWithScores.sort((a, b) => a.totalCost - b.totalCost)
+
+  // Oznacz top 3 jako rekomendowane
+  resultsWithScores.forEach((result, index) => {
+    result.isRecommended = index < 3
+  })
+
+  return resultsWithScores
+}
+
+/**
+ * Formatuje liczbę do formatu waluty PLN
+ */
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('pl-PL', {
+    style: 'currency',
+    currency: 'PLN',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)
+}
+
+/**
+ * Formatuje liczbę jako procent
+ */
+export function formatPercent(value: number): string {
+  return `${value.toFixed(2)}%`
+}
