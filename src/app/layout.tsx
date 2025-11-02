@@ -1,5 +1,6 @@
 import "styles/globals.css";
 
+import { CookieBanner } from "components/common/CookieBanner";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="pl" className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <CookieBanner />
       </body>
     </html>
   );
