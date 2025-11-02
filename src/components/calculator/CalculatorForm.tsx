@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
+import { useDebounce } from "hooks/useDebounce";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import tw from "tw-tailwind";
@@ -39,13 +40,17 @@ export const CalculatorForm = ({
 
   const formData = watch(); // Obserwuj wszystkie pola
 
-  // Automatyczne obliczenia przy zmianie wartości
+  // Debounce formData, aby ograniczyć ilość obliczeń przy przesuwaniu sliderów
+  const debouncedFormData = useDebounce(formData, 300);
+
+  // Automatyczne obliczenia z debounce - uruchamia się dopiero po 300ms od ostatniej zmiany
   useEffect(() => {
     if (isValid) {
-      onCalculate(formData);
+      onCalculate(debouncedFormData);
     }
-  }, [formData, isValid, onCalculate]);
+  }, [debouncedFormData, isValid, onCalculate]);
 
+  // Natychmiastowe wartości do wyświetlania (bez debounce)
   const loanAmount = watch("loanAmount");
   const loanPeriod = watch("loanPeriod");
   const downPayment = watch("downPayment");

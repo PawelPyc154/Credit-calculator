@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { BankLogo } from "components/common/BankLogo";
 import { useState } from "react";
 import tw from "tw-tailwind";
 import type { CalculationResult } from "types/calculator";
@@ -76,7 +77,13 @@ export const BankRanking = ({ results }: BankRankingProps) => {
                       <RankNumber>#{index + 1}</RankNumber>
                     </RankBadgeSimple>
                   )}
-                  <BankLogo>{result.bankLogo}</BankLogo>
+                  <BankLogo
+                    src={result.bankLogo ?? "/images/banks/placeholder.png"}
+                    alt={`${result.bankName} logo`}
+                    bankName={result.bankName}
+                    size="md"
+                    priority={index < 3}
+                  />
                 </LeftSection>
 
                 {/* Środkowa sekcja - Informacje */}
@@ -240,7 +247,12 @@ const RankBadgeSimple = tw.div`
 const RankIcon = tw.span`text-2xl`;
 const RankNumber = tw.span`text-sm font-bold`;
 
-const BankLogo = tw.span`text-5xl md:text-6xl`;
+const BankLogoWrapper = tw.div`
+  w-24 h-24 md:w-28 md:h-28 
+  flex items-center justify-center
+  bg-white rounded-lg
+  p-2
+`;
 
 const MiddleSection = tw.div`flex-1 flex flex-col gap-4`;
 

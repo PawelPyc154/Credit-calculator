@@ -2,7 +2,7 @@
   {
     "id": "pko-bp",
     "name": "PKO Bank Polski",
-    "logo": "🏦",
+    "logo": "/images/banks/pko-bp.svg",
     "baseInterestRate": 7.2,
     "commissionRate": 2.0,
     "insuranceRate": 0.15,
@@ -17,7 +17,7 @@
   {
     "id": "mbank",
     "name": "mBank",
-    "logo": "🏦",
+    "logo": "/images/banks/mbank.svg",
     "baseInterestRate": 7.4,
     "commissionRate": 1.5,
     "insuranceRate": 0.12,
@@ -32,7 +32,7 @@
   {
     "id": "ing",
     "name": "ING Bank Śląski",
-    "logo": "🏦",
+    "logo": "/images/banks/ing.png",
     "baseInterestRate": 7.1,
     "commissionRate": 2.5,
     "insuranceRate": 0.18,
@@ -47,7 +47,7 @@
   {
     "id": "santander",
     "name": "Santander Bank Polska",
-    "logo": "🏦",
+    "logo": "/images/banks/santander.svg",
     "baseInterestRate": 7.5,
     "commissionRate": 1.8,
     "insuranceRate": 0.14,
@@ -62,7 +62,7 @@
   {
     "id": "millennium",
     "name": "Bank Millennium",
-    "logo": "🏦",
+    "logo": "/images/banks/millennium.png",
     "baseInterestRate": 7.3,
     "commissionRate": 2.2,
     "insuranceRate": 0.16,
@@ -77,7 +77,7 @@
   {
     "id": "pekao",
     "name": "Bank Pekao SA",
-    "logo": "🏦",
+    "logo": "/images/banks/pekao.svg",
     "baseInterestRate": 7.25,
     "commissionRate": 2.1,
     "insuranceRate": 0.17,
@@ -92,7 +92,7 @@
   {
     "id": "alior",
     "name": "Alior Bank",
-    "logo": "🏦",
+    "logo": "/images/banks/alior.png",
     "baseInterestRate": 7.6,
     "commissionRate": 1.2,
     "insuranceRate": 0.13,
@@ -107,7 +107,7 @@
   {
     "id": "credit-agricole",
     "name": "Credit Agricole",
-    "logo": "🏦",
+    "logo": "/images/banks/credit-agricole.png",
     "baseInterestRate": 7.35,
     "commissionRate": 1.9,
     "insuranceRate": 0.15,
