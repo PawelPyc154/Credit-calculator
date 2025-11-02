@@ -1,22 +1,27 @@
-import type { RefAttributes } from 'react'
+import type { RefAttributes } from "react";
 
-import { type FieldValues, type UseControllerProps, useController } from 'react-hook-form'
-import type { GroupBase } from 'react-select'
+import {
+  type FieldValues,
+  type UseControllerProps,
+  useController,
+} from "react-hook-form";
+import type {
+  GroupBase,
+  Props as ReactSelectProps,
+  SelectInstance,
+} from "react-select";
+import { Select, SelectAsync, type SelectFieldProps } from "./select";
 
-import type SelectType from 'react-select/dist/declarations/src/Select'
-import type { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager'
-import { Select, SelectAsync, type SelectProps } from './select'
-
-type SelectControlProps = SelectProps
+type SelectControlProps = SelectFieldProps;
 
 export const SelectControl = <
   TFieldValues extends FieldValues = FieldValues,
   Option extends { label: string; value: string } = {
-    label: string
-    value: string
+    label: string;
+    value: string;
   },
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>,
+  Group extends GroupBase<Option> = GroupBase<Option>
 >({
   control,
   name,
@@ -28,8 +33,8 @@ export const SelectControl = <
   options = [],
   ...restProps
 }: SelectControlProps &
-  StateManagerProps<Option, IsMulti, Group> &
-  RefAttributes<SelectType<Option, IsMulti, Group>> &
+  ReactSelectProps<Option, IsMulti, Group> &
+  RefAttributes<SelectInstance<Option, IsMulti, Group>> &
   UseControllerProps<TFieldValues>) => {
   const {
     field: { value, onChange, onBlur, name: fieldName, ref },
@@ -39,9 +44,12 @@ export const SelectControl = <
     control,
     rules,
     defaultValue,
-  })
+  });
 
-  const flatOptions = options?.flatMap((item) => ('options' in item ? item.options : item))
+  const flatOptions =
+    options?.flatMap((item: Option | Group) =>
+      "options" in item ? item.options : item
+    ) ?? [];
 
   return (
     <Select
@@ -49,21 +57,25 @@ export const SelectControl = <
       error={error?.message}
       className={className}
       label={label}
-      onChange={(value) => {
-        if (value === null) {
-          onChange(value)
-        } else {
-          if ('label' in value) {
-            onChange(value?.value)
-          } else {
-            onChange(value.map(({ value }) => value))
-          }
+      onChange={(newValue) => {
+        if (newValue === null) {
+          onChange(null);
+        } else if (Array.isArray(newValue)) {
+          onChange(newValue.map((item: Option) => item.value));
+        } else if (
+          newValue &&
+          typeof newValue === "object" &&
+          "value" in newValue
+        ) {
+          onChange((newValue as Option).value);
         }
       }}
       value={
         isMulti
-          ? flatOptions.filter((c) => value.includes(c.value))
-          : flatOptions.find((c) => c.value === value)
+          ? flatOptions.filter(
+              (c: Option) => Array.isArray(value) && value.includes(c.value)
+            )
+          : flatOptions.find((c: Option) => c.value === value)
       }
       options={options}
       isMulti={isMulti}
@@ -71,21 +83,21 @@ export const SelectControl = <
       onBlur={onBlur}
       {...restProps}
     />
-  )
-}
+  );
+};
 
-type SelectAsyncControlProps = SelectProps
+type SelectAsyncControlProps = SelectFieldProps;
 
 // not Work
 
 export const SelectAsyncControl = <
   TFieldValues extends FieldValues = FieldValues,
   Option extends { label: string; value: string } = {
-    label: string
-    value: string
+    label: string;
+    value: string;
   },
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>,
+  Group extends GroupBase<Option> = GroupBase<Option>
 >({
   control,
   name,
@@ -97,8 +109,8 @@ export const SelectAsyncControl = <
   options = [],
   ...restProps
 }: SelectAsyncControlProps &
-  StateManagerProps<Option, IsMulti, Group> &
-  RefAttributes<SelectType<Option, IsMulti, Group>> &
+  ReactSelectProps<Option, IsMulti, Group> &
+  RefAttributes<SelectInstance<Option, IsMulti, Group>> &
   UseControllerProps<TFieldValues>) => {
   const {
     field: { value, onChange, onBlur, name: fieldName, ref },
@@ -108,9 +120,12 @@ export const SelectAsyncControl = <
     control,
     rules,
     defaultValue,
-  })
+  });
 
-  const flatOptions = options?.flatMap((item) => ('options' in item ? item.options : item))
+  const flatOptions =
+    options?.flatMap((item: Option | Group) =>
+      "options" in item ? item.options : item
+    ) ?? [];
 
   return (
     <SelectAsync
@@ -118,21 +133,25 @@ export const SelectAsyncControl = <
       error={error?.message}
       className={className}
       label={label}
-      onChange={(value) => {
-        if (value === null) {
-          onChange(value)
-        } else {
-          if ('label' in value) {
-            onChange(value?.value)
-          } else {
-            onChange(value.map(({ value }) => value))
-          }
+      onChange={(newValue) => {
+        if (newValue === null) {
+          onChange(null);
+        } else if (Array.isArray(newValue)) {
+          onChange(newValue.map((item: Option) => item.value));
+        } else if (
+          newValue &&
+          typeof newValue === "object" &&
+          "value" in newValue
+        ) {
+          onChange((newValue as Option).value);
         }
       }}
       value={
         isMulti
-          ? flatOptions.filter((c) => value.includes(c.value))
-          : flatOptions.find((c) => c.value === value)
+          ? flatOptions.filter(
+              (c: Option) => Array.isArray(value) && value.includes(c.value)
+            )
+          : flatOptions.find((c: Option) => c.value === value)
       }
       options={options}
       isMulti={isMulti}
@@ -140,5 +159,5 @@ export const SelectAsyncControl = <
       onBlur={onBlur}
       {...restProps}
     />
-  )
-}
+  );
+};
