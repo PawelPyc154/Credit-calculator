@@ -59,6 +59,41 @@ This is an intelligent credit calculator application that helps users find the b
 
 The application is built with modern web technologies to provide a fast, responsive, and user-friendly experience.
 
+### User-Centric Design Principles
+
+To ensure the credit calculator is accessible and understandable for users without prior knowledge of loans or financial concepts, the following principles should be followed:
+
+1. **Educational Guidance**:
+   - Provide clear explanations for each input field (e.g., "Kwota kredytu" should include a tooltip or description explaining what it means and how it affects the loan).
+   - Include contextual tips or information next to results (e.g., "Niższa rata miesięczna może oznaczać dłuższy okres kredytowania i wyższy całkowity koszt kredytu.").
+
+2. **Prioritization of Key Information**:
+   - Highlight the most critical factors first, such as monthly payment (rata miesięczna) and total cost (całkowity koszt kredytu).
+   - Provide secondary information, like additional fees or insurance, in a less prominent way but still accessible.
+
+3. **Interactive Learning**:
+   - Allow users to interact with "What-If" scenarios (e.g., "Co się stanie, jeśli zwiększę wkład własny?").
+   - Use visual aids like graphs or progress bars to show the impact of changes in loan parameters.
+
+4. **Simplified Language**:
+   - Avoid financial jargon. Use simple, everyday language to explain concepts.
+   - Provide examples to make abstract concepts concrete (e.g., "Przy oprocentowaniu 5%, pożyczając 100 000 zł na 10 lat, rata wyniesie około 1 060 zł miesięcznie.").
+
+5. **Step-by-Step Guidance**:
+   - Guide users through the process of selecting a loan with step-by-step instructions.
+   - Include a checklist of things to consider (e.g., "Sprawdź, czy możesz wcześniej spłacić kredyt bez dodatkowych opłat.").
+
+6. **Accessible Design**:
+   - Ensure the UI is intuitive and easy to navigate.
+   - Use visual hierarchy to emphasize important elements.
+   - Make the design mobile-friendly and responsive.
+
+7. **Trust and Transparency**:
+   - Clearly state that the data is based on mock data or real offers (when applicable).
+   - Provide disclaimers about the limitations of the calculator.
+
+By incorporating these principles, the credit calculator will not only provide users with numerical results but also empower them with the knowledge needed to make informed decisions about their loans.
+
 ## Tech Stack
 
 ### Stage 1 (Current)

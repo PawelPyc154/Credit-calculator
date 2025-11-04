@@ -20,21 +20,27 @@ const geist = Geist({
 })
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const isProduction = process.env.NODE_ENV === 'production'
+
   return (
     <html lang="pl" className={`${geist.variable}`}>
       <head>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-ZZ0BQ4CWZE"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-ZZ0BQ4CWZE');
-          `}
-        </Script>
+        {isProduction && (
+          <>
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=G-ZZ0BQ4CWZE"
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-ZZ0BQ4CWZE');
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>

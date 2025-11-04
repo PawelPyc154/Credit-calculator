@@ -1,26 +1,22 @@
-"use client";
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
-import { useDebounce } from "hooks/useDebounce";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import tw from "tw-tailwind";
-import {
-  type CalculatorFormData,
-  calculatorFormSchema,
-} from "types/calculator";
-import { formatCurrency } from "utils/calculator";
+import { zodResolver } from '@hookform/resolvers/zod'
+import clsx from 'clsx'
+import { Tooltip } from 'components/common/tooltip'
+import { useDebounce } from 'hooks/useDebounce'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import tw from 'tw-tailwind'
+import { type CalculatorFormData, calculatorFormSchema } from 'types/calculator'
+import { formatCurrency } from 'utils/calculator'
 
 export type CalculatorFormProps = {
-  onCalculate: (data: CalculatorFormData) => void;
-  hasResults: boolean;
-};
+  onCalculate: (data: CalculatorFormData) => void
+  hasResults: boolean
+  ref?: React.RefObject<HTMLFormElement | null>
+}
 
-export const CalculatorForm = ({
-  onCalculate,
-  hasResults,
-}: CalculatorFormProps) => {
+export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormProps) => {
   const {
     register,
     handleSubmit,
@@ -28,40 +24,36 @@ export const CalculatorForm = ({
     formState: { errors, isValid },
   } = useForm<CalculatorFormData>({
     resolver: zodResolver(calculatorFormSchema),
-    mode: "onChange", // Walidacja przy każdej zmianie
+    mode: 'onChange',
     defaultValues: {
       loanAmount: 500000,
       loanPeriod: 25,
       downPayment: 100000,
       monthlyIncome: 8000,
-      purpose: "purchase",
+      purpose: 'purchase',
     },
-  });
+  })
 
-  const formData = watch(); // Obserwuj wszystkie pola
+  const formData = watch()
+  const debouncedFormData = useDebounce(formData, 300)
 
-  // Debounce formData, aby ograniczyć ilość obliczeń przy przesuwaniu sliderów
-  const debouncedFormData = useDebounce(formData, 300);
-
-  // Automatyczne obliczenia z debounce - uruchamia się dopiero po 300ms od ostatniej zmiany
   useEffect(() => {
     if (isValid) {
-      onCalculate(debouncedFormData);
+      onCalculate(debouncedFormData)
     }
-  }, [debouncedFormData, isValid, onCalculate]);
+  }, [debouncedFormData, isValid, onCalculate])
 
-  // Natychmiastowe wartości do wyświetlania (bez debounce)
-  const loanAmount = watch("loanAmount");
-  const loanPeriod = watch("loanPeriod");
-  const downPayment = watch("downPayment");
-  const monthlyIncome = watch("monthlyIncome");
+  const loanAmount = watch('loanAmount')
+  const loanPeriod = watch('loanPeriod')
+  const downPayment = watch('downPayment')
+  const monthlyIncome = watch('monthlyIncome')
 
   const scrollToResults = () => {
-    document.getElementById("results")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
+    document.getElementById('results')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   return (
     <FormCard>
@@ -70,12 +62,27 @@ export const CalculatorForm = ({
         <FormSubtitle>Dopasuj parametry kredytu do swoich potrzeb</FormSubtitle>
       </FormHeader>
 
-      <Form onSubmit={handleSubmit(scrollToResults)}>
+      <Form ref={ref} onSubmit={handleSubmit(scrollToResults)}>
         <FormGrid>
           {/* Kwota kredytu */}
           <FormGroup>
             <LabelRow>
-              <Label htmlFor="loanAmount">Kwota kredytu</Label>
+              <LabelWithTooltip>
+                <Label htmlFor="loanAmount">Kwota kredytu</Label>
+                <Tooltip
+                  content={
+                    <TooltipContent>
+                      <strong>Kwota kredytu</strong> to suma pieniędzy, którą chcesz pożyczyć od
+                      banku.
+                      <br />
+                      <br />💡 <strong>Wskazówka:</strong> Im niższa kwota kredytu, tym niższa rata
+                      miesięczna i łatwiej uzyskać zgodę banku.
+                    </TooltipContent>
+                  }
+                >
+                  <InfoIcon>ℹ️</InfoIcon>
+                </Tooltip>
+              </LabelWithTooltip>
               <ValueDisplay>{formatCurrency(loanAmount)}</ValueDisplay>
             </LabelRow>
             <SliderInput
@@ -84,22 +91,35 @@ export const CalculatorForm = ({
               min="50000"
               max="2000000"
               step="10000"
-              {...register("loanAmount", { valueAsNumber: true })}
-              className={clsx(errors.loanAmount && "border-red-500")}
+              {...register('loanAmount', { valueAsNumber: true })}
+              className={clsx(errors.loanAmount && 'border-red-500')}
             />
             <SliderLabels>
               <SliderLabel>50 tys. zł</SliderLabel>
               <SliderLabel>2 mln zł</SliderLabel>
             </SliderLabels>
-            {errors.loanAmount && (
-              <ErrorMessage>{errors.loanAmount.message}</ErrorMessage>
-            )}
+            {errors.loanAmount && <ErrorMessage>{errors.loanAmount.message}</ErrorMessage>}
           </FormGroup>
 
           {/* Okres kredytowania */}
           <FormGroup>
             <LabelRow>
-              <Label htmlFor="loanPeriod">Okres kredytowania</Label>
+              <LabelWithTooltip>
+                <Label htmlFor="loanPeriod">Okres kredytowania</Label>
+                <Tooltip
+                  content={
+                    <TooltipContent>
+                      <strong>Okres kredytowania</strong> to czas, przez który będziesz spłacać
+                      kredyt.
+                      <br />
+                      <br />💡 <strong>Wskazówka:</strong> Dłuższy okres = niższa rata, ale wyższy
+                      całkowity koszt kredytu.
+                    </TooltipContent>
+                  }
+                >
+                  <InfoIcon>ℹ️</InfoIcon>
+                </Tooltip>
+              </LabelWithTooltip>
               <ValueDisplay>{loanPeriod} lat</ValueDisplay>
             </LabelRow>
             <SliderInput
@@ -108,22 +128,34 @@ export const CalculatorForm = ({
               min="5"
               max="35"
               step="1"
-              {...register("loanPeriod", { valueAsNumber: true })}
-              className={clsx(errors.loanPeriod && "border-red-500")}
+              {...register('loanPeriod', { valueAsNumber: true })}
+              className={clsx(errors.loanPeriod && 'border-red-500')}
             />
             <SliderLabels>
               <SliderLabel>5 lat</SliderLabel>
               <SliderLabel>35 lat</SliderLabel>
             </SliderLabels>
-            {errors.loanPeriod && (
-              <ErrorMessage>{errors.loanPeriod.message}</ErrorMessage>
-            )}
+            {errors.loanPeriod && <ErrorMessage>{errors.loanPeriod.message}</ErrorMessage>}
           </FormGroup>
 
           {/* Wkład własny */}
           <FormGroup>
             <LabelRow>
-              <Label htmlFor="downPayment">Wkład własny</Label>
+              <LabelWithTooltip>
+                <Label htmlFor="downPayment">Wkład własny</Label>
+                <Tooltip
+                  content={
+                    <TooltipContent>
+                      <strong>Wkład własny</strong> to kwota, którą wpłacisz ze swoich oszczędności.
+                      <br />
+                      <br />💡 <strong>Wskazówka:</strong> Wyższy wkład własny = lepsze warunki
+                      kredytu i niższe oprocentowanie.
+                    </TooltipContent>
+                  }
+                >
+                  <InfoIcon>ℹ️</InfoIcon>
+                </Tooltip>
+              </LabelWithTooltip>
               <ValueDisplay>{formatCurrency(downPayment)}</ValueDisplay>
             </LabelRow>
             <SliderInput
@@ -132,22 +164,34 @@ export const CalculatorForm = ({
               min="0"
               max="1000000"
               step="10000"
-              {...register("downPayment", { valueAsNumber: true })}
-              className={clsx(errors.downPayment && "border-red-500")}
+              {...register('downPayment', { valueAsNumber: true })}
+              className={clsx(errors.downPayment && 'border-red-500')}
             />
             <SliderLabels>
               <SliderLabel>0 zł</SliderLabel>
               <SliderLabel>1 mln zł</SliderLabel>
             </SliderLabels>
-            {errors.downPayment && (
-              <ErrorMessage>{errors.downPayment.message}</ErrorMessage>
-            )}
+            {errors.downPayment && <ErrorMessage>{errors.downPayment.message}</ErrorMessage>}
           </FormGroup>
 
           {/* Dochód miesięczny */}
           <FormGroup>
             <LabelRow>
-              <Label htmlFor="monthlyIncome">Dochód miesięczny</Label>
+              <LabelWithTooltip>
+                <Label htmlFor="monthlyIncome">Dochód miesięczny</Label>
+                <Tooltip
+                  content={
+                    <TooltipContent>
+                      <strong>Dochód miesięczny</strong> to Twoje stałe, miesięczne zarobki netto.
+                      <br />
+                      <br />💡 <strong>Wskazówka:</strong> Bank sprawdza czy Twój dochód pozwala na
+                      bezpieczną spłatę raty (zwykle rata nie może przekraczać 50% dochodu).
+                    </TooltipContent>
+                  }
+                >
+                  <InfoIcon>ℹ️</InfoIcon>
+                </Tooltip>
+              </LabelWithTooltip>
               <ValueDisplay>{formatCurrency(monthlyIncome)}</ValueDisplay>
             </LabelRow>
             <SliderInput
@@ -156,16 +200,14 @@ export const CalculatorForm = ({
               min="3000"
               max="30000"
               step="500"
-              {...register("monthlyIncome", { valueAsNumber: true })}
-              className={clsx(errors.monthlyIncome && "border-red-500")}
+              {...register('monthlyIncome', { valueAsNumber: true })}
+              className={clsx(errors.monthlyIncome && 'border-red-500')}
             />
             <SliderLabels>
               <SliderLabel>3 tys. zł</SliderLabel>
               <SliderLabel>30 tys. zł</SliderLabel>
             </SliderLabels>
-            {errors.monthlyIncome && (
-              <ErrorMessage>{errors.monthlyIncome.message}</ErrorMessage>
-            )}
+            {errors.monthlyIncome && <ErrorMessage>{errors.monthlyIncome.message}</ErrorMessage>}
           </FormGroup>
 
           {/* Cel kredytu */}
@@ -177,7 +219,7 @@ export const CalculatorForm = ({
                   type="radio"
                   id="purchase"
                   value="purchase"
-                  {...register("purpose")}
+                  {...register('purpose')}
                 />
                 <PurposeLabel htmlFor="purchase">
                   <PurposeIcon>🏠</PurposeIcon>
@@ -190,7 +232,7 @@ export const CalculatorForm = ({
                   type="radio"
                   id="refinancing"
                   value="refinancing"
-                  {...register("purpose")}
+                  {...register('purpose')}
                 />
                 <PurposeLabel htmlFor="refinancing">
                   <PurposeIcon>🔄</PurposeIcon>
@@ -203,7 +245,7 @@ export const CalculatorForm = ({
                   type="radio"
                   id="construction"
                   value="construction"
-                  {...register("purpose")}
+                  {...register('purpose')}
                 />
                 <PurposeLabel htmlFor="construction">
                   <PurposeIcon>🏗️</PurposeIcon>
@@ -211,9 +253,7 @@ export const CalculatorForm = ({
                 </PurposeLabel>
               </PurposeOption>
             </PurposeGrid>
-            {errors.purpose && (
-              <ErrorMessage>{errors.purpose.message}</ErrorMessage>
-            )}
+            {errors.purpose && <ErrorMessage>{errors.purpose.message}</ErrorMessage>}
           </FormGroup>
         </FormGrid>
 
@@ -225,20 +265,20 @@ export const CalculatorForm = ({
         )}
       </Form>
     </FormCard>
-  );
-};
+  )
+}
 
-const FormCard = tw.div`w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-8 md:p-10 -mt-16 relative z-10 border border-gray-100`;
-const FormHeader = tw.div`mb-8 text-center`;
-const FormTitle = tw.h2`text-3xl md:text-4xl font-bold text-gray-900 mb-2`;
-const FormSubtitle = tw.p`text-gray-600 text-lg`;
+const FormCard = tw.div`w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl p-8 md:p-10 -mt-16 relative z-10 border border-gray-100`
+const FormHeader = tw.div`mb-8 text-center`
+const FormTitle = tw.h2`text-3xl md:text-4xl font-bold text-gray-900 mb-2`
+const FormSubtitle = tw.p`text-gray-600 text-lg`
 
-const Form = tw.form`space-y-8`;
-const FormGrid = tw.div`grid grid-cols-1 md:grid-cols-2 gap-8`;
-const FormGroup = tw.div`flex flex-col space-y-3`;
-const LabelRow = tw.div`flex justify-between items-center`;
-const Label = tw.label`text-sm font-semibold text-gray-700 uppercase tracking-wide`;
-const ValueDisplay = tw.span`text-lg font-bold text-blue-600`;
+const Form = tw.form`space-y-8`
+const FormGrid = tw.div`grid grid-cols-1 md:grid-cols-2 gap-8`
+const FormGroup = tw.div`flex flex-col space-y-3`
+const LabelRow = tw.div`flex justify-between items-center`
+const Label = tw.label`text-sm font-semibold text-gray-700 uppercase tracking-wide`
+const ValueDisplay = tw.span`text-lg font-bold text-blue-600`
 
 const SliderInput = tw.input`
   w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
@@ -262,23 +302,23 @@ const SliderInput = tw.input`
   [&::-moz-range-thumb]:transition-all
   [&::-moz-range-thumb]:hover:bg-blue-700
   [&::-moz-range-thumb]:hover:scale-110
-`;
+`
 
-const SliderLabels = tw.div`flex justify-between text-xs text-gray-500`;
-const SliderLabel = tw.span``;
-const ErrorMessage = tw.p`text-sm text-red-600`;
+const SliderLabels = tw.div`flex justify-between text-xs text-gray-500`
+const SliderLabel = tw.span``
+const ErrorMessage = tw.p`text-sm text-red-600`
 
-const PurposeGrid = tw.div`grid grid-cols-3 gap-4`;
-const PurposeOption = tw.div`relative`;
-const PurposeRadio = tw.input`peer absolute opacity-0`;
+const PurposeGrid = tw.div`grid grid-cols-3 gap-4`
+const PurposeOption = tw.div`relative`
+const PurposeRadio = tw.input`peer absolute opacity-0`
 const PurposeLabel = tw.label`
   flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer
   transition-all duration-200
   peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:shadow-md
   hover:border-blue-300 hover:bg-gray-50
-`;
-const PurposeIcon = tw.span`text-3xl mb-2`;
-const PurposeText = tw.span`text-sm font-medium text-gray-700 text-center`;
+`
+const PurposeIcon = tw.span`text-3xl mb-2`
+const PurposeText = tw.span`text-sm font-medium text-gray-700 text-center`
 
 const SubmitButton = tw.button`
   w-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
@@ -287,6 +327,10 @@ const SubmitButton = tw.button`
   shadow-lg hover:shadow-xl
   flex items-center justify-center gap-3
   transform hover:scale-[1.02] active:scale-[0.98]
-`;
+`
 
-const ButtonIcon = tw.span`text-xl`;
+const ButtonIcon = tw.span`text-xl`
+
+const LabelWithTooltip = tw.div`flex items-center gap-2`
+const InfoIcon = tw.span`cursor-help text-blue-500 hover:text-blue-700 transition-colors`
+const TooltipContent = tw.div`text-sm max-w-xs`
