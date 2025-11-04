@@ -3,7 +3,7 @@
 ## Project Overview
 This is an intelligent credit calculator application that helps users find the best mortgage loan option for their needs. The application analyzes various loan parameters, compares offers from different banks, and provides personalized recommendations based on the user's financial situation.
 
-**Production Domain**: ranking-kredytów.pl
+**Production Domain**: www.kredytanaliza.pl
 
 ### Development Stages
 
