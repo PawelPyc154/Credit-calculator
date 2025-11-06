@@ -70,11 +70,13 @@ export default function Home() {
     <MainContainer>
       <Hero />
       <ContentWrapper>
-        <CalculatorForm
-          ref={formRef}
-          onCalculate={handleCalculate}
-          hasResults={results.length > 0}
-        />
+        <div id="calculator">
+          <CalculatorForm
+            ref={formRef}
+            onCalculate={handleCalculate}
+            hasResults={results.length > 0}
+          />
+        </div>
         <div id="results">
           <BankRanking
             results={results}

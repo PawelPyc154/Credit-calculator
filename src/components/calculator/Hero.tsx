@@ -1,117 +1,381 @@
-import tw from "tw-tailwind";
+import tw from 'tw-tailwind'
+import { HeroStats } from './atoms/HeroStats'
 
 export const Hero = () => {
   return (
-    <HeroSection>
-      <HeroContent>
-        <IconWrapper>
-          <Icon>💰</Icon>
-          <IconGlow />
-        </IconWrapper>
-        <Title>
-          Znajdź najlepszy kredyt
-          <TitleAccent> hipoteczny</TitleAccent>
-        </Title>
-        <Subtitle>
-          Porównaj oferty z wiodących banków w Polsce i oszczędź tysiące złotych
-          <br />
-          <SubtitleHighlight>
-            ✓ Darmowo ✓ Bez zobowiązań ✓ W 2 minuty
-          </SubtitleHighlight>
-        </Subtitle>
-        <StatsGrid>
-          <StatItem>
-            <StatNumber>15+</StatNumber>
-            <StatLabel>Banków</StatLabel>
-          </StatItem>
-          <StatItem>
-            <StatNumber>1000+</StatNumber>
-            <StatLabel>Zadowolonych klientów</StatLabel>
-          </StatItem>
-          <StatItem>
-            <StatNumber>100%</StatNumber>
-            <StatLabel>Bezpłatnie</StatLabel>
-          </StatItem>
-        </StatsGrid>
-      </HeroContent>
-      <WaveDecoration>
-        <svg
-          viewBox="0 0 1440 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-auto w-full"
-        >
-          <title>Wave Decoration</title>
-          <path
-            d="M0,64 C360,16 720,16 1080,64 C1440,112 1440,112 1440,112 L1440,0 L0,0 Z"
-            fill="rgba(255,255,255,0.1)"
-          />
-          <path
-            d="M0,96 C360,48 720,48 1080,96 C1440,144 1440,120 1440,120 L1440,120 L0,120 Z"
-            fill="white"
-          />
-        </svg>
-      </WaveDecoration>
-    </HeroSection>
-  );
-};
+    <HeroWrapper>
+      <HeroSection>
+        {/* Dekoracyjne elementy tła */}
+        <BackgroundOrb1 />
+        <BackgroundOrb2 />
+        <BackgroundOrb3 />
+        <GridPattern />
+
+        <HeroContent>
+          {/* Główna ikona z animacją */}
+          <IconWrapper>
+            <IconPulse />
+            <IconContainer>
+              <Icon>🏠</Icon>
+            </IconContainer>
+          </IconWrapper>
+
+          {/* Badge z informacją */}
+          <TrustBadge>
+            <BadgeIcon>✨</BadgeIcon>
+            <BadgeText>Zaufało nam ponad 50 000 Polaków</BadgeText>
+          </TrustBadge>
+
+          {/* Główny tytuł */}
+          <TitleWrapper>
+            <Title>
+              Znajdź <TitleAccent>najlepszy</TitleAccent>
+              <br />
+              kredyt hipoteczny
+            </Title>
+            <TitleUnderline />
+          </TitleWrapper>
+
+          {/* Podtytuł */}
+          <Subtitle>
+            Porównaj oferty z <SubtitleBold>15+ wiodących banków</SubtitleBold> w Polsce
+            <br />i oszczędź nawet do <SubtitleHighlight>50 000 zł</SubtitleHighlight>
+          </Subtitle>
+
+          {/* Lista korzyści */}
+          <BenefitsList>
+            <BenefitItem>
+              <BenefitIcon>✓</BenefitIcon>
+              <BenefitText>Darmowa analiza</BenefitText>
+            </BenefitItem>
+            <BenefitItem>
+              <BenefitIcon>✓</BenefitIcon>
+              <BenefitText>Bez zobowiązań</BenefitText>
+            </BenefitItem>
+            <BenefitItem>
+              <BenefitIcon>✓</BenefitIcon>
+              <BenefitText>Wynik w 2 minuty</BenefitText>
+            </BenefitItem>
+          </BenefitsList>
+
+          {/* CTA Button */}
+          <CTAButton
+            onClick={() => {
+              document.getElementById('calculator')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              })
+            }}
+          >
+            <ButtonContent>
+              <ButtonText>Oblicz swoją ratę</ButtonText>
+              <ButtonIcon>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </ButtonIcon>
+            </ButtonContent>
+            <ButtonShine />
+          </CTAButton>
+
+          {/* Statystyki */}
+          <HeroStats />
+        </HeroContent>
+
+        {/* Falista dekoracja na dole */}
+        <WaveDecoration>
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+          >
+            <title>Wave Decoration</title>
+            <path
+              d="M0,64 C360,16 720,16 1080,64 C1440,112 1440,112 1440,112 L1440,0 L0,0 Z"
+              fill="rgba(255,255,255,0.08)"
+            />
+            <path
+              d="M0,80 C360,40 720,40 1080,80 C1440,120 1440,120 1440,120 L1440,120 L0,120 Z"
+              fill="rgba(255,255,255,0.05)"
+            />
+            <path
+              d="M0,96 C360,56 720,56 1080,96 C1440,136 1440,120 1440,120 L1440,120 L0,120 Z"
+              fill="white"
+            />
+          </svg>
+        </WaveDecoration>
+      </HeroSection>
+    </HeroWrapper>
+  )
+}
+
+const HeroWrapper = tw.div`
+  relative
+  w-full
+  overflow-hidden
+`
 
 const HeroSection = tw.section`
-  relative w-full 
-  bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800
-  text-white py-20 md:py-28 px-4
+  relative 
+  w-full 
+  bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800
+  text-white 
+  pt-16 pb-24 md:pt-20 md:pb-32 lg:pt-24 lg:pb-36
+  px-4 sm:px-6 lg:px-8
   overflow-hidden
-  before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]
-  after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.05),transparent_50%)]
-`;
+`
 
-const HeroContent = tw.div`relative z-10 max-w-4xl mx-auto`;
-
-const IconWrapper = tw.div`relative flex justify-center mb-6`;
-const Icon = tw.span`text-7xl md:text-8xl animate-bounce`;
-const IconGlow = tw.div`
-  absolute inset-0 blur-3xl bg-white opacity-20 rounded-full
+const BackgroundOrb1 = tw.div`
+  absolute -top-40 -right-40
+  w-80 h-80 md:w-[600px] md:h-[600px]
+  bg-linear-to-br from-blue-400/30 to-indigo-600/20
+  rounded-full
+  blur-3xl
   animate-pulse
-`;
+  animation-duration-[4s]
+  pointer-events-none
+`
+
+const BackgroundOrb2 = tw.div`
+  absolute -bottom-40 -left-40
+  w-96 h-96 md:w-[700px] md:h-[700px]
+  bg-linear-to-tr from-purple-500/20 to-pink-500/10
+  rounded-full
+  blur-3xl
+  animate-pulse
+  animation-duration-[5s]
+  pointer-events-none
+`
+
+const BackgroundOrb3 = tw.div`
+  absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+  w-[600px] h-[600px] md:w-[900px] md:h-[900px]
+  bg-gradient-radial from-white/5 to-transparent
+  rounded-full
+  pointer-events-none
+`
+
+const GridPattern = tw.div`
+  absolute inset-0
+  bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)]
+  bg-size-[50px_50px]
+  mask-[radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]
+  pointer-events-none
+`
+
+const HeroContent = tw.div`
+  relative z-10 
+  max-w-4xl mx-auto
+  flex flex-col 
+  items-center
+  gap-3 md:gap-4 lg:gap-5
+  animate-in fade-in slide-in-from-bottom-8
+  duration-1000
+`
+
+const IconWrapper = tw.div`
+  relative 
+  flex justify-center items-center
+  mb-0
+`
+
+const IconPulse = tw.div`
+  absolute inset-0
+  w-24 h-24 md:w-28 md:h-28
+  bg-linear-to-br from-yellow-300/30 to-orange-400/20
+  rounded-full
+  blur-2xl
+  animate-ping
+  animation-duration-[2s]
+`
+
+const IconContainer = tw.div`
+  relative
+  w-20 h-20 md:w-24 md:h-24
+  flex items-center justify-center
+  bg-white/10
+  backdrop-blur-sm
+  rounded-3xl
+  shadow-2xl
+  border border-white/20
+  transform hover:scale-110 hover:rotate-6
+  transition-all duration-500
+`
+
+const Icon = tw.span`
+  text-5xl md:text-6xl
+  filter drop-shadow-2xl
+`
+
+const TrustBadge = tw.div`
+  inline-flex items-center gap-2
+  bg-white/10 backdrop-blur-md
+  border border-white/20
+  rounded-full
+  px-4 md:px-5 py-1.5 md:py-2
+  shadow-lg
+  animate-in fade-in slide-in-from-top-4
+  duration-700
+  delay-200
+`
+
+const BadgeIcon = tw.span`
+  text-base md:text-lg
+`
+
+const BadgeText = tw.span`
+  text-xs md:text-sm
+  font-semibold
+  text-white/90
+`
+
+const TitleWrapper = tw.div`
+  relative
+  flex flex-col items-center
+  gap-2 md:gap-3
+  animate-in fade-in slide-in-from-bottom-6
+  duration-700
+  delay-300
+`
 
 const Title = tw.h1`
-  text-4xl md:text-6xl lg:text-7xl font-extrabold text-center mb-4
+  text-3xl sm:text-4xl md:text-5xl lg:text-6xl 
+  font-extrabold 
+  text-center
   leading-tight
-  drop-shadow-lg
-`;
+  tracking-tight
+  drop-shadow-2xl
+`
+
 const TitleAccent = tw.span`
-  bg-linear-to-r from-yellow-300 to-orange-400 
+  bg-linear-to-r from-yellow-300 via-orange-300 to-yellow-400
   bg-clip-text text-transparent
-`;
+  animate-pulse
+  animation-duration-[3s]
+`
+
+const TitleUnderline = tw.div`
+  w-20 md:w-24 
+  h-1 md:h-1.5
+  bg-linear-to-r from-transparent via-yellow-300 to-transparent
+  rounded-full
+  shadow-lg shadow-yellow-300/50
+`
 
 const Subtitle = tw.p`
-  text-lg md:text-xl text-center text-blue-50 max-w-3xl mx-auto mb-8
+  text-sm sm:text-base md:text-lg lg:text-xl
+  text-center 
+  text-blue-50/90
+  max-w-2xl
   leading-relaxed
-`;
+  animate-in fade-in slide-in-from-bottom-4
+  duration-700
+  delay-500
+`
+
+const SubtitleBold = tw.span`
+  font-bold
+  text-white
+`
 
 const SubtitleHighlight = tw.span`
-  inline-block mt-3 text-yellow-300 font-semibold text-base
-`;
+  font-extrabold
+  text-yellow-300
+  drop-shadow-lg
+`
 
-const StatsGrid = tw.div`
-  grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto mt-10
-`;
+const BenefitsList = tw.div`
+  flex flex-wrap
+  items-center justify-center
+  gap-3 md:gap-4 lg:gap-5
+  mt-1
+  animate-in fade-in slide-in-from-bottom-4
+  duration-700
+  delay-700
+`
 
-const StatItem = tw.div`
-  text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl
-  border border-white/20
-  hover:bg-white/20 transition-all duration-300
-  hover:scale-105 hover:shadow-xl
-`;
+const BenefitItem = tw.div`
+  flex items-center gap-2
+  bg-white/5 backdrop-blur-sm
+  border border-white/10
+  rounded-full
+  px-3 md:px-4 py-1.5 md:py-2
+  shadow-lg
+  hover:bg-white/10 hover:scale-105
+  transition-all duration-300
+`
 
-const StatNumber = tw.div`
-  text-2xl md:text-4xl font-bold text-white mb-1
-`;
+const BenefitIcon = tw.span`
+  text-green-300
+  font-bold
+  text-base md:text-lg
+`
 
-const StatLabel = tw.div`
-  text-xs md:text-sm text-blue-100
-`;
+const BenefitText = tw.span`
+  text-xs md:text-sm
+  font-medium
+  text-white/90
+`
+
+const CTAButton = tw.button`
+  relative
+  mt-2 md:mt-3 lg:mt-4
+  bg-linear-to-r from-yellow-400 via-orange-400 to-yellow-500
+  hover:from-yellow-300 hover:via-orange-300 hover:to-yellow-400
+  text-gray-900
+  font-bold
+  text-sm md:text-base
+  px-6 md:px-8 py-3 md:py-4
+  rounded-full
+  shadow-2xl shadow-yellow-500/30
+  hover:shadow-3xl hover:shadow-yellow-400/40
+  transform hover:scale-105 active:scale-95
+  transition-all duration-300
+  overflow-hidden
+  group
+  focus:outline-none focus:ring-4 focus:ring-yellow-300/50
+  animate-in fade-in zoom-in-95
+`
+
+const ButtonContent = tw.div`
+  relative z-10
+  flex items-center justify-center gap-2 md:gap-3
+`
+
+const ButtonText = tw.span`
+  font-bold
+`
+
+const ButtonIcon = tw.span`
+  flex items-center justify-center
+  transition-transform duration-300
+  group-hover:translate-x-1
+`
+
+const ButtonShine = tw.span`
+  absolute inset-0
+  bg-linear-to-r from-transparent via-white/40 to-transparent
+  transform -translate-x-full
+  group-hover:translate-x-full
+  transition-transform duration-700
+  pointer-events-none
+`
 
 const WaveDecoration = tw.div`
-  absolute bottom-0 left-0 right-0 z-0
-`;
+  absolute 
+  bottom-0 left-0 right-0 
+  w-full
+  h-[80px] md:h-[100px]
+  z-0
+  pointer-events-none
+`

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { BankOffer } from './bank'
 
 // Cel kredytu
 export const loanPurposeSchema = z.enum(['purchase', 'refinancing', 'construction'])
@@ -34,4 +35,5 @@ export interface CalculationResult {
   insurance: number
   score: number // Wynik oceny oferty (0-100)
   isRecommended: boolean // Czy to top 3 oferta
+  bank?: BankOffer // Pełne informacje o banku z dodatkowymi parametrami
 }

@@ -5,6 +5,111 @@ This is an intelligent credit calculator application that helps users find the b
 
 **Production Domain**: www.kredytanaliza.pl
 
+## Modern Development Standards
+
+### Latest Programming Trends (2025)
+Follow current best practices and modern development patterns:
+
+- **Performance First**: Optimize for Core Web Vitals (LCP, FID, CLS)
+- **Accessibility (a11y)**: WCAG 2.2 AA compliance as minimum standard
+- **Type Safety**: Leverage TypeScript's advanced features (const assertions, template literals, branded types)
+- **Edge Computing**: Utilize Next.js Edge Runtime where appropriate
+- **Progressive Enhancement**: Ensure core functionality works without JavaScript
+- **Error Boundaries**: Implement proper error handling with React Error Boundaries
+- **Suspense & Streaming**: Use React 19 Suspense for data fetching and streaming SSR
+- **Server Actions**: Leverage Next.js Server Actions for form submissions (Stage 2)
+- **Optimistic Updates**: Provide instant feedback for better UX
+- **Code Splitting**: Automatic and manual code splitting for optimal bundle sizes
+- **Modern JavaScript**: Use latest ECMAScript features (optional chaining, nullish coalescing, private class fields)
+- **Immutability**: Prefer immutable data structures and pure functions
+- **Composition over Inheritance**: Use React hooks and composition patterns
+- **DRY with Caution**: Balance reusability with code clarity - avoid over-abstraction
+
+### Modern UI/UX Design Principles (2025)
+
+#### Visual Design
+- **Minimalist Aesthetics**: Clean, uncluttered interfaces with purposeful whitespace
+- **Micro-interactions**: Subtle animations and transitions for user feedback (use Framer Motion or CSS animations)
+- **Glassmorphism & Neomorphism**: Modern visual styles with backdrop-blur and soft shadows
+- **Dark Mode Support**: Provide system-preference-aware dark mode option
+- **Custom Scrollbars**: Styled scrollbars that match the design system
+- **Skeleton Loading**: Use skeleton screens instead of traditional spinners
+- **Progressive Disclosure**: Show advanced options only when needed
+- **Visual Hierarchy**: Use size, color, and spacing to guide user attention
+- **Consistent Spacing**: Use a systematic spacing scale (4px, 8px, 16px, 24px, 32px, 48px, 64px)
+- **Typography Scale**: Implement a harmonious type scale with clear hierarchy
+
+#### Interaction Patterns
+- **Gesture Support**: Swipe gestures on mobile (for carousels, dismissing modals)
+- **Haptic Feedback**: Provide tactile feedback on mobile devices
+- **Keyboard Shortcuts**: Support common keyboard shortcuts for power users
+- **Focus Management**: Clear focus indicators and logical focus flow
+- **Loading States**: Always show loading indicators for async operations
+- **Empty States**: Thoughtful empty state designs with clear calls-to-action
+- **Error Prevention**: Validate inputs in real-time with helpful suggestions
+- **Undo/Redo**: Allow users to reverse actions where appropriate
+- **Confirmation Dialogs**: Use sparingly, only for destructive actions
+- **Toast Notifications**: Non-intrusive notifications that auto-dismiss
+
+#### Mobile-First Approach
+- **Touch Targets**: Minimum 44x44px touch targets (48x48px preferred)
+- **Thumb Zones**: Place primary actions in easily reachable areas
+- **Responsive Typography**: Fluid typography that scales with viewport
+- **Mobile Navigation**: Bottom navigation or hamburger menu for mobile
+- **Swipe Actions**: Implement swipe-to-action for list items on mobile
+- **Pull-to-Refresh**: Where appropriate for data updates
+- **Responsive Images**: Use next/image with proper sizing and lazy loading
+- **Reduced Motion**: Respect prefers-reduced-motion user preference
+
+#### Performance & Accessibility
+- **Semantic HTML**: Use proper HTML5 semantic elements
+- **ARIA Labels**: Provide descriptive labels for screen readers
+- **Color Contrast**: Ensure WCAG AA contrast ratios (4.5:1 for text)
+- **Focus Visible**: Clear focus indicators for keyboard navigation
+- **Loading Performance**: Target <2s LCP, <100ms FID, <0.1 CLS
+- **Image Optimization**: WebP/AVIF formats with fallbacks
+- **Font Loading**: Use font-display: swap and preload critical fonts
+- **Reduced Bundle Size**: Lazy load non-critical components
+
+#### Form Design Best Practices
+- **Inline Validation**: Validate as users type, not just on submit
+- **Clear Error Messages**: Specific, actionable error messages in Polish
+- **Smart Defaults**: Pre-fill with sensible defaults when possible
+- **Autocomplete**: Use proper autocomplete attributes
+- **Input Masking**: Format inputs (currency, dates) as users type
+- **Progress Indicators**: Show progress in multi-step forms
+- **Field Grouping**: Group related fields with clear labels
+- **Required Field Indicators**: Clear visual indicators for required fields
+- **Help Text**: Provide contextual help without cluttering the UI
+
+#### Animation & Motion
+- **Purposeful Animation**: Animations should serve a functional purpose
+- **Duration**: Keep animations short (150-300ms for transitions)
+- **Easing**: Use natural easing functions (ease-in-out, cubic-bezier)
+- **Page Transitions**: Smooth transitions between routes
+- **Scroll Animations**: Subtle parallax and reveal effects
+- **Loading Animations**: Engaging loading states that reduce perceived wait time
+- **Micro-interactions**: Button press states, hover effects, focus rings
+- **Respect Motion Preferences**: Disable animations for users with motion sensitivity
+
+#### Component Design Patterns
+- **Atomic Design**: Build from atoms → molecules → organisms → templates → pages
+- **Compound Components**: Use compound pattern for flexible component APIs
+- **Render Props & Hooks**: Prefer hooks over render props for logic reuse
+- **Controlled Components**: Use controlled inputs for forms
+- **Polymorphic Components**: Components that can render as different HTML elements
+- **Composable Components**: Small, focused components that work well together
+- **Accessible by Default**: Build accessibility into components from the start
+
+### Development Workflow
+- **Version Control**: Meaningful commit messages following Conventional Commits
+- **Code Reviews**: Review code for logic, performance, and accessibility
+- **Testing**: Write tests for critical business logic (consider Vitest + Testing Library)
+- **Documentation**: Document complex logic and component APIs
+- **Performance Monitoring**: Use Lighthouse CI and Core Web Vitals monitoring
+- **Error Tracking**: Implement error tracking (consider Sentry in production)
+- **Analytics**: Track user interactions for data-driven improvements
+
 ### Development Stages
 
 #### Stage 1 (Current - MVP)
@@ -151,6 +256,7 @@ By incorporating these principles, the credit calculator will not only provide u
 - Use Tailwind CSS utility classes
 - Follow mobile-first responsive design
 - Use semantic HTML elements
+- **Prefer `gap` over margins**: Use Flexbox/Grid `gap` utilities for spacing between elements instead of margins (e.g., `flex gap-4` instead of applying margins to children). This creates cleaner, more maintainable layouts with consistent spacing.
 - Use `tw-tailwind` library for creating styled components with Tailwind classes
 - Follow the component pattern shown in the example below
 - For internal component styles, always create styled components using `tw` at the bottom of the file

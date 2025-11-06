@@ -144,6 +144,7 @@ export function calculateBankOffers(
       insurance,
       score: 0, // Będzie obliczone później
       isRecommended: false, // Będzie oznaczone później
+      bank, // Dodajemy pełny obiekt banku z wszystkimi informacjami
     }
   })
 
