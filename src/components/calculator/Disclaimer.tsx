@@ -50,15 +50,15 @@ const DisclaimerWrapper = tw.section`w-full`
 
 const DisclaimerContainer = tw.div`
   mx-auto w-full max-w-6xl
-  flex flex-col gap-6 sm:gap-8
+  flex flex-col gap-3 sm:gap-4
 `
 
 const RememberBox = tw.div`
-  flex flex-col items-start gap-4 sm:gap-5 md:flex-row md:gap-6
+  flex flex-col items-start gap-2 sm:gap-3 md:flex-row md:gap-4
   rounded-2xl sm:rounded-3xl
   border border-blue-200
   bg-linear-to-br from-blue-50 to-indigo-50 
-  p-6 sm:p-7 md:p-8
+  p-3 sm:p-4 md:p-5
   shadow-sm 
   backdrop-blur-sm
   transition-all duration-300
@@ -70,7 +70,7 @@ const RememberIcon = tw.span`shrink-0 animate-pulse text-4xl sm:text-5xl`
 const RememberContent = tw.div`w-full flex-1`
 
 const RememberTitle = tw.h3`
-  mb-3 sm:mb-4
+  mb-2 sm:mb-3
   text-xl font-bold sm:text-2xl
   bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent
 `
@@ -78,11 +78,11 @@ const RememberTitle = tw.h3`
 const RememberText = tw.p`text-sm leading-relaxed text-gray-700 sm:text-base`
 
 const DisclaimerBox = tw.div`
-  flex flex-col items-start gap-4 sm:gap-5 md:flex-row md:gap-6
+  flex flex-col items-start gap-2 sm:gap-3 md:flex-row md:gap-4
   rounded-2xl sm:rounded-3xl
   border border-amber-300
   bg-linear-to-br from-amber-50 to-yellow-50
-  p-6 sm:p-7 md:p-8
+  p-3 sm:p-4 md:p-5
   shadow-sm 
   backdrop-blur-sm
   transition-all duration-300
@@ -99,10 +99,10 @@ const WarningIcon = tw.div`
 
 const DisclaimerContent = tw.div`w-full flex-1`
 
-const DisclaimerTitle = tw.h3`mb-3 text-xl font-bold text-gray-900 sm:mb-4 sm:text-2xl`
+const DisclaimerTitle = tw.h3`mb-2 text-xl font-bold text-gray-900 sm:mb-3 sm:text-2xl`
 
 const DisclaimerText = tw.p`
-  mb-3 text-sm leading-relaxed text-gray-700 last:mb-0 sm:text-base
+  mb-2 text-sm leading-relaxed text-gray-700 last:mb-0 sm:text-base
 `
 
 const Strong = tw.strong`font-semibold text-gray-900`

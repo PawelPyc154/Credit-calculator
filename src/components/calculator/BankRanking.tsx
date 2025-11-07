@@ -17,7 +17,6 @@ export type BankRankingProps = {
     loanPeriod: number
     downPayment: number
   }
-  onParamsChange: (params: { loanAmount: number; loanPeriod: number; downPayment: number }) => void
   formRef: RefObject<HTMLFormElement | null>
 }
 
@@ -237,7 +236,7 @@ const RankingWrapper = tw.div`animate-in fade-in slide-in-from-bottom-8 duration
 const RankingSection = tw.section`
   mx-auto w-full max-w-7xl
   px-4 sm:px-6 lg:px-8
-  py-12 sm:py-16 md:py-20 lg:py-24
+  pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12 lg:pt-16 lg:pb-16
 `
 
 const ResultsList = tw.div`flex flex-col gap-6 sm:gap-8 md:gap-10`

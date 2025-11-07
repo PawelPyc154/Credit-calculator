@@ -1,10 +1,16 @@
 import tw from 'tw-tailwind'
+import type { ReactNode } from 'react'
 import { HeroStats } from './atoms/HeroStats'
 
-export const Hero = () => {
+export type HeroProps = {
+  actionSlot?: ReactNode
+}
+
+export const Hero = ({ actionSlot }: HeroProps) => {
   return (
     <HeroWrapper>
       <HeroSection>
+        {actionSlot && <ActionSlot>{actionSlot}</ActionSlot>}
         {/* Dekoracyjne elementy tła */}
         <BackgroundOrb1 />
         <BackgroundOrb2 />
@@ -126,9 +132,18 @@ const HeroSection = tw.section`
   relative w-full 
   bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800
   text-white 
-  pt-16 pb-24 sm:pt-20 sm:pb-28 md:pt-24 md:pb-32 lg:pt-28 lg:pb-40
+  pt-12 pb-16 sm:pt-16 sm:pb-20 md:pt-20 md:pb-24 lg:pt-24 lg:pb-28
   px-4 sm:px-6 lg:px-8
   overflow-hidden
+`
+
+const ActionSlot = tw.div`
+  absolute top-4 right-4
+  sm:top-6 sm:right-6
+  flex
+  items-center
+  justify-end
+  z-20
 `
 
 const BackgroundOrb1 = tw.div`

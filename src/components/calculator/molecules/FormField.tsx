@@ -15,6 +15,11 @@ export type FormFieldProps = {
   tooltipContent: React.ReactNode
   minLabel: string
   maxLabel: string
+  useSlider?: boolean
+  onDecrease?: () => void
+  onIncrease?: () => void
+  isDecreaseDisabled?: boolean
+  isIncreaseDisabled?: boolean
 }
 
 export const FormField = ({
@@ -29,6 +34,11 @@ export const FormField = ({
   tooltipContent,
   minLabel,
   maxLabel,
+  useSlider = true,
+  onDecrease,
+  onIncrease,
+  isDecreaseDisabled = false,
+  isIncreaseDisabled = false,
 }: FormFieldProps) => {
   return (
     <FormGroup>
@@ -57,19 +67,83 @@ export const FormField = ({
         </LabelWithTooltip>
         <ValueDisplay>{value}</ValueDisplay>
       </LabelRow>
-      <SliderInput
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        {...register}
-        className={clsx(error && 'border-red-500')}
-      />
-      <SliderLabels>
-        <SliderLabel>{minLabel}</SliderLabel>
-        <SliderLabel>{maxLabel}</SliderLabel>
-      </SliderLabels>
+      {useSlider ? (
+        <>
+          <SliderContainer>
+            {onDecrease && (
+              <SliderButton
+                type="button"
+                onClick={onDecrease}
+                disabled={isDecreaseDisabled}
+                aria-label="Zmniejsz wartość"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                </svg>
+              </SliderButton>
+            )}
+            <SliderInput
+              id={id}
+              type="range"
+              min={min}
+              max={max}
+              step={step}
+              {...register}
+              className={clsx(error && 'border-red-500')}
+            />
+            {onIncrease && (
+              <SliderButton
+                type="button"
+                onClick={onIncrease}
+                disabled={isIncreaseDisabled}
+                aria-label="Zwiększ wartość"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </SliderButton>
+            )}
+          </SliderContainer>
+          <SliderLabels>
+            <SliderLabel>{minLabel}</SliderLabel>
+            <SliderLabel>{maxLabel}</SliderLabel>
+          </SliderLabels>
+        </>
+      ) : (
+        <>
+          <TextInput
+            id={id}
+            type="number"
+            min={min}
+            max={max}
+            step={step}
+            {...register}
+            className={clsx(error && 'border-red-500')}
+          />
+          <InputLabels>
+            <InputLabel>Min: {minLabel}</InputLabel>
+            <InputLabel>Max: {maxLabel}</InputLabel>
+          </InputLabels>
+        </>
+      )}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </FormGroup>
   )
@@ -80,8 +154,9 @@ const LabelRow = tw.div`flex justify-between items-center`
 const Label = tw.label`text-sm font-semibold text-gray-700 uppercase tracking-wide`
 const ValueDisplay = tw.span`text-lg font-bold text-blue-600`
 
+const SliderContainer = tw.div`flex items-center gap-2`
 const SliderInput = tw.input`
-  w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+  flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
   [&::-webkit-slider-thumb]:appearance-none
   [&::-webkit-slider-thumb]:w-5
   [&::-webkit-slider-thumb]:h-5
@@ -104,8 +179,44 @@ const SliderInput = tw.input`
   [&::-moz-range-thumb]:hover:scale-110
 `
 
+const SliderButton = tw.button`
+  flex items-center justify-center
+  w-8 h-8
+  rounded-lg
+  bg-blue-50
+  hover:bg-blue-100
+  text-blue-600
+  transition-all duration-200
+  hover:scale-110
+  active:scale-95
+  disabled:opacity-30
+  disabled:cursor-not-allowed
+  disabled:hover:scale-100
+  shrink-0
+`
+
 const SliderLabels = tw.div`flex justify-between text-xs text-gray-500`
 const SliderLabel = tw.span``
+const InputLabels = tw.div`flex justify-between text-xs text-gray-500`
+const InputLabel = tw.span`font-medium`
+const TextInput = tw.input`
+  w-full
+  h-11
+  px-4
+  rounded-lg
+  border border-gray-300
+  bg-white
+  text-gray-900
+  text-base
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:border-blue-500
+  transition-all
+  [&::-webkit-inner-spin-button]:appearance-none
+  [&::-webkit-outer-spin-button]:appearance-none
+  [-moz-appearance:textfield]
+`
 const ErrorMessage = tw.p`text-sm text-red-600`
 
 const LabelWithTooltip = tw.div`flex items-center gap-2`

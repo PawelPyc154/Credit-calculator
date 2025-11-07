@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from 'hooks/useDebounce'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import tw from 'tw-tailwind'
 import { type CalculatorFormData, calculatorFormSchema } from 'types/calculator'
@@ -14,14 +14,18 @@ import { PurposeSelector } from './molecules/PurposeSelector'
 export type CalculatorFormProps = {
   onCalculate: (data: CalculatorFormData) => void
   hasResults: boolean
-  ref?: React.RefObject<HTMLFormElement | null>
+  formRef?: React.RefObject<HTMLFormElement | null>
 }
 
-export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormProps) => {
+export const CalculatorForm = ({ onCalculate, hasResults, formRef }: CalculatorFormProps) => {
+  const [useSlider, setUseSlider] = useState(true)
+
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
+    trigger,
     formState: { errors, isValid },
   } = useForm<CalculatorFormData>({
     resolver: zodResolver(calculatorFormSchema),
@@ -39,6 +43,10 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
   const debouncedFormData = useDebounce(formData, 300)
 
   useEffect(() => {
+    void trigger()
+  }, [trigger])
+
+  useEffect(() => {
     if (isValid) {
       onCalculate(debouncedFormData)
     }
@@ -48,6 +56,22 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
   const loanPeriod = watch('loanPeriod')
   const downPayment = watch('downPayment')
   const monthlyIncome = watch('monthlyIncome')
+
+  const handleDecrease = (field: keyof CalculatorFormData, step: number, min: number) => {
+    const currentValue = watch(field) as number
+    if (currentValue > min) {
+      const newValue = Math.max(min, currentValue - step)
+      setValue(field, newValue, { shouldDirty: true, shouldValidate: true })
+    }
+  }
+
+  const handleIncrease = (field: keyof CalculatorFormData, step: number, max: number) => {
+    const currentValue = watch(field) as number
+    if (currentValue < max) {
+      const newValue = Math.min(max, currentValue + step)
+      setValue(field, newValue, { shouldDirty: true, shouldValidate: true })
+    }
+  }
 
   const scrollToResults = () => {
     document.getElementById('results')?.scrollIntoView({
@@ -61,7 +85,46 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
       <FormCard>
         <CalculatorFormHeader />
 
-        <Form ref={ref} onSubmit={handleSubmit(scrollToResults)}>
+        <Form ref={formRef} onSubmit={handleSubmit(scrollToResults)}>
+          <SliderToggleButton
+            type="button"
+            onClick={() => setUseSlider(!useSlider)}
+            aria-label={useSlider ? 'Przełącz na inputy' : 'Przełącz na slidery'}
+            title={useSlider ? 'Przełącz na inputy' : 'Przełącz na slidery'}
+          >
+            {useSlider ? (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <title>Przełącz na inputy</title>
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <path d="M9 9h6M9 15h6M9 12h6" />
+              </svg>
+            ) : (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <title>Przełącz na slidery</title>
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <circle cx="12" cy="12" r="4" fill="currentColor" />
+              </svg>
+            )}
+          </SliderToggleButton>
+
           <FormGrid>
             {/* Kwota kredytu */}
             <FormField
@@ -73,6 +136,11 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               step="10000"
               register={register('loanAmount', { valueAsNumber: true })}
               error={errors.loanAmount?.message}
+              useSlider={useSlider}
+              onDecrease={() => handleDecrease('loanAmount', 10000, 50000)}
+              onIncrease={() => handleIncrease('loanAmount', 10000, 2000000)}
+              isDecreaseDisabled={loanAmount <= 50000}
+              isIncreaseDisabled={loanAmount >= 2000000}
               tooltipContent={
                 <TooltipContent>
                   <TooltipHeader>
@@ -120,6 +188,11 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               step="1"
               register={register('loanPeriod', { valueAsNumber: true })}
               error={errors.loanPeriod?.message}
+              useSlider={useSlider}
+              onDecrease={() => handleDecrease('loanPeriod', 1, 5)}
+              onIncrease={() => handleIncrease('loanPeriod', 1, 35)}
+              isDecreaseDisabled={loanPeriod <= 5}
+              isIncreaseDisabled={loanPeriod >= 35}
               tooltipContent={
                 <TooltipContent>
                   <TooltipHeader>
@@ -177,6 +250,11 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               step="10000"
               register={register('downPayment', { valueAsNumber: true })}
               error={errors.downPayment?.message}
+              useSlider={useSlider}
+              onDecrease={() => handleDecrease('downPayment', 10000, 0)}
+              onIncrease={() => handleIncrease('downPayment', 10000, 1000000)}
+              isDecreaseDisabled={downPayment <= 0}
+              isIncreaseDisabled={downPayment >= 1000000}
               tooltipContent={
                 <TooltipContent>
                   <TooltipHeader>
@@ -243,6 +321,11 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               step="500"
               register={register('monthlyIncome', { valueAsNumber: true })}
               error={errors.monthlyIncome?.message}
+              useSlider={useSlider}
+              onDecrease={() => handleDecrease('monthlyIncome', 500, 3000)}
+              onIncrease={() => handleIncrease('monthlyIncome', 500, 30000)}
+              isDecreaseDisabled={monthlyIncome <= 3000}
+              isIncreaseDisabled={monthlyIncome >= 30000}
               tooltipContent={
                 <TooltipContent>
                   <TooltipHeader>
@@ -353,8 +436,8 @@ const FormWrapper = tw.div`
   relative
   w-full
   px-4 sm:px-6 lg:px-8
-  -mt-16 sm:-mt-20 md:-mt-24 lg:-mt-32
-  pb-12 sm:pb-16 md:pb-20 lg:pb-24
+  -mt-8 sm:-mt-10 md:-mt-12 lg:-mt-16
+  pb-8 sm:pb-10 md:pb-12 lg:pb-16
   overflow-hidden
 `
 
@@ -372,7 +455,31 @@ const FormCard = tw.div`
   z-10
 `
 
-const Form = tw.form`flex flex-col gap-8 sm:gap-10 md:gap-12`
+const Form = tw.form`relative flex flex-col gap-8 sm:gap-10 md:gap-12`
+
+const SliderToggleButton = tw.button`
+  absolute
+  top-0
+  right-0
+  z-20
+  w-10 h-10
+  sm:w-12 sm:h-12
+  flex items-center justify-center
+  bg-white
+  border border-gray-300
+  rounded-full
+  shadow-md
+  hover:shadow-lg
+  hover:bg-gray-50
+  active:scale-95
+  transition-all duration-200
+  text-gray-700
+  hover:text-blue-600
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:ring-offset-2
+`
 
 const FormGrid = tw.div`grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2`
 
@@ -510,3 +617,4 @@ const BackgroundDecor2 = tw.div`
   blur-3xl
   pointer-events-none
 `
+
