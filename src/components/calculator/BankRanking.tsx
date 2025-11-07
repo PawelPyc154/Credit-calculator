@@ -131,9 +131,9 @@ export const BankRanking = ({ results, selectedParams, formRef }: BankRankingPro
                 {isTopThree && (
                   <TopBadge
                     className={clsx(
-                      index === 0 && 'bg-gradient-to-br from-amber-400 to-yellow-500',
-                      index === 1 && 'bg-gradient-to-br from-gray-300 to-gray-400',
-                      index === 2 && 'bg-gradient-to-br from-orange-400 to-amber-500',
+                      index === 0 && 'bg-linear-to-br from-amber-400 to-yellow-500',
+                      index === 1 && 'bg-linear-to-br from-gray-300 to-gray-400',
+                      index === 2 && 'bg-linear-to-br from-orange-400 to-amber-500',
                     )}
                   >
                     <BadgeIcon>
@@ -194,99 +194,85 @@ export const BankRanking = ({ results, selectedParams, formRef }: BankRankingPro
   )
 }
 
-const RankingWrapper = tw.div`
-  animate-in fade-in slide-in-from-bottom-8
-  duration-700
-`
+const RankingWrapper = tw.div`animate-in fade-in slide-in-from-bottom-8 duration-700`
 
 const RankingSection = tw.section`
-  w-full max-w-7xl mx-auto 
+  mx-auto w-full max-w-7xl
   px-4 sm:px-6 lg:px-8
-  py-12 md:py-16 lg:py-20
+  py-12 sm:py-16 md:py-20 lg:py-24
 `
 
-const ResultsList = tw.div`
-  flex flex-col 
-  gap-6 md:gap-8
-`
+const ResultsList = tw.div`flex flex-col gap-6 sm:gap-8 md:gap-10`
 
 const BankCard = tw.div`
-  relative
   group
-  bg-white rounded-2xl md:rounded-3xl 
-  shadow-md hover:shadow-2xl 
-  transition-all duration-500 ease-out
-  border border-gray-100
+  relative
   overflow-hidden
+  rounded-2xl sm:rounded-3xl
+  border border-gray-100
+  bg-white 
+  shadow-md 
+  transition-all duration-500 ease-out
   hover:border-gray-200
+  hover:shadow-2xl
   animate-in fade-in slide-in-from-bottom-4
   fill-mode-both
 `
 
 const TopBadge = tw.div`
   absolute top-0 right-0
-  flex items-center gap-2
-  px-4 py-2 md:px-6 md:py-3
-  rounded-bl-2xl
-  shadow-lg
   z-10
+  flex items-center gap-2 sm:gap-2.5
+  rounded-bl-2xl
+  px-4 sm:px-5 py-2 sm:py-2.5 md:px-6 md:py-3
+  shadow-lg
   animate-in slide-in-from-right-4
   duration-500
 `
 
-const BadgeIcon = tw.span`
-  text-xl md:text-2xl
-`
+const BadgeIcon = tw.span`text-xl sm:text-2xl`
 
 const BadgeText = tw.span`
-  text-white font-bold text-sm md:text-base
+  text-sm sm:text-base 
+  font-bold text-white 
   drop-shadow-md
 `
 
 const CardInner = tw.div`
-  p-4 md:p-6 lg:p-8
-  flex flex-col md:flex-row 
-  gap-4 md:gap-6 lg:gap-8
-  items-start
+  flex flex-col items-start 
+  gap-4 sm:gap-5 md:flex-row md:gap-6 lg:gap-8
+  p-5 sm:p-6 md:p-7 lg:p-8
 `
 
 const DetailsButtonWrapper = tw.div`
-  px-4 py-4 md:px-6 md:py-5 lg:px-8 lg:py-6
+  flex justify-center 
   border-t border-gray-100
-  bg-gradient-to-r from-gray-50/50 to-transparent
-  flex justify-center md:justify-end
+  bg-linear-to-r from-gray-50/50 to-transparent
+  px-5 py-4 sm:px-6 sm:py-5 md:justify-end md:px-7 md:py-6 lg:px-8
 `
 
 const DetailsButton = tw.button`
-  flex items-center justify-center gap-2 md:gap-3
-  bg-gradient-to-r from-blue-600 to-indigo-600
-  hover:from-blue-700 hover:to-indigo-700
-  text-white
-  font-semibold
-  px-6 md:px-8 py-3 md:py-3.5
-  rounded-xl md:rounded-2xl
-  transition-all duration-300 ease-out
-  shadow-md hover:shadow-xl
-  hover:scale-105
-  active:scale-95
-  border-2 border-transparent
-  hover:border-blue-300/50
-  min-w-[180px] md:min-w-[220px]
-  focus:outline-none focus:ring-4 focus:ring-blue-300/50
   group/button
+  flex min-w-[180px] items-center justify-center gap-2 sm:min-w-[200px] sm:gap-3 md:min-w-[220px]
+  rounded-xl border-2 border-transparent sm:rounded-2xl
+  bg-linear-to-r from-blue-600 to-indigo-600
+  px-6 py-3 sm:px-8 sm:py-3.5
+  text-sm font-semibold text-white sm:text-base
+  shadow-md 
+  transition-all duration-300 ease-out
+  hover:scale-105 hover:border-blue-300/50
+  hover:from-blue-700 hover:to-indigo-700
+  hover:shadow-xl
+  active:scale-95
+  focus:outline-none focus:ring-4 focus:ring-blue-300/50
 `
 
-const ButtonText = tw.span`
-  text-sm md:text-base
-`
+const ButtonText = tw.span`text-sm sm:text-base`
 
 const ButtonIcon = tw.span`
-  transition-transform duration-300 ease-out
   flex items-center justify-center
+  transition-transform duration-300 ease-out
   group-hover/button:scale-110
 `
 
-const ExpandedDetails = tw.div`
-  animate-in fade-in slide-in-from-top-2
-  duration-500
-`
+const ExpandedDetails = tw.div`animate-in fade-in slide-in-from-top-2 duration-500`

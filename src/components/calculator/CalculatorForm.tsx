@@ -205,6 +205,7 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
+                      <title>Strzałki w dół</title>
                       <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
                     </svg>
                   </ButtonIcon>
@@ -231,41 +232,32 @@ const FormWrapper = tw.div`
   relative
   w-full
   px-4 sm:px-6 lg:px-8
-  -mt-20 md:-mt-24 lg:-mt-32
-  pb-8 md:pb-12 lg:pb-16
+  -mt-16 sm:-mt-20 md:-mt-24 lg:-mt-32
+  pb-12 sm:pb-16 md:pb-20 lg:pb-24
 `
 
 const FormCard = tw.div`
   relative
-  w-full max-w-5xl mx-auto 
+  mx-auto w-full max-w-5xl
   bg-white 
-  rounded-2xl md:rounded-3xl 
+  rounded-2xl sm:rounded-3xl
   shadow-2xl hover:shadow-3xl
   p-6 sm:p-8 md:p-10 lg:p-12
   border border-gray-100
   backdrop-blur-sm
-  transition-shadow duration-500
+  transition-shadow duration-700
   animate-in fade-in slide-in-from-bottom-8
-  duration-700
   z-10
 `
 
-const Form = tw.form`
-  flex flex-col 
-  gap-8 md:gap-10
-`
+const Form = tw.form`flex flex-col gap-8 sm:gap-10 md:gap-12`
 
-const FormGrid = tw.div`
-  grid grid-cols-1 md:grid-cols-2 
-  gap-6 md:gap-8
-`
+const FormGrid = tw.div`grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2`
 
-const FormGroupFullWidth = tw.div`
-  md:col-span-2
-`
+const FormGroupFullWidth = tw.div`md:col-span-2`
 
 const SubmitButtonWrapper = tw.div`
-  mt-4 md:mt-6
+  mt-6 sm:mt-8
   animate-in fade-in slide-in-from-bottom-4
   duration-500
   delay-300
@@ -274,13 +266,13 @@ const SubmitButtonWrapper = tw.div`
 const SubmitButton = tw.button`
   relative
   w-full 
-  bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700
+  bg-linear-to-r from-blue-600 via-indigo-600 to-blue-700
   hover:from-blue-700 hover:via-indigo-700 hover:to-blue-800
   text-white 
   font-bold 
-  py-5 md:py-6
-  px-8 md:px-10
-  rounded-xl md:rounded-2xl
+  py-5 sm:py-6
+  px-8 sm:px-10
+  rounded-xl sm:rounded-2xl
   transition-all duration-300 ease-out
   shadow-lg hover:shadow-2xl
   transform hover:scale-[1.02] active:scale-[0.98]
@@ -293,7 +285,7 @@ const SubmitButton = tw.button`
 const ButtonContent = tw.div`
   relative z-10
   flex items-center justify-center 
-  gap-3 md:gap-4
+  gap-3 sm:gap-4
 `
 
 const ButtonIcon = tw.span`
@@ -303,89 +295,61 @@ const ButtonIcon = tw.span`
   group-hover:scale-110
 `
 
-const ButtonTextWrapper = tw.div`
-  flex flex-col items-start
-  gap-0.5
-`
+const ButtonTextWrapper = tw.div`flex flex-col items-start gap-1`
 
-const ButtonMainText = tw.span`
-  text-base md:text-lg
-  font-bold
-`
+const ButtonMainText = tw.span`text-base sm:text-lg font-bold`
 
-const ButtonSubText = tw.span`
-  text-xs md:text-sm
-  opacity-90
-  font-normal
-`
+const ButtonSubText = tw.span`text-xs sm:text-sm font-normal opacity-90`
 
 const ButtonGlow = tw.span`
   absolute inset-0
-  bg-gradient-to-r from-blue-400/0 via-white/20 to-blue-400/0
+  bg-linear-to-r from-blue-400/0 via-white/20 to-blue-400/0
   transform -translate-x-full
   group-hover:translate-x-full
   transition-transform duration-1000
   pointer-events-none
 `
 
-const TooltipContent = tw.div`
-  flex flex-col 
-  gap-3
-  text-sm 
-  max-w-xs
-`
+const TooltipContent = tw.div`flex flex-col gap-3 max-w-xs text-sm`
 
 const TooltipTitle = tw.div`
-  font-bold 
-  text-base
-  text-gray-900
-  pb-1
   border-b border-gray-200
+  pb-2
+  text-base font-bold text-gray-900
 `
 
-const TooltipText = tw.div`
-  text-gray-700
-  leading-relaxed
-`
+const TooltipText = tw.div`leading-relaxed text-gray-700`
 
 const TooltipTip = tw.div`
   flex gap-2
-  bg-blue-50 
-  rounded-lg 
+  rounded-lg border border-blue-100 bg-blue-50 
   p-3
-  border border-blue-100
 `
 
-const TipIcon = tw.span`
-  text-lg
-  flex-shrink-0
-`
+const TipIcon = tw.span`shrink-0 text-lg`
 
-const TipText = tw.div`
-  text-gray-800
-  leading-relaxed
-`
+const TipText = tw.div`leading-relaxed text-gray-800`
 
 const BackgroundDecor1 = tw.div`
   absolute -top-32 -right-32
-  w-64 h-64 md:w-96 md:h-96
-  bg-gradient-to-br from-blue-100/30 to-indigo-100/30
-  rounded-full
-  blur-3xl
-  pointer-events-none
   -z-10
+  h-64 w-64 sm:h-80 sm:w-80 md:h-96 md:w-96
   animate-pulse
   animation-duration-[3s]
+  rounded-full
+  bg-linear-to-br from-blue-100/30 to-indigo-100/30
+  blur-3xl
+  pointer-events-none
 `
 
 const BackgroundDecor2 = tw.div`
   absolute -bottom-32 -left-32
-  w-64 h-64 md:w-96 md:h-96
-  bg-gradient-to-tr from-purple-100/30 to-pink-100/30
-  rounded-full
-  blur-3xl
-  pointer-events-none
   -z-10
+  h-64 w-64 sm:h-80 sm:w-80 md:h-96 md:w-96
   animate-pulse
   animation-duration-[4s]
+  rounded-full
+  bg-linear-to-tr from-purple-100/30 to-pink-100/30
+  blur-3xl
+  pointer-events-none
 `

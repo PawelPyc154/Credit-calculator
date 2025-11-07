@@ -80,6 +80,7 @@ export const Hero = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
+                  <title>Strzałka w prawo</title>
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </ButtonIcon>
@@ -99,7 +100,7 @@ export const Hero = () => {
             xmlns="http://www.w3.org/2000/svg"
             preserveAspectRatio="none"
           >
-            <title>Wave Decoration</title>
+            <title>Dekoracja falista</title>
             <path
               d="M0,64 C360,16 720,16 1080,64 C1440,112 1440,112 1440,112 L1440,0 L0,0 Z"
               fill="rgba(255,255,255,0.08)"
@@ -119,18 +120,13 @@ export const Hero = () => {
   )
 }
 
-const HeroWrapper = tw.div`
-  relative
-  w-full
-  overflow-hidden
-`
+const HeroWrapper = tw.div`relative w-full overflow-hidden`
 
 const HeroSection = tw.section`
-  relative 
-  w-full 
+  relative w-full 
   bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800
   text-white 
-  pt-16 pb-24 md:pt-20 md:pb-32 lg:pt-24 lg:pb-36
+  pt-16 pb-24 sm:pt-20 sm:pb-28 md:pt-24 md:pb-32 lg:pt-28 lg:pb-40
   px-4 sm:px-6 lg:px-8
   overflow-hidden
 `
@@ -175,23 +171,19 @@ const GridPattern = tw.div`
 
 const HeroContent = tw.div`
   relative z-10 
-  max-w-4xl mx-auto
+  mx-auto max-w-4xl
   flex flex-col 
   items-center
-  gap-3 md:gap-4 lg:gap-5
+  gap-4 sm:gap-5 md:gap-6 lg:gap-8
   animate-in fade-in slide-in-from-bottom-8
   duration-1000
 `
 
-const IconWrapper = tw.div`
-  relative 
-  flex justify-center items-center
-  mb-0
-`
+const IconWrapper = tw.div`relative flex items-center justify-center mb-2 sm:mb-3`
 
 const IconPulse = tw.div`
   absolute inset-0
-  w-24 h-24 md:w-28 md:h-28
+  w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32
   bg-linear-to-br from-yellow-300/30 to-orange-400/20
   rounded-full
   blur-2xl
@@ -201,7 +193,7 @@ const IconPulse = tw.div`
 
 const IconContainer = tw.div`
   relative
-  w-20 h-20 md:w-24 md:h-24
+  w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28
   flex items-center justify-center
   bg-white/10
   backdrop-blur-sm
@@ -212,44 +204,35 @@ const IconContainer = tw.div`
   transition-all duration-500
 `
 
-const Icon = tw.span`
-  text-5xl md:text-6xl
-  filter drop-shadow-2xl
-`
+const Icon = tw.span`text-5xl sm:text-6xl md:text-7xl filter drop-shadow-2xl`
 
 const TrustBadge = tw.div`
-  inline-flex items-center gap-2
+  inline-flex items-center gap-2 sm:gap-2.5
   bg-white/10 backdrop-blur-md
   border border-white/20
   rounded-full
-  px-4 md:px-5 py-1.5 md:py-2
+  px-4 sm:px-5 py-2 sm:py-2.5
   shadow-lg
   animate-in fade-in slide-in-from-top-4
   duration-700
   delay-200
 `
 
-const BadgeIcon = tw.span`
-  text-base md:text-lg
-`
-
-const BadgeText = tw.span`
-  text-xs md:text-sm
-  font-semibold
-  text-white/90
-`
+const BadgeIcon = tw.span`text-base sm:text-lg`
+const BadgeText = tw.span`text-xs sm:text-sm font-semibold text-white/90`
 
 const TitleWrapper = tw.div`
   relative
   flex flex-col items-center
-  gap-2 md:gap-3
+  gap-3 sm:gap-4
+  mb-1 sm:mb-2
   animate-in fade-in slide-in-from-bottom-6
   duration-700
   delay-300
 `
 
 const Title = tw.h1`
-  text-3xl sm:text-4xl md:text-5xl lg:text-6xl 
+  text-4xl sm:text-5xl md:text-6xl lg:text-7xl 
   font-extrabold 
   text-center
   leading-tight
@@ -265,7 +248,7 @@ const TitleAccent = tw.span`
 `
 
 const TitleUnderline = tw.div`
-  w-20 md:w-24 
+  w-24 sm:w-28 md:w-32
   h-1 md:h-1.5
   bg-linear-to-r from-transparent via-yellow-300 to-transparent
   rounded-full
@@ -273,69 +256,53 @@ const TitleUnderline = tw.div`
 `
 
 const Subtitle = tw.p`
-  text-sm sm:text-base md:text-lg lg:text-xl
+  text-base sm:text-lg md:text-xl lg:text-2xl
   text-center 
   text-blue-50/90
   max-w-2xl
   leading-relaxed
+  px-4
   animate-in fade-in slide-in-from-bottom-4
   duration-700
   delay-500
 `
 
-const SubtitleBold = tw.span`
-  font-bold
-  text-white
-`
-
-const SubtitleHighlight = tw.span`
-  font-extrabold
-  text-yellow-300
-  drop-shadow-lg
-`
+const SubtitleBold = tw.span`font-bold text-white`
+const SubtitleHighlight = tw.span`font-extrabold text-yellow-300 drop-shadow-lg`
 
 const BenefitsList = tw.div`
   flex flex-wrap
   items-center justify-center
-  gap-3 md:gap-4 lg:gap-5
-  mt-1
+  gap-3 sm:gap-4 md:gap-5
+  mt-2 sm:mt-3
   animate-in fade-in slide-in-from-bottom-4
   duration-700
   delay-700
 `
 
 const BenefitItem = tw.div`
-  flex items-center gap-2
+  flex items-center gap-2 sm:gap-2.5
   bg-white/5 backdrop-blur-sm
   border border-white/10
   rounded-full
-  px-3 md:px-4 py-1.5 md:py-2
+  px-4 sm:px-5 py-2 sm:py-2.5
   shadow-lg
   hover:bg-white/10 hover:scale-105
   transition-all duration-300
 `
 
-const BenefitIcon = tw.span`
-  text-green-300
-  font-bold
-  text-base md:text-lg
-`
-
-const BenefitText = tw.span`
-  text-xs md:text-sm
-  font-medium
-  text-white/90
-`
+const BenefitIcon = tw.span`text-green-300 font-bold text-base sm:text-lg`
+const BenefitText = tw.span`text-sm sm:text-base font-medium text-white/90`
 
 const CTAButton = tw.button`
   relative
-  mt-2 md:mt-3 lg:mt-4
+  mt-4 sm:mt-5 md:mt-6
   bg-linear-to-r from-yellow-400 via-orange-400 to-yellow-500
   hover:from-yellow-300 hover:via-orange-300 hover:to-yellow-400
   text-gray-900
   font-bold
-  text-sm md:text-base
-  px-6 md:px-8 py-3 md:py-4
+  text-base sm:text-lg
+  px-8 sm:px-10 py-4 sm:py-5
   rounded-full
   shadow-2xl shadow-yellow-500/30
   hover:shadow-3xl hover:shadow-yellow-400/40
@@ -345,17 +312,11 @@ const CTAButton = tw.button`
   group
   focus:outline-none focus:ring-4 focus:ring-yellow-300/50
   animate-in fade-in zoom-in-95
+  animation-delay-900
 `
 
-const ButtonContent = tw.div`
-  relative z-10
-  flex items-center justify-center gap-2 md:gap-3
-`
-
-const ButtonText = tw.span`
-  font-bold
-`
-
+const ButtonContent = tw.div`relative z-10 flex items-center justify-center gap-3`
+const ButtonText = tw.span`font-bold`
 const ButtonIcon = tw.span`
   flex items-center justify-center
   transition-transform duration-300
@@ -367,7 +328,7 @@ const ButtonShine = tw.span`
   bg-linear-to-r from-transparent via-white/40 to-transparent
   transform -translate-x-full
   group-hover:translate-x-full
-  transition-transform duration-700
+  transition-transform duration-1000
   pointer-events-none
 `
 
@@ -375,7 +336,7 @@ const WaveDecoration = tw.div`
   absolute 
   bottom-0 left-0 right-0 
   w-full
-  h-[80px] md:h-[100px]
+  h-20 sm:h-[100px] md:h-[120px]
   z-0
   pointer-events-none
 `

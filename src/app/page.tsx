@@ -70,22 +70,26 @@ export default function Home() {
     <MainContainer>
       <Hero />
       <ContentWrapper>
-        <div id="calculator">
+        <CalculatorSection id="calculator">
           <CalculatorForm
             ref={formRef}
             onCalculate={handleCalculate}
             hasResults={results.length > 0}
           />
-        </div>
-        <div id="results">
+        </CalculatorSection>
+        <ResultsSection id="results">
           <BankRanking
             results={results}
             selectedParams={selectedParams}
             onParamsChange={handleParamsChange}
             formRef={formRef}
           />
-        </div>
-        {results.length > 0 && <Disclaimer />}
+        </ResultsSection>
+        {results.length > 0 && (
+          <DisclaimerSection>
+            <Disclaimer />
+          </DisclaimerSection>
+        )}
       </ContentWrapper>
       <Footer />
     </MainContainer>
@@ -93,4 +97,7 @@ export default function Home() {
 }
 
 const MainContainer = tw.div`min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50`
-const ContentWrapper = tw.div`pb-12`
+const ContentWrapper = tw.div`flex flex-col gap-0`
+const CalculatorSection = tw.section`w-full`
+const ResultsSection = tw.section`w-full`
+const DisclaimerSection = tw.section`w-full px-4 pb-12 sm:px-6 sm:pb-16 md:pb-20 lg:px-8 lg:pb-24`
