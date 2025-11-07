@@ -36,7 +36,23 @@ export const FormField = ({
         <LabelWithTooltip>
           <Label htmlFor={id}>{label}</Label>
           <Tooltip content={tooltipContent}>
-            <InfoIcon>ℹ️</InfoIcon>
+            <InfoIcon>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <title>Informacja</title>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+              </svg>
+            </InfoIcon>
           </Tooltip>
         </LabelWithTooltip>
         <ValueDisplay>{value}</ValueDisplay>
@@ -93,4 +109,14 @@ const SliderLabel = tw.span``
 const ErrorMessage = tw.p`text-sm text-red-600`
 
 const LabelWithTooltip = tw.div`flex items-center gap-2`
-const InfoIcon = tw.span`cursor-help text-blue-500 hover:text-blue-700 transition-colors`
+const InfoIcon = tw.span`
+  cursor-help 
+  text-blue-600 
+  hover:text-blue-700 
+  transition-all duration-200
+  hover:scale-110
+  flex items-center justify-center
+  w-5 h-5
+  rounded-full
+  hover:bg-blue-50
+`

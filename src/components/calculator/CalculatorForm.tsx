@@ -75,16 +75,33 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               error={errors.loanAmount?.message}
               tooltipContent={
                 <TooltipContent>
-                  <TooltipTitle>Kwota kredytu</TooltipTitle>
+                  <TooltipHeader>
+                    <TooltipIconWrapper variant="blue">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Pieniądze</title>
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                      </svg>
+                    </TooltipIconWrapper>
+                    <TooltipTitle>Kwota kredytu</TooltipTitle>
+                  </TooltipHeader>
                   <TooltipText>
-                    To suma pieniędzy, którą chcesz pożyczyć od banku na zakup nieruchomości.
+                    To suma pieniędzy, którą chcesz pożyczyć od banku na zakup nieruchomości. Im
+                    wyższa kwota, tym większa rata i wyższe wymagania banku.
                   </TooltipText>
-                  <TooltipTip>
-                    <TipIcon>💡</TipIcon>
+                  <TooltipTip variant="blue">
+                    <TipIcon>💰</TipIcon>
                     <TipText>
-                      <strong>Wskazówka:</strong> Im niższa kwota kredytu, tym niższa rata
-                      miesięczna i łatwiej uzyskać zgodę banku. Zwiększ wkład własny, aby obniżyć
-                      kwotę kredytu.
+                      <strong>Wskazówka:</strong> Zwiększ wkład własny powyżej 20%, aby obniżyć
+                      kwotę kredytu i uzyskać lepsze oprocentowanie.
                     </TipText>
                   </TooltipTip>
                 </TooltipContent>
@@ -105,16 +122,43 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               error={errors.loanPeriod?.message}
               tooltipContent={
                 <TooltipContent>
-                  <TooltipTitle>Okres kredytowania</TooltipTitle>
+                  <TooltipHeader>
+                    <TooltipIconWrapper variant="purple">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Czas</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </TooltipIconWrapper>
+                    <TooltipTitle>Okres kredytowania</TooltipTitle>
+                  </TooltipHeader>
                   <TooltipText>
-                    To czas, przez który będziesz spłacać kredyt. Typowo wynosi od 5 do 35 lat.
+                    To czas, przez który będziesz spłacać kredyt. Typowo od 5 do 35 lat.
                   </TooltipText>
-                  <TooltipTip>
-                    <TipIcon>💡</TipIcon>
+                  <TooltipComparison>
+                    <ComparisonRow>
+                      <ComparisonLabel variant="green">Dłuższy okres (np. 30 lat)</ComparisonLabel>
+                      <ComparisonValue>Niższa rata, wyższy koszt całkowity</ComparisonValue>
+                    </ComparisonRow>
+                    <ComparisonRow>
+                      <ComparisonLabel variant="orange">Krótszy okres (np. 15 lat)</ComparisonLabel>
+                      <ComparisonValue>Wyższa rata, oszczędność na odsetkach</ComparisonValue>
+                    </ComparisonRow>
+                  </TooltipComparison>
+                  <TooltipTip variant="purple">
+                    <TipIcon>⏱️</TipIcon>
                     <TipText>
-                      <strong>Wskazówka:</strong> Dłuższy okres = niższa rata miesięczna, ale wyższy
-                      całkowity koszt kredytu przez większe odsetki. Krótszy okres = wyższa rata,
-                      ale oszczędzasz na odsetkach.
+                      <strong>Wybierz mądrze:</strong> Jeśli możesz sobie pozwolić na wyższą ratę,
+                      wybierz krótszy okres – zaoszczędzisz tysiące złotych na odsetkach.
                     </TipText>
                   </TooltipTip>
                 </TooltipContent>
@@ -135,17 +179,52 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               error={errors.downPayment?.message}
               tooltipContent={
                 <TooltipContent>
-                  <TooltipTitle>Wkład własny</TooltipTitle>
+                  <TooltipHeader>
+                    <TooltipIconWrapper variant="green">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Oszczędności</title>
+                        <path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2h0V5z" />
+                        <path d="M2 9v1c0 1.1.9 2 2 2h1" />
+                        <path d="M16 11h0" />
+                      </svg>
+                    </TooltipIconWrapper>
+                    <TooltipTitle>Wkład własny</TooltipTitle>
+                  </TooltipHeader>
                   <TooltipText>
-                    To kwota, którą wpłacisz ze swoich oszczędności. Banki wymagają minimum 10-20%
-                    wartości nieruchomości.
+                    To kwota, którą wpłacisz ze swoich oszczędności przy zakupie nieruchomości.
+                    Banki wymagają minimum 10-20% wartości nieruchomości.
                   </TooltipText>
-                  <TooltipTip>
-                    <TipIcon>💡</TipIcon>
+                  <TooltipBenefits>
+                    <BenefitTitle>Korzyści z wyższego wkładu własnego (powyżej 20%):</BenefitTitle>
+                    <BenefitsList>
+                      <BenefitItem>
+                        <BenefitIcon>✓</BenefitIcon>
+                        Niższe oprocentowanie kredytu
+                      </BenefitItem>
+                      <BenefitItem>
+                        <BenefitIcon>✓</BenefitIcon>
+                        Brak ubezpieczenia niskiego wkładu
+                      </BenefitItem>
+                      <BenefitItem>
+                        <BenefitIcon>✓</BenefitIcon>
+                        Łatwiejsza akceptacja kredytu
+                      </BenefitItem>
+                    </BenefitsList>
+                  </TooltipBenefits>
+                  <TooltipTip variant="green">
+                    <TipIcon>🎯</TipIcon>
                     <TipText>
-                      <strong>Wskazówka:</strong> Wyższy wkład własny (powyżej 20%) = lepsze warunki
-                      kredytu, niższe oprocentowanie i brak konieczności ubezpieczenia niskiego
-                      wkładu.
+                      <strong>Cel idealny:</strong> Wkład własny 20% lub więcej to klucz do
+                      najlepszych warunków kredytu i największych oszczędności.
                     </TipText>
                   </TooltipTip>
                 </TooltipContent>
@@ -166,16 +245,58 @@ export const CalculatorForm = ({ onCalculate, hasResults, ref }: CalculatorFormP
               error={errors.monthlyIncome?.message}
               tooltipContent={
                 <TooltipContent>
-                  <TooltipTitle>Dochód miesięczny</TooltipTitle>
+                  <TooltipHeader>
+                    <TooltipIconWrapper variant="amber">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Portfel</title>
+                        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                      </svg>
+                    </TooltipIconWrapper>
+                    <TooltipTitle>Dochód miesięczny netto</TooltipTitle>
+                  </TooltipHeader>
                   <TooltipText>
-                    To Twoje stałe, miesięczne zarobki netto (po potrąceniu podatków i ZUS).
+                    To Twoje stałe, miesięczne zarobki po potrąceniu podatków i składek ZUS. Bank
+                    analizuje tę kwotę, aby ocenić Twoją zdolność kredytową.
                   </TooltipText>
-                  <TooltipTip>
-                    <TipIcon>💡</TipIcon>
+                  <TooltipWarning>
+                    <WarningIcon>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </WarningIcon>
+                    <WarningText>
+                      <strong>Zasada 40-50%:</strong> Rata kredytu nie może przekraczać 40-50%
+                      Twojego miesięcznego dochodu netto.
+                    </WarningText>
+                  </TooltipWarning>
+                  <TooltipTip variant="amber">
+                    <TipIcon>📊</TipIcon>
                     <TipText>
-                      <strong>Wskazówka:</strong> Bank sprawdza tzw. zdolność kredytową - czy Twój
-                      dochód pozwala na bezpieczną spłatę raty. Zwykle rata nie może przekraczać
-                      40-50% dochodu.
+                      <strong>Przykład:</strong> Przy dochodzie 8 000 zł, maksymalna bezpieczna rata
+                      to około 3 200-4 000 zł miesięcznie.
                     </TipText>
                   </TooltipTip>
                 </TooltipContent>
@@ -258,7 +379,6 @@ const FormGrid = tw.div`grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2`
 const FormGroupFullWidth = tw.div`md:col-span-2`
 
 const SubmitButtonWrapper = tw.div`
-  mt-6 sm:mt-8
   animate-in fade-in slide-in-from-bottom-4
   duration-500
   delay-300
@@ -311,25 +431,61 @@ const ButtonGlow = tw.span`
   pointer-events-none
 `
 
-const TooltipContent = tw.div`flex flex-col gap-3 max-w-xs text-sm`
+const TooltipContent = tw.div`flex flex-col gap-3 max-w-xs text-sm p-4`
+
+const TooltipHeader = tw.div`flex items-center gap-2`
+
+const TooltipIconWrapper = tw.div<{ variant: string }>`
+  flex items-center justify-center
+  w-6 h-6
+  rounded-full
+  bg-${(props) => props.variant}-100
+  text-${(props) => props.variant}-600
+`
 
 const TooltipTitle = tw.div`
-  border-b border-gray-200
-  pb-2
   text-base font-bold text-gray-900
 `
 
 const TooltipText = tw.div`leading-relaxed text-gray-700`
 
-const TooltipTip = tw.div`
+const TooltipTip = tw.div<{ variant: string }>`
   flex gap-2
-  rounded-lg border border-blue-100 bg-blue-50 
+  rounded-lg border border-${(props) => props.variant}-200 bg-${(props) => props.variant}-50 
   p-3
 `
 
 const TipIcon = tw.span`shrink-0 text-lg`
 
-const TipText = tw.div`leading-relaxed text-gray-800`
+const TipText = tw.div`leading-relaxed text-gray-900 text-sm`
+
+const TooltipComparison = tw.div`flex flex-col gap-2`
+
+const ComparisonRow = tw.div`flex flex-col gap-1`
+
+const ComparisonLabel = tw.div<{ variant: string }>`
+  text-${(props) => props.variant}-700
+  font-semibold
+  text-sm
+`
+
+const ComparisonValue = tw.div`text-gray-600 text-sm`
+
+const TooltipBenefits = tw.div`flex flex-col gap-2`
+
+const BenefitTitle = tw.div`font-semibold text-gray-900 text-sm`
+
+const BenefitsList = tw.ul`flex flex-col gap-1.5 ml-1`
+
+const BenefitItem = tw.li`flex items-start gap-2 text-gray-700 text-sm`
+
+const BenefitIcon = tw.span`text-green-600 font-bold shrink-0`
+
+const TooltipWarning = tw.div`flex gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg`
+
+const WarningIcon = tw.span`text-amber-600 shrink-0 flex items-center justify-center`
+
+const WarningText = tw.div`text-gray-900 leading-relaxed text-sm`
 
 const BackgroundDecor1 = tw.div`
   absolute -top-16 -right-16 sm:-top-32 sm:-right-32

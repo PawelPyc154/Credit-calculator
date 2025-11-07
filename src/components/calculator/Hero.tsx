@@ -296,7 +296,6 @@ const BenefitText = tw.span`text-sm sm:text-base font-medium text-white/90`
 
 const CTAButton = tw.button`
   relative
-  mt-4 sm:mt-5 md:mt-6
   bg-linear-to-r from-yellow-400 via-orange-400 to-yellow-500
   hover:from-yellow-300 hover:via-orange-300 hover:to-yellow-400
   text-gray-900

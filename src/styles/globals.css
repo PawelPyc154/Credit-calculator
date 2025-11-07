@@ -5,3 +5,58 @@
     var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+/* Niestandardowe style dla tooltipów - jasny motyw */
+.tippy-box[data-theme~="light"] {
+  background-color: white;
+  color: #1f2937; /* text-gray-800 */
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.tippy-box[data-theme~="light"][data-placement^="top"] > .tippy-arrow::before {
+  border-top-color: white;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.tippy-box[data-theme~="light"][data-placement^="bottom"] > .tippy-arrow::before {
+  border-bottom-color: white;
+  filter: drop-shadow(0 -1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.tippy-box[data-theme~="light"][data-placement^="left"] > .tippy-arrow::before {
+  border-left-color: white;
+  filter: drop-shadow(1px 0 2px rgba(0, 0, 0, 0.1));
+}
+
+.tippy-box[data-theme~="light"][data-placement^="right"] > .tippy-arrow::before {
+  border-right-color: white;
+  filter: drop-shadow(-1px 0 2px rgba(0, 0, 0, 0.1));
+}
+
+.tippy-box[data-theme~="light"] > .tippy-content {
+  padding: 0;
+}
+
+/* Animacja dla przycisku CTA najlepszej oferty */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 25px -5px rgb(16 185 129 / 0.3),
+      0 8px 10px -6px rgb(16 185 129 / 0.1);
+  }
+  50% {
+    box-shadow:
+      0 10px 35px -5px rgb(16 185 129 / 0.5),
+      0 8px 20px -6px rgb(16 185 129 / 0.3);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

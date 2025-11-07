@@ -259,7 +259,22 @@
       "ratio90": 0.28,
       "ratio95": 0.58
     },
-    "updated": "2025-11-01"
+    "updated": "2025-11-01",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_2160",
+      "campaignId": "2160",
+      "commission": 1.0,
+      "cookiesTime": 180,
+      "restrictions": [
+        "Brak zgody na SEM i Facebook na frazy związane z nazwą Banku",
+        "Zakaz mailingów",
+        "Zakaz używania mechanizmów popingowych",
+        "Zakaz stosowania iframe na formularzu",
+        "Zakaz rewalidacji leadów przez własne call center"
+      ],
+      "notes": "Prowizja 1% od wartości udzielonego kredytu. Cookies Time: 180 dni. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
   },
   {
     "id": "alior",
@@ -356,5 +371,244 @@
       "ratio95": 0.62
     },
     "updated": "2025-11-01"
+  },
+  {
+    "id": "citi-handlowy",
+    "name": "Citi Handlowy",
+    "logo": "/images/banks/citi-handlowy.svg",
+    "baseInterestRate": 7.69,
+    "wibor": 5.85,
+    "margin": 1.84,
+    "commissionRate": 1.5,
+    "insuranceRate": 0.025,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": ["purchase", "refinancing", "construction"],
+    "description": "Międzynarodowy bank z atrakcyjnymi warunkami kredytowymi",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "7-14 dni roboczych",
+    "specialOffers": [
+      "Twój nowy dom jest bliżej niż myślisz!",
+      "Kredyt hipoteczny na atrakcyjnych warunkach",
+      "RRSO 6,84%"
+    ],
+    "advantages": [
+      "Atrakcyjne oprocentowanie",
+      "Międzynarodowe doświadczenie",
+      "Darmowe wcześniejsze spłaty",
+      "Wszystkie cele kredytowe"
+    ],
+    "disadvantages": ["Wymóg otwarcia konta", "Mniejsza sieć oddziałów w Polsce"],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.3,
+      "ratio95": 0.6
+    },
+    "updated": "2025-11-07",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_2204",
+      "campaignId": "2204",
+      "commission": 0.75,
+      "restrictions": [
+        "Formularz musi być wypełniony danymi zgodnymi ze stanem faktycznym",
+        "Formularz wypełniony jednokrotnie",
+        "Klient nie może odstąpić od umowy",
+        "Brak prowizji jeśli klient wypełnił inny wniosek w ostatnich 90 dni",
+        "Brak prowizji jeśli klient procesuje wniosek u pośrednika współpracującego z Bankiem"
+      ],
+      "notes": "Prowizja 0.75% od wartości wypłaconego kredytu. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
+  },
+  {
+    "id": "velobank",
+    "name": "VeloBank",
+    "logo": "/images/banks/velobank.svg",
+    "baseInterestRate": 7.58,
+    "wibor": 5.85,
+    "margin": 1.73,
+    "commissionRate": 0,
+    "insuranceRate": 0.023,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": ["purchase", "refinancing"],
+    "description": "Nowoczesny bank z 0% prowizji i 100% zdalną obsługą",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "7-14 dni roboczych",
+    "specialOffers": [
+      "0% prowizji z kontem z pakietem i ubezpieczeniem VeloBezpieczny",
+      "0% prowizji za wcześniejszą spłatę lub nadpłatę kredytu",
+      "100% zdalna obsługa przez wideorozmowę",
+      "RRSO 7,43%"
+    ],
+    "advantages": [
+      "Brak prowizji",
+      "Niska marża",
+      "Pełna obsługa online",
+      "Darmowe wcześniejsze spłaty i nadpłaty",
+      "Wideorozmowa z ekspertem hipotecznym"
+    ],
+    "disadvantages": [
+      "Tylko zakup i refinansowanie",
+      "Wymóg konta z pakietem",
+      "Nowy bank na rynku"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.25,
+      "ratio95": 0.55
+    },
+    "updated": "2025-11-07",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_3042",
+      "campaignId": "3042",
+      "commission": 0.75,
+      "cookiesTime": 180,
+      "restrictions": [
+        "CAŁKOWITY ZAKAZ biddowania na brand Velo, VeloBank, Velo Bank i pochodnych",
+        "Zakaz ogłoszeń rekrutacyjnych jako pretekst do pozyskiwania klientów",
+        "Zakaz prowadzenia pozornych testów produktu",
+        "Zakaz szkoleń nakłaniających do założenia produktu",
+        "Zakaz ruchu motywowanego i nadużyć"
+      ],
+      "notes": "Prowizja 0.75% od wartości brutto umowy kredytowej. Kredyt musi być uruchomiony i utrzymany co najmniej miesiąc. Zakup i refinansowanie - 6 miesięcy na zawarcie umowy od daty leada. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
+  },
+  {
+    "id": "velobank-professionals",
+    "name": "VeloBank dla Profesjonalistów",
+    "logo": "/images/banks/velobank.svg",
+    "baseInterestRate": 7.48,
+    "wibor": 5.85,
+    "margin": 1.63,
+    "commissionRate": 0,
+    "insuranceRate": 0.023,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2500000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": ["purchase", "refinancing"],
+    "description": "Specjalna oferta kredytu hipotecznego dla wybranych zawodów - w uproszczonym trybie",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "5-10 dni roboczych",
+    "specialOffers": [
+      "Uproszczony tryb dla wybranych zawodów",
+      "Obniżona marża - od 1,63%",
+      "0% prowizji z kontem z pakietem",
+      "Wyższy limit kredytowy - do 2,5 mln zł",
+      "RRSO 7,43%"
+    ],
+    "advantages": [
+      "Brak prowizji",
+      "Najniższa marża wśród ofert VeloBank",
+      "Uproszczony proces dla profesjonalistów",
+      "Szybsza decyzja kredytowa",
+      "Wyższy limit kredytu",
+      "Darmowe wcześniejsze spłaty"
+    ],
+    "disadvantages": [
+      "Tylko dla wybranych zawodów",
+      "Tylko zakup i refinansowanie",
+      "Wymóg konta z pakietem"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.2,
+      "ratio95": 0.5
+    },
+    "updated": "2025-11-07",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_3043",
+      "campaignId": "3043",
+      "commission": 0.75,
+      "cookiesTime": 180,
+      "restrictions": [
+        "CAŁKOWITY ZAKAZ biddowania na brand Velo, VeloBank, Velo Bank i pochodnych",
+        "Zakaz ogłoszeń rekrutacyjnych jako pretekst do pozyskiwania klientów",
+        "Zakaz prowadzenia pozornych testów produktu",
+        "Zakaz szkoleń nakłaniających do założenia produktu",
+        "Zakaz ruchu motywowanego i nadużyć"
+      ],
+      "notes": "Prowizja 0.75% od wartości brutto umowy kredytowej. Kredyt musi być uruchomiony i utrzymany co najmniej miesiąc. Oferta dedykowana dla wybranych zawodów. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
+  },
+  {
+    "id": "velobank-refinancing",
+    "name": "VeloBank z refinansowaniem",
+    "logo": "/images/banks/velobank.svg",
+    "baseInterestRate": 7.58,
+    "wibor": 5.85,
+    "margin": 1.73,
+    "commissionRate": 0,
+    "insuranceRate": 0.023,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": ["refinancing"],
+    "description": "Dedykowana oferta refinansowania kredytu hipotecznego z innymi bankami",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "7-14 dni roboczych",
+    "specialOffers": [
+      "0% prowizji z kontem z pakietem i ubezpieczeniem VeloBezpieczny",
+      "0% prowizji za wcześniejszą spłatę lub nadpłatę kredytu",
+      "Specjalne warunki dla refinansowania",
+      "RRSO 7,43%"
+    ],
+    "advantages": [
+      "Brak prowizji",
+      "Niska marża",
+      "Dedykowana oferta refinansowania",
+      "Darmowe wcześniejsze spłaty",
+      "Pełna obsługa online"
+    ],
+    "disadvantages": ["Tylko refinansowanie", "Wymóg konta z pakietem", "Nowy bank na rynku"],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.25,
+      "ratio95": 0.55
+    },
+    "updated": "2025-11-07",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_3044",
+      "campaignId": "3044",
+      "commission": 0.75,
+      "cookiesTime": 180,
+      "restrictions": [
+        "CAŁKOWITY ZAKAZ biddowania na brand Velo, VeloBank, Velo Bank i pochodnych",
+        "Zakaz ogłoszeń rekrutacyjnych jako pretekst do pozyskiwania klientów",
+        "Zakaz prowadzenia pozornych testów produktu",
+        "Zakaz szkoleń nakłaniających do założenia produktu",
+        "Zakaz ruchu motywowanego i nadużyć"
+      ],
+      "notes": "Prowizja 0.75% od wartości brutto umowy kredytowej. Kredyt musi być uruchomiony i utrzymany co najmniej miesiąc. Oferta dedykowana dla refinansowania. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
   }
 ]

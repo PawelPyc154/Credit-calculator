@@ -1,5 +1,18 @@
 import { z } from 'zod'
 
+// Schema dla programu afiliacyjnego
+export const affiliateSchema = z.object({
+  enabled: z.boolean(), // Czy bank ma aktywny program afiliacyjny
+  url: z.string().optional(), // Link afiliacyjny
+  campaignId: z.string().optional(), // ID kampanii
+  commission: z.number().optional(), // Prowizja w %
+  cookiesTime: z.number().optional(), // Czas ważności cookies w dniach
+  restrictions: z.array(z.string()).optional(), // Ograniczenia i zasady (np. zakaz biddowania)
+  notes: z.string().optional(), // Dodatkowe notatki
+})
+
+export type Affiliate = z.infer<typeof affiliateSchema>
+
 // Schema dla oferty bankowej
 export const bankOfferSchema = z.object({
   id: z.string(),
@@ -36,6 +49,7 @@ export const bankOfferSchema = z.object({
     })
     .optional(),
   updated: z.string().optional(), // Data ostatniej aktualizacji danych
+  affiliate: affiliateSchema.optional(), // Informacje o programie afiliacyjnym
 })
 
 export type BankOffer = z.infer<typeof bankOfferSchema>
