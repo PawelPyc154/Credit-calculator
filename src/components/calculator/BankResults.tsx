@@ -7,15 +7,15 @@ import { useRef, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { formatCurrency, formatPercent } from 'utils/calculator'
-import { BankDetails } from '../molecules/BankDetails'
+import { BankDetails } from './molecules/BankDetails'
 
-type BankResultsCursorProps = {
+type BankResultsProps = {
   results: CalculationResult[]
   formData: CalculatorFormData
   formRef: RefObject<HTMLFormElement | null>
 }
 
-export const BankResultsCursor = ({ results, formData, formRef }: BankResultsCursorProps) => {
+export const BankResults = ({ results, formData, formRef }: BankResultsProps) => {
   const offerListRef = useRef<HTMLDivElement>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
 

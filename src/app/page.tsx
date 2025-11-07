@@ -1,15 +1,9 @@
 'use client'
 
-import { BankRanking } from 'components/calculator/BankRanking'
+import { BankResults } from 'components/calculator/BankResults'
 import { CalculatorForm } from 'components/calculator/CalculatorForm'
-import { BankResultsCursor } from 'components/calculator/cursor/BankResultsCursor'
-import { CalculatorFormCursor } from 'components/calculator/cursor/CalculatorFormCursor'
-import { DisclaimerCursor } from 'components/calculator/cursor/DisclaimerCursor'
-import { FooterCursor } from 'components/calculator/cursor/FooterCursor'
 import { Disclaimer } from 'components/calculator/Disclaimer'
-import { ExperimentSwitch, type ExperimentVariant } from 'components/calculator/ExperimentSwitch'
-import { Footer } from 'components/calculator/Footer'
-import { Hero } from 'components/calculator/Hero'
+import { FooterMain } from 'components/calculator/FooterMain'
 import { NavigationTabs, type TabType } from 'components/calculator/NavigationTabs'
 import { StickySummaryBar } from 'components/calculator/StickySummaryBar'
 import { useCallback, useMemo, useRef, useState } from 'react'
@@ -38,144 +32,63 @@ export default function Home() {
     }
   }, [])
 
-  const [variant, setVariant] = useState<ExperimentVariant>('copilot')
   const [activeTab, setActiveTab] = useState<TabType>('hipoteczny')
+  const [results, setResults] = useState<CalculationResult[]>([])
+  const [formData, setFormData] = useState<CalculatorFormData>(defaultFormData)
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const [copilotResults, setCopilotResults] = useState<CalculationResult[]>([])
-  const [cursorResults, setCursorResults] = useState<CalculationResult[]>([])
-
-  const [copilotParams, setCopilotParams] = useState({
-    loanAmount: defaultFormData.loanAmount,
-    loanPeriod: defaultFormData.loanPeriod,
-    downPayment: defaultFormData.downPayment,
-  })
-
-  const [cursorFormData, setCursorFormData] = useState<CalculatorFormData>(defaultFormData)
-
-  const copilotFormRef = useRef<HTMLFormElement>(null)
-  const cursorFormRef = useRef<HTMLFormElement>(null)
-
-  const handleCalculateCopilot = useCallback(
+  const handleCalculate = useCallback(
     (formData: CalculatorFormData) => {
       try {
         const calculatedResults = calculateBankOffers(formData, banks)
-        setCopilotResults(calculatedResults)
-        setCopilotParams({
-          loanAmount: formData.loanAmount,
-          loanPeriod: formData.loanPeriod,
-          downPayment: formData.downPayment,
-        })
+        setResults(calculatedResults)
+        setFormData(formData)
       } catch (error) {
-        console.error('Błąd podczas kalkulacji (Copilot):', error)
+        console.error('Błąd podczas kalkulacji:', error)
       }
     },
     [banks],
   )
-
-  const handleCalculateCursor = useCallback(
-    (formData: CalculatorFormData) => {
-      try {
-        const calculatedResults = calculateBankOffers(formData, banks)
-        setCursorResults(calculatedResults)
-        setCursorFormData(formData)
-      } catch (error) {
-        console.error('Błąd podczas kalkulacji (Cursor):', error)
-      }
-    },
-    [banks],
-  )
-
-  const activeResults = variant === 'copilot' ? copilotResults : cursorResults
-  const activeParams =
-    variant === 'copilot'
-      ? copilotParams
-      : {
-          loanAmount: cursorFormData.loanAmount,
-          loanPeriod: cursorFormData.loanPeriod,
-          downPayment: cursorFormData.downPayment,
-        }
-  const hasActiveResults = activeResults.length > 0
-
-  const experimentSwitch = <ExperimentSwitch variant={variant} onChange={setVariant} />
 
   return (
     <MainContainer>
-      {variant === 'copilot' ? (
-        <>
-          <Hero actionSlot={experimentSwitch} />
-          <ContentWrapper>
-            <CalculatorSection id="calculator">
-              <CalculatorForm
-                formRef={copilotFormRef}
-                onCalculate={handleCalculateCopilot}
-                hasResults={copilotResults.length > 0}
-              />
-            </CalculatorSection>
-            <ResultsSection id="results">
-              <BankRanking
-                results={copilotResults}
-                selectedParams={copilotParams}
-                formRef={copilotFormRef}
-              />
-            </ResultsSection>
-            {copilotResults.length > 0 && (
-              <DisclaimerSection>
-                <Disclaimer />
-              </DisclaimerSection>
-            )}
-          </ContentWrapper>
-          <Footer />
-        </>
-      ) : (
-        <>
-          <NavigationTabs
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            variant={variant}
-            onVariantChange={setVariant}
-          />
+      <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-          <CalculatorSection id="calculator">
-            <CalculatorFormCursor
-              formRef={cursorFormRef}
-              onCalculate={handleCalculateCursor}
-              hasResults={cursorResults.length > 0}
-              defaultValues={cursorFormData}
-            />
-          </CalculatorSection>
+      <CalculatorSection id="calculator">
+        <CalculatorForm
+          formRef={formRef}
+          onCalculate={handleCalculate}
+          hasResults={results.length > 0}
+          defaultValues={formData}
+        />
+      </CalculatorSection>
 
-          <StickySummaryBar
-            formData={{
-              loanAmount: cursorFormData.loanAmount,
-              loanPeriod: cursorFormData.loanPeriod,
-              downPayment: cursorFormData.downPayment,
-              monthlyIncome: cursorFormData.monthlyIncome,
-            }}
-            onEditClick={() => {
-              document.getElementById('calculator')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              })
-            }}
-          />
+      <StickySummaryBar
+        formData={{
+          loanAmount: formData.loanAmount,
+          loanPeriod: formData.loanPeriod,
+          downPayment: formData.downPayment,
+          monthlyIncome: formData.monthlyIncome,
+        }}
+        onEditClick={() => {
+          document.getElementById('calculator')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          })
+        }}
+      />
 
-          <ContentWrapper>
-            <ResultsSection id="results">
-              <BankResultsCursor
-                results={cursorResults}
-                formData={cursorFormData}
-                formRef={cursorFormRef}
-              />
-            </ResultsSection>
-            {cursorResults.length > 0 && (
-              <DisclaimerSection>
-                <DisclaimerCursor />
-              </DisclaimerSection>
-            )}
-          </ContentWrapper>
-          <FooterCursor />
-        </>
-      )}
+      <ContentWrapper>
+        <ResultsSection id="results">
+          <BankResults results={results} formData={formData} formRef={formRef} />
+        </ResultsSection>
+        {results.length > 0 && (
+          <DisclaimerSection>
+            <Disclaimer />
+          </DisclaimerSection>
+        )}
+      </ContentWrapper>
+      <FooterMain />
     </MainContainer>
   )
 }

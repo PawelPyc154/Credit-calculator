@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import tw from 'tw-tailwind'
 
-export const FooterCursor = () => {
+export const FooterMain = () => {
   const currentYear = new Date().getFullYear()
 
   return (

@@ -1,18 +1,15 @@
 'use client'
 
 import tw from 'tw-tailwind'
-import { ExperimentSwitch, type ExperimentVariant } from './ExperimentSwitch'
 
 export type TabType = 'hipoteczny' | 'gotowkowy' | 'refinansowanie'
 
 export type NavigationTabsProps = {
   activeTab: TabType
   onTabChange: (tab: TabType) => void
-  variant: ExperimentVariant
-  onVariantChange: (variant: ExperimentVariant) => void
 }
 
-export const NavigationTabs = ({ activeTab, onTabChange, variant, onVariantChange }: NavigationTabsProps) => {
+export const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
   return (
     <NavContainer>
       <NavContent>
@@ -35,9 +32,6 @@ export const NavigationTabs = ({ activeTab, onTabChange, variant, onVariantChang
           </LogoIcon>
           <LogoText>Kalkulator kredytu hipotecznego</LogoText>
         </NavLogo>
-        <SwitchWrapper>
-          <ExperimentSwitch variant={variant} onChange={onVariantChange} />
-        </SwitchWrapper>
       </NavContent>
     </NavContainer>
   )
@@ -73,9 +67,5 @@ const LogoIcon = tw.span`
 const LogoText = tw.span`
   text-lg font-bold
   text-gray-900
-`
-
-const SwitchWrapper = tw.div`
-  shrink-0
 `
 
