@@ -151,7 +151,7 @@ export const FormField = ({
 
 const FormGroup = tw.div`flex flex-col gap-3`
 const LabelRow = tw.div`flex justify-between items-center`
-const Label = tw.label`text-sm font-semibold text-gray-700 uppercase tracking-wide`
+const Label = tw.label`text-sm font-bold text-gray-700 uppercase tracking-wide`
 const ValueDisplay = tw.span`text-lg font-bold text-blue-600`
 
 const SliderContainer = tw.div`flex items-center gap-2`

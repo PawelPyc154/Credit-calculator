@@ -1,10 +1,12 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Tooltip } from 'components/common/tooltip'
 import { useDebounce } from 'hooks/useDebounce'
 import type { RefObject } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { BsInputCursor } from 'react-icons/bs'
 import tw from 'tw-tailwind'
 import { type CalculatorFormData, calculatorFormSchema } from 'types/calculator'
 import { formatCurrency } from 'utils/calculator'
@@ -108,20 +110,7 @@ export const CalculatorFormCursor = ({
           title={useSlider ? 'Przełącz na inputy' : 'Przełącz na slidery'}
         >
           {useSlider ? (
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <title>Przełącz na inputy</title>
-              <rect x="4" y="4" width="16" height="16" rx="2" />
-              <path d="M9 9h6M9 15h6M9 12h6" />
-            </svg>
+            <BsInputCursor size={20} />
           ) : (
             <svg
               width="20"
@@ -144,12 +133,63 @@ export const CalculatorFormCursor = ({
           <Field>
             <FieldBox>
               <FieldHeader>
-                <FieldTitle>Kwota kredytu</FieldTitle>
+                <FieldTitleWithTooltip>
+                  <FieldTitle>Kwota kredytu</FieldTitle>
+                  <Tooltip
+                    content={
+                      <TooltipContent>
+                        <TooltipHeader>
+                          <TooltipIconWrapper>
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <title>Pieniądze</title>
+                              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg>
+                          </TooltipIconWrapper>
+                          <TooltipTitle>Kwota kredytu</TooltipTitle>
+                        </TooltipHeader>
+                        <TooltipText>
+                          Im wyższa kwota, tym większa rata miesięczna i wyższe wymagania banku.
+                          Zwiększ wkład własny powyżej 20%, aby obniżyć kwotę kredytu i uzyskać
+                          lepsze oprocentowanie.
+                        </TooltipText>
+                      </TooltipContent>
+                    }
+                  >
+                    <InfoIcon>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </InfoIcon>
+                  </Tooltip>
+                </FieldTitleWithTooltip>
+                <FieldValue>{formatCurrency(loanAmount)}</FieldValue>
               </FieldHeader>
               {useSlider ? (
                 <>
-                  <FieldValue>{formatCurrency(loanAmount)}</FieldValue>
-                  <FieldDescription>Kwota finansowania, którą chcesz uzyskać od banku.</FieldDescription>
+                  <FieldDescription>
+                    Kwota finansowania, którą chcesz uzyskać od banku.
+                  </FieldDescription>
                   <SliderContainer>
                     <SliderButton
                       type="button"
@@ -205,6 +245,9 @@ export const CalculatorFormCursor = ({
                 </>
               ) : (
                 <>
+                  <FieldDescription>
+                    Kwota finansowania, którą chcesz uzyskać od banku.
+                  </FieldDescription>
                   <InputContainer>
                     <DecreaseButton
                       type="button"
@@ -225,7 +268,20 @@ export const CalculatorFormCursor = ({
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
-                    <FieldValue>{formatCurrency(loanAmount)}</FieldValue>
+                    <InputWrapper>
+                      <NumberInput
+                        type="number"
+                        min={50000}
+                        max={2000000}
+                        step={10000}
+                        inputMode="numeric"
+                        {...register('loanAmount', { valueAsNumber: true })}
+                        onBlur={(event) =>
+                          updateValue('loanAmount', Number(event.currentTarget.value))
+                        }
+                      />
+                      <InputSuffix>zł</InputSuffix>
+                    </InputWrapper>
                     <IncreaseButton
                       type="button"
                       onClick={() => handleIncrease('loanAmount', 10000, 2000000)}
@@ -246,19 +302,9 @@ export const CalculatorFormCursor = ({
                       </svg>
                     </IncreaseButton>
                   </InputContainer>
-                  <FieldDescription>Kwota finansowania, którą chcesz uzyskać od banku.</FieldDescription>
-                  <NumberInput
-                    type="number"
-                    min={50000}
-                    max={2000000}
-                    step={10000}
-                    inputMode="numeric"
-                    {...register('loanAmount', { valueAsNumber: true })}
-                    onBlur={(event) => updateValue('loanAmount', Number(event.currentTarget.value))}
-                  />
                   <InputLabels>
-                    <InputLabel>Min: 50 tys. zł</InputLabel>
-                    <InputLabel>Max: 2 mln zł</InputLabel>
+                    <InputLabel>50 tys. zł</InputLabel>
+                    <InputLabel>2 mln zł</InputLabel>
                   </InputLabels>
                 </>
               )}
@@ -269,11 +315,65 @@ export const CalculatorFormCursor = ({
           <Field>
             <FieldBox>
               <FieldHeader>
-                <FieldTitle>Okres spłaty</FieldTitle>
+                <FieldTitleWithTooltip>
+                  <FieldTitle>Okres spłaty</FieldTitle>
+                  <Tooltip
+                    content={
+                      <TooltipContent>
+                        <TooltipHeader>
+                          <TooltipIconWrapper>
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <title>Czas</title>
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 6v6l4 2" />
+                            </svg>
+                          </TooltipIconWrapper>
+                          <TooltipTitle>Okres spłaty</TooltipTitle>
+                        </TooltipHeader>
+                        <TooltipText>
+                          <strong>Dłuższy okres (np. 30 lat):</strong> Niższa rata, ale wyższy koszt
+                          całkowity.
+                        </TooltipText>
+                        <TooltipText>
+                          <strong>Krótszy okres (np. 15 lat):</strong> Wyższa rata, ale oszczędność
+                          na odsetkach. Jeśli możesz sobie pozwolić, wybierz krótszy okres –
+                          zaoszczędzisz tysiące złotych.
+                        </TooltipText>
+                      </TooltipContent>
+                    }
+                  >
+                    <InfoIcon>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </InfoIcon>
+                  </Tooltip>
+                </FieldTitleWithTooltip>
+                <FieldValue>{loanPeriod} lat</FieldValue>
               </FieldHeader>
               {useSlider ? (
                 <>
-                  <FieldValue>{loanPeriod} lat</FieldValue>
                   <FieldDescription>Najczęściej wybierany okres to 25–30 lat.</FieldDescription>
                   <SliderContainer>
                     <SliderButton
@@ -330,6 +430,7 @@ export const CalculatorFormCursor = ({
                 </>
               ) : (
                 <>
+                  <FieldDescription>Najczęściej wybierany okres to 25–30 lat.</FieldDescription>
                   <InputContainer>
                     <DecreaseButton
                       type="button"
@@ -350,7 +451,20 @@ export const CalculatorFormCursor = ({
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
-                    <FieldValue>{loanPeriod} lat</FieldValue>
+                    <InputWrapper>
+                      <NumberInput
+                        type="number"
+                        min={5}
+                        max={35}
+                        step={1}
+                        inputMode="numeric"
+                        {...register('loanPeriod', { valueAsNumber: true })}
+                        onBlur={(event) =>
+                          updateValue('loanPeriod', Number(event.currentTarget.value))
+                        }
+                      />
+                      <InputSuffix>lat</InputSuffix>
+                    </InputWrapper>
                     <IncreaseButton
                       type="button"
                       onClick={() => handleIncrease('loanPeriod', 1, 35)}
@@ -371,19 +485,9 @@ export const CalculatorFormCursor = ({
                       </svg>
                     </IncreaseButton>
                   </InputContainer>
-                  <FieldDescription>Najczęściej wybierany okres to 25–30 lat.</FieldDescription>
-                  <NumberInput
-                    type="number"
-                    min={5}
-                    max={35}
-                    step={1}
-                    inputMode="numeric"
-                    {...register('loanPeriod', { valueAsNumber: true })}
-                    onBlur={(event) => updateValue('loanPeriod', Number(event.currentTarget.value))}
-                  />
                   <InputLabels>
-                    <InputLabel>Min: 5 lat</InputLabel>
-                    <InputLabel>Max: 35 lat</InputLabel>
+                    <InputLabel>5 lat</InputLabel>
+                    <InputLabel>35 lat</InputLabel>
                   </InputLabels>
                 </>
               )}
@@ -394,11 +498,70 @@ export const CalculatorFormCursor = ({
           <Field>
             <FieldBox>
               <FieldHeader>
-                <FieldTitle>Wkład własny</FieldTitle>
+                <FieldTitleWithTooltip>
+                  <FieldTitle>Wkład własny</FieldTitle>
+                  <Tooltip
+                    content={
+                      <TooltipContent>
+                        <TooltipHeader>
+                          <TooltipIconWrapper>
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <title>Oszczędności</title>
+                              <path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2h0V5z" />
+                              <path d="M2 9v1c0 1.1.9 2 2 2h1" />
+                              <path d="M16 11h0" />
+                            </svg>
+                          </TooltipIconWrapper>
+                          <TooltipTitle>Wkład własny</TooltipTitle>
+                        </TooltipHeader>
+                        <TooltipText>
+                          Banki wymagają minimum 10-20% wartości nieruchomości. Wkład własny powyżej
+                          20% daje:
+                        </TooltipText>
+                        <TooltipList>
+                          <TooltipListItem>Niższe oprocentowanie kredytu</TooltipListItem>
+                          <TooltipListItem>Brak ubezpieczenia niskiego wkładu</TooltipListItem>
+                          <TooltipListItem>Łatwiejsza akceptacja kredytu</TooltipListItem>
+                        </TooltipList>
+                        <TooltipText>
+                          <strong>Cel idealny:</strong> 20% lub więcej to klucz do najlepszych
+                          warunków kredytu.
+                        </TooltipText>
+                      </TooltipContent>
+                    }
+                  >
+                    <InfoIcon>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </InfoIcon>
+                  </Tooltip>
+                </FieldTitleWithTooltip>
+                <FieldValue>{formatCurrency(downPayment)}</FieldValue>
               </FieldHeader>
               {useSlider ? (
                 <>
-                  <FieldValue>{formatCurrency(downPayment)}</FieldValue>
                   <FieldDescription>
                     Aktualnie {downPaymentPercent}% wartości nieruchomości. Powyżej 20% daje lepsze
                     warunki.
@@ -458,6 +621,10 @@ export const CalculatorFormCursor = ({
                 </>
               ) : (
                 <>
+                  <FieldDescription>
+                    Aktualnie {downPaymentPercent}% wartości nieruchomości. Powyżej 20% daje lepsze
+                    warunki.
+                  </FieldDescription>
                   <InputContainer>
                     <DecreaseButton
                       type="button"
@@ -478,7 +645,20 @@ export const CalculatorFormCursor = ({
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
-                    <FieldValue>{formatCurrency(downPayment)}</FieldValue>
+                    <InputWrapper>
+                      <NumberInput
+                        type="number"
+                        min={0}
+                        max={1000000}
+                        step={10000}
+                        inputMode="numeric"
+                        {...register('downPayment', { valueAsNumber: true })}
+                        onBlur={(event) =>
+                          updateValue('downPayment', Number(event.currentTarget.value))
+                        }
+                      />
+                      <InputSuffix>zł</InputSuffix>
+                    </InputWrapper>
                     <IncreaseButton
                       type="button"
                       onClick={() => handleIncrease('downPayment', 10000, 1000000)}
@@ -499,22 +679,9 @@ export const CalculatorFormCursor = ({
                       </svg>
                     </IncreaseButton>
                   </InputContainer>
-                  <FieldDescription>
-                    Aktualnie {downPaymentPercent}% wartości nieruchomości. Powyżej 20% daje lepsze
-                    warunki.
-                  </FieldDescription>
-                  <NumberInput
-                    type="number"
-                    min={0}
-                    max={1000000}
-                    step={10000}
-                    inputMode="numeric"
-                    {...register('downPayment', { valueAsNumber: true })}
-                    onBlur={(event) => updateValue('downPayment', Number(event.currentTarget.value))}
-                  />
                   <InputLabels>
-                    <InputLabel>Min: 0 zł</InputLabel>
-                    <InputLabel>Max: 1 mln zł</InputLabel>
+                    <InputLabel>0 zł</InputLabel>
+                    <InputLabel>1 mln zł</InputLabel>
                   </InputLabels>
                 </>
               )}
@@ -525,11 +692,68 @@ export const CalculatorFormCursor = ({
           <Field>
             <FieldBox>
               <FieldHeader>
-                <FieldTitle>Dochód miesięczny netto</FieldTitle>
+                <FieldTitleWithTooltip>
+                  <FieldTitle>Dochód miesięczny netto</FieldTitle>
+                  <Tooltip
+                    content={
+                      <TooltipContent>
+                        <TooltipHeader>
+                          <TooltipIconWrapper>
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <title>Portfel</title>
+                              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                            </svg>
+                          </TooltipIconWrapper>
+                          <TooltipTitle>Dochód miesięczny netto</TooltipTitle>
+                        </TooltipHeader>
+                        <TooltipText>
+                          To Twoje stałe, miesięczne zarobki po potrąceniu podatków i składek ZUS.
+                        </TooltipText>
+                        <TooltipWarning>
+                          <strong>Zasada 40-50%:</strong> Rata kredytu nie może przekraczać 40-50%
+                          Twojego miesięcznego dochodu netto.
+                        </TooltipWarning>
+                        <TooltipText>
+                          <strong>Przykład:</strong> Przy dochodzie 8 000 zł, maksymalna bezpieczna
+                          rata to około 3 200-4 000 zł miesięcznie.
+                        </TooltipText>
+                      </TooltipContent>
+                    }
+                  >
+                    <InfoIcon>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </InfoIcon>
+                  </Tooltip>
+                </FieldTitleWithTooltip>
+                <FieldValue>{formatCurrency(monthlyIncome)}</FieldValue>
               </FieldHeader>
               {useSlider ? (
                 <>
-                  <FieldValue>{formatCurrency(monthlyIncome)}</FieldValue>
                   <FieldDescription>
                     Banki zakładają, że rata nie powinna przekraczać ok. 45% dochodu.
                   </FieldDescription>
@@ -588,6 +812,9 @@ export const CalculatorFormCursor = ({
                 </>
               ) : (
                 <>
+                  <FieldDescription>
+                    Banki zakładają, że rata nie powinna przekraczać ok. 45% dochodu.
+                  </FieldDescription>
                   <InputContainer>
                     <DecreaseButton
                       type="button"
@@ -608,7 +835,20 @@ export const CalculatorFormCursor = ({
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
-                    <FieldValue>{formatCurrency(monthlyIncome)}</FieldValue>
+                    <InputWrapper>
+                      <NumberInput
+                        type="number"
+                        min={3000}
+                        max={30000}
+                        step={500}
+                        inputMode="numeric"
+                        {...register('monthlyIncome', { valueAsNumber: true })}
+                        onBlur={(event) =>
+                          updateValue('monthlyIncome', Number(event.currentTarget.value))
+                        }
+                      />
+                      <InputSuffix>zł</InputSuffix>
+                    </InputWrapper>
                     <IncreaseButton
                       type="button"
                       onClick={() => handleIncrease('monthlyIncome', 500, 30000)}
@@ -629,21 +869,9 @@ export const CalculatorFormCursor = ({
                       </svg>
                     </IncreaseButton>
                   </InputContainer>
-                  <FieldDescription>
-                    Banki zakładają, że rata nie powinna przekraczać ok. 45% dochodu.
-                  </FieldDescription>
-                  <NumberInput
-                    type="number"
-                    min={3000}
-                    max={30000}
-                    step={500}
-                    inputMode="numeric"
-                    {...register('monthlyIncome', { valueAsNumber: true })}
-                    onBlur={(event) => updateValue('monthlyIncome', Number(event.currentTarget.value))}
-                  />
                   <InputLabels>
-                    <InputLabel>Min: 3 tys. zł</InputLabel>
-                    <InputLabel>Max: 30 tys. zł</InputLabel>
+                    <InputLabel>3 tys. zł</InputLabel>
+                    <InputLabel>30 tys. zł</InputLabel>
                   </InputLabels>
                 </>
               )}
@@ -674,7 +902,6 @@ export const CalculatorFormCursor = ({
           <SubmitButton type="submit" disabled={!isValid && !hasResults}>
             Zobacz oferty
           </SubmitButton>
-          <InlineInfo>Obliczenia aktualizują się automatycznie.</InlineInfo>
         </SubmitBar>
       </Form>
     </Card>
@@ -688,6 +915,7 @@ const purposes = [
 ] as const
 
 const Card = tw.div`
+  relative
   w-full
   max-w-7xl
   mx-auto
@@ -697,15 +925,20 @@ const Card = tw.div`
   flex flex-col gap-6
 `
 
-const Form = tw.form`relative flex flex-col gap-8`
+const Form = tw.form`flex flex-col gap-8`
 
 const SliderToggleButton = tw.button`
   absolute
-  top-0
-  right-0
+  top-4
+  right-4
+  sm:top-5
+  sm:right-6
+  md:top-6
+  md:right-8
+  -translate-y-1/2
   z-20
-  w-10 h-10
-  sm:w-12 sm:h-12
+  w-7 h-7
+  sm:w-8 sm:h-8
   flex items-center justify-center
   bg-white/20
   backdrop-blur-sm
@@ -735,14 +968,29 @@ const FieldBox = tw.div`
   rounded-lg
   p-3 sm:p-4
   border border-white/20
-  flex flex-col gap-3
+  flex flex-col gap-2
 `
 
-const FieldHeader = tw.div`flex items-start justify-between gap-3`
+const FieldHeader = tw.div`flex items-center justify-between gap-3`
 
-const FieldTitle = tw.span`text-xs text-green-50/90 uppercase tracking-wide`
+const FieldTitle = tw.span`text-xs font-bold text-green-50/90 uppercase tracking-wide`
 
-const FieldValue = tw.span`text-sm sm:text-base md:text-lg font-bold text-white flex-1 text-center`
+const FieldTitleWithTooltip = tw.div`flex items-center gap-2`
+
+const FieldValue = tw.span`text-sm sm:text-base md:text-lg font-bold text-white whitespace-nowrap leading-tight`
+
+const InfoIcon = tw.span`
+  cursor-help 
+  text-green-100
+  hover:text-white 
+  transition-all duration-200
+  hover:scale-110
+  flex items-center justify-center
+  w-5 h-5
+  rounded-full
+  hover:bg-white/20
+  shrink-0
+`
 
 const InputContainer = tw.div`
   flex items-center gap-2
@@ -781,15 +1029,16 @@ const IncreaseButton = tw.button`
   shrink-0
 `
 
-const FieldDescription = tw.p`text-xs text-green-50/80`
+const FieldDescription = tw.p`text-xs text-green-50/80 m-0`
 
+const InputWrapper = tw.div`relative flex-1`
 const NumberInput = tw.input`
   w-full
   rounded-lg
   border border-white/20
   bg-white/10
   backdrop-blur-sm
-  px-4 py-2.5
+  pl-4 pr-12 py-2.5
   text-base font-medium text-white
   placeholder:text-white/50
   focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20
@@ -797,6 +1046,14 @@ const NumberInput = tw.input`
   [&::-webkit-inner-spin-button]:appearance-none
   [&::-webkit-outer-spin-button]:appearance-none
   [-moz-appearance:textfield]
+`
+const InputSuffix = tw.span`
+  absolute
+  right-4
+  top-1/2
+  -translate-y-1/2
+  text-base font-medium text-white/70
+  pointer-events-none
 `
 
 const InputLabels = tw.div`flex justify-between text-xs text-green-50/70`
@@ -879,18 +1136,65 @@ const PurposeTile = tw.label`
 const SubmitBar = tw.div`flex flex-col md:flex-row md:items-center gap-3`
 
 const SubmitButton = tw.button`
-  inline-flex items-center justify-center
+  w-full
   rounded-lg
   bg-white
-  hover:bg-white/90
+  hover:bg-white/95
   text-green-600
-  px-6 py-2.5
-  text-sm font-semibold
-  transition-all duration-200
-  hover:scale-105
-  active:scale-95
-  focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50
-  disabled:opacity-60 disabled:cursor-not-allowed
+  px-6 py-3
+  text-base font-semibold
+  transition-colors duration-200
+  focus:outline-none focus:ring-2 focus:ring-white/50
+  disabled:opacity-50 disabled:cursor-not-allowed
 `
 
-const InlineInfo = tw.p`text-xs text-green-50/80`
+const TooltipContent = tw.div`
+  flex flex-col gap-2.5
+  max-w-xs
+  text-sm
+  p-4
+  bg-gradient-to-br from-green-50 to-emerald-50
+  border border-green-200/50
+  rounded-xl
+  shadow-lg
+`
+
+const TooltipHeader = tw.div`flex items-center gap-2`
+
+const TooltipIconWrapper = tw.div`
+  flex items-center justify-center
+  w-6 h-6
+  rounded-full
+  bg-green-200/50
+  text-green-700
+  shrink-0
+`
+
+const TooltipTitle = tw.div`
+  text-base font-bold text-green-900
+`
+
+const TooltipText = tw.div`
+  leading-relaxed text-green-800/90
+  text-sm
+`
+
+const TooltipList = tw.ul`
+  flex flex-col gap-1.5
+  ml-4
+  list-disc
+  text-green-800/90
+  text-sm
+`
+
+const TooltipListItem = tw.li``
+
+const TooltipWarning = tw.div`
+  p-2.5
+  bg-amber-50/80
+  border border-amber-200/60
+  rounded-lg
+  text-amber-900
+  text-sm
+  font-medium
+`

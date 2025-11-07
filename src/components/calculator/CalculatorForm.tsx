@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from 'hooks/useDebounce'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { BsInputCursor } from 'react-icons/bs'
 import tw from 'tw-tailwind'
 import { type CalculatorFormData, calculatorFormSchema } from 'types/calculator'
 import { formatCurrency } from 'utils/calculator'
@@ -93,20 +94,7 @@ export const CalculatorForm = ({ onCalculate, hasResults, formRef }: CalculatorF
             title={useSlider ? 'Przełącz na inputy' : 'Przełącz na slidery'}
           >
             {useSlider ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <title>Przełącz na inputy</title>
-                <rect x="4" y="4" width="16" height="16" rx="2" />
-                <path d="M9 9h6M9 15h6M9 12h6" />
-              </svg>
+              <BsInputCursor size={20} />
             ) : (
               <svg
                 width="20"
@@ -455,15 +443,22 @@ const FormCard = tw.div`
   z-10
 `
 
-const Form = tw.form`relative flex flex-col gap-8 sm:gap-10 md:gap-12`
+const Form = tw.form`flex flex-col gap-8 sm:gap-10 md:gap-12`
 
 const SliderToggleButton = tw.button`
   absolute
-  top-0
-  right-0
+  top-3
+  right-4
+  sm:top-4
+  sm:right-6
+  md:top-5
+  md:right-8
+  lg:top-6
+  lg:right-10
+  -translate-y-1/2
   z-20
-  w-10 h-10
-  sm:w-12 sm:h-12
+  w-7 h-7
+  sm:w-8 sm:h-8
   flex items-center justify-center
   bg-white
   border border-gray-300

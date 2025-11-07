@@ -83,31 +83,31 @@ export const StickySummaryBar = ({ formData, onEditClick }: StickySummaryBarProp
   return (
     <StickyBar style={{ top: `0px`, position: 'fixed' }}>
       <StickyContent>
-        <MetricsGrid>
-          <MetricBox>
-            <MetricLabel>Kwota kredytu</MetricLabel>
+        <MetricsRow>
+          <MetricChip>
+            <MetricLabel>Kwota:</MetricLabel>
             <MetricValue>{formatCurrency(formData.loanAmount)}</MetricValue>
-          </MetricBox>
-          <MetricBox>
-            <MetricLabel>Okres kredytowania</MetricLabel>
+          </MetricChip>
+          <MetricChip>
+            <MetricLabel>Okres:</MetricLabel>
             <MetricValue>{formData.loanPeriod} lat</MetricValue>
-          </MetricBox>
-          <MetricBox>
-            <MetricLabel>Wkład własny</MetricLabel>
+          </MetricChip>
+          <MetricChip>
+            <MetricLabel>Wkład:</MetricLabel>
             <MetricValue>
-              {formatCurrency(formData.downPayment)} ({downPaymentPercent}%)
+              {formatCurrency(formData.downPayment)}
+              <PercentText> ({downPaymentPercent}%)</PercentText>
             </MetricValue>
-          </MetricBox>
-          <MetricBox>
-            <MetricLabel>Dochód miesięczny</MetricLabel>
+          </MetricChip>
+          <MetricChip>
+            <MetricLabel>Dochód:</MetricLabel>
             <MetricValue>{formatCurrency(formData.monthlyIncome)}</MetricValue>
-          </MetricBox>
-        </MetricsGrid>
+          </MetricChip>
+        </MetricsRow>
         <EditButton onClick={onEditClick}>
           <EditIcon>
             <svg
-              width="20"
-              height="20"
+              className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -129,7 +129,7 @@ export const StickySummaryBar = ({ formData, onEditClick }: StickySummaryBarProp
 
 const StickyBar = tw.div`
   fixed left-0 right-0
-  bg-gradient-to-r from-green-600 to-emerald-600
+  bg-linear-to-r from-green-600 to-emerald-600
   text-white
   shadow-lg
   z-40
@@ -138,58 +138,69 @@ const StickyBar = tw.div`
 
 const StickyContent = tw.div`
   mx-auto max-w-7xl
-  px-4 sm:px-6 lg:px-8
-  py-3 sm:py-4
-  flex flex-col sm:flex-row
-  items-start sm:items-center
-  gap-4 sm:gap-6
+  px-2 sm:px-4 lg:px-6
+  py-2 sm:py-3
+  flex items-center justify-between
+  gap-2 sm:gap-3
+  overflow-hidden
 `
 
-const MetricsGrid = tw.div`
-  grid grid-cols-2 lg:grid-cols-4
-  gap-3 sm:gap-4
+const MetricsRow = tw.div`
+  flex items-center
+  gap-1 sm:gap-2
   flex-1
-  w-full sm:w-auto
+  text-xs sm:text-sm
+  min-w-0
+  overflow-hidden
 `
 
-const MetricBox = tw.div`
+const MetricChip = tw.div`
+  flex flex-col
+  gap-0.5
   bg-white/10
   backdrop-blur-sm
-  rounded-lg
-  p-2 sm:p-3
+  rounded-md sm:rounded-lg
+  px-1.5 py-1 sm:px-2.5 sm:py-1.5
   border border-white/20
+  shrink-0
 `
 
-const MetricLabel = tw.div`
-  text-xs
+const MetricLabel = tw.span`
+  text-[9px] sm:text-xs
   text-green-50/90
-  mb-1
+  font-medium
+  leading-tight
 `
 
-const MetricValue = tw.div`
-  text-sm sm:text-base md:text-lg
+const MetricValue = tw.span`
+  text-xs sm:text-sm md:text-base
   font-bold
+  text-white
+  leading-tight
+`
+
+const PercentText = tw.span`
+  hidden sm:inline
 `
 
 const EditButton = tw.button`
-  flex items-center justify-center gap-2
+  flex items-center justify-center
+  gap-0 xl:gap-2
   bg-white
   hover:bg-white/90
   text-green-600
-  rounded-lg
-  px-4 py-2.5
-  text-sm font-semibold
+  rounded-md sm:rounded-lg
+  w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12
+  xl:w-auto xl:h-auto xl:px-4 xl:py-2
+  text-xs sm:text-sm font-semibold
   transition-all duration-200
   hover:scale-105
   active:scale-95
-  whitespace-nowrap
   shrink-0
-  w-full sm:w-auto
 `
 
 const EditIcon = tw.span`
   flex items-center justify-center
-  w-5 h-5
 `
 
-const EditButtonText = tw.span`text-sm font-semibold`
+const EditButtonText = tw.span`hidden xl:inline text-sm font-semibold`

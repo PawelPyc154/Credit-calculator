@@ -9,5 +9,7 @@ export const Tooltip = (props: TippyProps) => (
     maxWidth={400}
     placement="top"
     className="custom-tooltip"
+    appendTo={() => document.body}
+    zIndex={9999}
   />
 )
