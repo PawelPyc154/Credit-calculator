@@ -187,9 +187,9 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               >
                 {result.bank.accountRequired ? 'Tak' : '✓ Nie'}
                 {result.bank.accountRequired &&
-                  result.bank.accountFee &&
+                  !!result.bank.accountFee &&
                   result.bank.accountFee > 0 && (
-                    <ParameterSubvalue>({result.bank.accountFee} zł/msc)</ParameterSubvalue>
+                    <ParameterSubvalue> ({result.bank.accountFee} zł/msc)</ParameterSubvalue>
                   )}
               </ParameterValue>
             </ParameterCard>
@@ -543,18 +543,19 @@ const ParametersGrid = tw.div`
 const ParameterCard = tw.div`
   bg-white p-4 rounded-xl border border-gray-200
   hover:border-blue-300 hover:shadow-md
-  transition-all duration-200
+  transition-all duration-300
   group
 `
 
 const ParameterLabel = tw.div`
   text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide
-  group-hover:text-gray-700 transition-colors
+  transition-colors duration-300
 `
 
-const ParameterValue = tw.div`
+const ParameterValue = tw.span`
+  inline-block
   text-sm md:text-base font-bold
-  transition-transform duration-200
+  transition-all duration-300 ease-out
   group-hover:scale-105
 `
 

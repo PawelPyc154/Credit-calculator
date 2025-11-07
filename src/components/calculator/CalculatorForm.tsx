@@ -234,6 +234,7 @@ const FormWrapper = tw.div`
   px-4 sm:px-6 lg:px-8
   -mt-16 sm:-mt-20 md:-mt-24 lg:-mt-32
   pb-12 sm:pb-16 md:pb-20 lg:pb-24
+  overflow-hidden
 `
 
 const FormCard = tw.div`
@@ -331,9 +332,9 @@ const TipIcon = tw.span`shrink-0 text-lg`
 const TipText = tw.div`leading-relaxed text-gray-800`
 
 const BackgroundDecor1 = tw.div`
-  absolute -top-32 -right-32
+  absolute -top-16 -right-16 sm:-top-32 sm:-right-32
   -z-10
-  h-64 w-64 sm:h-80 sm:w-80 md:h-96 md:w-96
+  h-48 w-48 sm:h-64 sm:w-64 md:h-96 md:w-96
   animate-pulse
   animation-duration-[3s]
   rounded-full
@@ -343,9 +344,9 @@ const BackgroundDecor1 = tw.div`
 `
 
 const BackgroundDecor2 = tw.div`
-  absolute -bottom-32 -left-32
+  absolute -bottom-16 -left-16 sm:-bottom-32 sm:-left-32
   -z-10
-  h-64 w-64 sm:h-80 sm:w-80 md:h-96 md:w-96
+  h-48 w-48 sm:h-64 sm:w-64 md:h-96 md:w-96
   animate-pulse
   animation-duration-[4s]
   rounded-full

@@ -127,28 +127,6 @@ export const BankRanking = ({ results, selectedParams, formRef }: BankRankingPro
                   animationDelay: `${index * 100}ms`,
                 }}
               >
-                {/* Medal dla top 3 */}
-                {isTopThree && (
-                  <TopBadge
-                    className={clsx(
-                      index === 0 && 'bg-linear-to-br from-amber-400 to-yellow-500',
-                      index === 1 && 'bg-linear-to-br from-gray-300 to-gray-400',
-                      index === 2 && 'bg-linear-to-br from-orange-400 to-amber-500',
-                    )}
-                  >
-                    <BadgeIcon>
-                      {index === 0 && '🥇'}
-                      {index === 1 && '🥈'}
-                      {index === 2 && '🥉'}
-                    </BadgeIcon>
-                    <BadgeText>
-                      {index === 0 && 'Najlepsza oferta'}
-                      {index === 1 && '2. miejsce'}
-                      {index === 2 && '3. miejsce'}
-                    </BadgeText>
-                  </TopBadge>
-                )}
-
                 <CardInner>
                   <BankCardHeader result={result} index={index} isTopThree={isTopThree} />
                 </CardInner>

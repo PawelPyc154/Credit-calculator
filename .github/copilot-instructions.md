@@ -257,6 +257,7 @@ By incorporating these principles, the credit calculator will not only provide u
 - Follow mobile-first responsive design
 - Use semantic HTML elements
 - **Prefer `gap` over margins**: Use Flexbox/Grid `gap` utilities for spacing between elements instead of margins (e.g., `flex gap-4` instead of applying margins to children). This creates cleaner, more maintainable layouts with consistent spacing.
+- **Prefer `padding` over margins**: Use padding for internal spacing within components rather than margins. Padding is more predictable and doesn't collapse, making layouts more maintainable. Use margins only for spacing between sibling elements when `gap` is not applicable.
 - Use `tw-tailwind` library for creating styled components with Tailwind classes
 - Follow the component pattern shown in the example below
 - For internal component styles, always create styled components using `tw` at the bottom of the file
