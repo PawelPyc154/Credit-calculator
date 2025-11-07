@@ -33,7 +33,7 @@ export const NavigationTabs = ({ activeTab, onTabChange, variant, onVariantChang
               <path d="M9 3v18M3 9h18" />
             </svg>
           </LogoIcon>
-          <LogoText>Kalkulator Kredytów</LogoText>
+          <LogoText>Kalkulator kredytu hipotecznego</LogoText>
         </NavLogo>
         <SwitchWrapper>
           <ExperimentSwitch variant={variant} onChange={onVariantChange} />

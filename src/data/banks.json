@@ -1,282 +1,5 @@
 [
   {
-    "id": "pko-bp",
-    "name": "PKO Bank Polski",
-    "logo": "/images/banks/pko-bp.svg",
-    "baseInterestRate": 7.79,
-    "wibor": 5.85,
-    "margin": 1.94,
-    "commissionRate": 2.0,
-    "insuranceRate": 0.024,
-    "minLoanAmount": 50000,
-    "maxLoanAmount": 2000000,
-    "minLoanPeriod": 5,
-    "maxLoanPeriod": 35,
-    "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing", "construction"],
-    "description": "Najstarszy bank w Polsce z konkurencyjnymi ofertami i najszerszą siecią oddziałów",
-    "earlyRepaymentFee": 0,
-    "accountRequired": true,
-    "accountFee": 0,
-    "propertyInsuranceRequired": true,
-    "lifeInsuranceRequired": false,
-    "processingTime": "7-14 dni roboczych",
-    "specialOffers": [
-      "Brak prowizji przy wkładzie własnym powyżej 30%",
-      "Obniżona marża dla klientów z kontem osobistym"
-    ],
-    "advantages": [
-      "Największa sieć oddziałów w Polsce",
-      "Możliwość załatwienia formalności osobiście",
-      "Darmowe wcześniejsze spłaty",
-      "Długa historia i stabilność"
-    ],
-    "disadvantages": ["Wymóg otwarcia konta", "Standardowy czas rozpatrzenia wniosku"],
-    "ltv": {
-      "ratio80": 0,
-      "ratio90": 0.3,
-      "ratio95": 0.6
-    },
-    "updated": "2025-11-01"
-  },
-  {
-    "id": "mbank",
-    "name": "mBank",
-    "logo": "/images/banks/mbank.svg",
-    "baseInterestRate": 7.65,
-    "wibor": 5.85,
-    "margin": 1.8,
-    "commissionRate": 0,
-    "insuranceRate": 0.021,
-    "minLoanAmount": 50000,
-    "maxLoanAmount": 2500000,
-    "minLoanPeriod": 5,
-    "maxLoanPeriod": 35,
-    "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing"],
-    "description": "Nowoczesny bank online z najniższą marżą na rynku i prostym procesem aplikacji",
-    "earlyRepaymentFee": 0,
-    "accountRequired": true,
-    "accountFee": 0,
-    "propertyInsuranceRequired": true,
-    "lifeInsuranceRequired": false,
-    "processingTime": "5-10 dni roboczych",
-    "specialOffers": [
-      "0% prowizji dla wszystkich klientów",
-      "Możliwość całkowitej obsługi online",
-      "Darmowe konto eKonto przy kredycie"
-    ],
-    "advantages": [
-      "Brak prowizji",
-      "Niska marża",
-      "Szybki proces decyzyjny",
-      "Pełna obsługa online",
-      "Wysoki limit kredytowy"
-    ],
-    "disadvantages": [
-      "Tylko zakup i refinansowanie (brak budowy)",
-      "Wymóg otwarcia konta",
-      "Mniejsza sieć oddziałów"
-    ],
-    "ltv": {
-      "ratio80": 0,
-      "ratio90": 0.25,
-      "ratio95": 0.5
-    },
-    "updated": "2025-11-01"
-  },
-  {
-    "id": "ing",
-    "name": "ING Bank Śląski",
-    "logo": "/images/banks/ing.png",
-    "baseInterestRate": 7.45,
-    "wibor": 5.85,
-    "margin": 1.6,
-    "commissionRate": 2.5,
-    "insuranceRate": 0.027,
-    "minLoanAmount": 50000,
-    "maxLoanAmount": 3000000,
-    "minLoanPeriod": 5,
-    "maxLoanPeriod": 30,
-    "minDownPaymentPercent": 15,
-    "supportedPurposes": ["purchase", "refinancing", "construction"],
-    "description": "Bank z najniższym oprocentowaniem i najwyższym limitem kredytowym",
-    "earlyRepaymentFee": 0,
-    "accountRequired": false,
-    "accountFee": 0,
-    "propertyInsuranceRequired": true,
-    "lifeInsuranceRequired": false,
-    "processingTime": "10-14 dni roboczych",
-    "specialOffers": [
-      "Najniższe oprocentowanie na rynku",
-      "Najwyższy limit kredytowy - do 3 mln zł",
-      "Brak wymogu otwarcia konta"
-    ],
-    "advantages": [
-      "Najniższa marża na rynku",
-      "Bardzo wysoki maksymalny kredyt",
-      "Bez wymogu konta",
-      "Darmowe wcześniejsze spłaty",
-      "Wszystkie cele kredytowe"
-    ],
-    "disadvantages": [
-      "Wyższa prowizja",
-      "Wyższy minimalny wkład własny (15%)",
-      "Krótszy maksymalny okres (30 lat)"
-    ],
-    "ltv": {
-      "ratio80": 0,
-      "ratio90": -0.5,
-      "ratio95": -0.5
-    },
-    "updated": "2025-11-01"
-  },
-  {
-    "id": "santander",
-    "name": "Santander Bank Polska",
-    "logo": "/images/banks/santander.svg",
-    "baseInterestRate": 7.95,
-    "wibor": 5.85,
-    "margin": 2.1,
-    "commissionRate": 1.5,
-    "insuranceRate": 0.023,
-    "minLoanAmount": 50000,
-    "maxLoanAmount": 2000000,
-    "minLoanPeriod": 5,
-    "maxLoanPeriod": 35,
-    "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing"],
-    "description": "Bank z najszybszym procesem decyzyjnym i elastycznymi warunkami",
-    "earlyRepaymentFee": 3,
-    "accountRequired": true,
-    "accountFee": 0,
-    "propertyInsuranceRequired": true,
-    "lifeInsuranceRequired": false,
-    "processingTime": "3-7 dni roboczych",
-    "specialOffers": [
-      "Najszybsza decyzja kredytowa na rynku",
-      "Obniżona prowizja - tylko 1,5%",
-      "Program lojalnościowy dla stałych klientów"
-    ],
-    "advantages": [
-      "Bardzo szybki czas rozpatrzenia",
-      "Niska prowizja",
-      "Elastyczne warunki",
-      "Dobra obsługa klienta"
-    ],
-    "disadvantages": [
-      "Wyższa marża",
-      "Opłata za wcześniejszą spłatę (3%)",
-      "Tylko zakup i refinansowanie",
-      "Wymóg konta"
-    ],
-    "ltv": {
-      "ratio80": 0,
-      "ratio90": 0.35,
-      "ratio95": 0.7
-    },
-    "updated": "2025-11-01"
-  },
-  {
-    "id": "millennium",
-    "name": "Bank Millennium",
-    "logo": "/images/banks/millennium.png",
-    "baseInterestRate": 7.85,
-    "wibor": 5.85,
-    "margin": 2.0,
-    "commissionRate": 1.8,
-    "insuranceRate": 0.025,
-    "minLoanAmount": 50000,
-    "maxLoanAmount": 2500000,
-    "minLoanPeriod": 5,
-    "maxLoanPeriod": 35,
-    "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing", "construction"],
-    "description": "Bank oferujący kompleksową obsługę kredytową z dedykowanym doradcą",
-    "earlyRepaymentFee": 0,
-    "accountRequired": true,
-    "accountFee": 5,
-    "propertyInsuranceRequired": true,
-    "lifeInsuranceRequired": false,
-    "processingTime": "7-10 dni roboczych",
-    "specialOffers": [
-      "Dedykowany doradca kredytowy",
-      "Możliwość negocjacji warunków",
-      "Pakiet ubezpieczeń w promocyjnej cenie"
-    ],
-    "advantages": [
-      "Kompleksowa obsługa",
-      "Dedykowany doradca",
-      "Wszystkie cele kredytowe",
-      "Wysoki limit kredytu",
-      "Darmowe wcześniejsze spłaty"
-    ],
-    "disadvantages": ["Opłata za konto (5 zł/msc)", "Wymóg konta", "Średni czas rozpatrzenia"],
-    "ltv": {
-      "ratio80": 0,
-      "ratio90": 0.3,
-      "ratio95": 0.65
-    },
-    "updated": "2025-11-01"
-  },
-  {
-    "id": "pekao",
-    "name": "Bank Pekao SA",
-    "logo": "/images/banks/pekao.svg",
-    "baseInterestRate": 7.75,
-    "wibor": 5.85,
-    "margin": 1.9,
-    "commissionRate": 2.0,
-    "insuranceRate": 0.026,
-    "minLoanAmount": 50000,
-    "maxLoanAmount": 2000000,
-    "minLoanPeriod": 5,
-    "maxLoanPeriod": 35,
-    "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing"],
-    "description": "Tradycyjny bank z bogatym doświadczeniem i stabilną pozycją na rynku",
-    "earlyRepaymentFee": 0,
-    "accountRequired": true,
-    "accountFee": 0,
-    "propertyInsuranceRequired": true,
-    "lifeInsuranceRequired": false,
-    "processingTime": "10-14 dni roboczych",
-    "specialOffers": [
-      "Promocja dla młodych - obniżona marża do 35 roku życia",
-      "Dodatkowe benefity dla obecnych klientów",
-      "Możliwość karencji w spłacie"
-    ],
-    "advantages": [
-      "Stabilność i wiarygodność",
-      "Niska marża",
-      "Szeroka sieć oddziałów",
-      "Darmowe wcześniejsze spłaty",
-      "Promocje dla młodych"
-    ],
-    "disadvantages": ["Dłuższy czas rozpatrzenia", "Tylko zakup i refinansowanie", "Wymóg konta"],
-    "ltv": {
-      "ratio80": 0,
-      "ratio90": 0.28,
-      "ratio95": 0.58
-    },
-    "updated": "2025-11-01",
-    "affiliate": {
-      "enabled": true,
-      "url": "https://tmlead.pl/redirect/869307_2160",
-      "campaignId": "2160",
-      "commission": 1.0,
-      "cookiesTime": 180,
-      "restrictions": [
-        "Brak zgody na SEM i Facebook na frazy związane z nazwą Banku",
-        "Zakaz mailingów",
-        "Zakaz używania mechanizmów popingowych",
-        "Zakaz stosowania iframe na formularzu",
-        "Zakaz rewalidacji leadów przez własne call center"
-      ],
-      "notes": "Prowizja 1% od wartości udzielonego kredytu. Cookies Time: 180 dni. Możliwe problemy z przeglądarką Mozilla Firefox."
-    }
-  },
-  {
     "id": "alior",
     "name": "Alior Bank",
     "logo": "/images/banks/alior.png",
@@ -290,7 +13,11 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 30,
     "minDownPaymentPercent": 15,
-    "supportedPurposes": ["purchase", "refinancing", "construction"],
+    "supportedPurposes": [
+      "purchase",
+      "refinancing",
+      "construction"
+    ],
     "description": "Dynamiczny bank z innowacyjnymi rozwiązaniami i bez prowizji",
     "earlyRepaymentFee": 0,
     "accountRequired": false,
@@ -326,6 +53,182 @@
     "updated": "2025-11-01"
   },
   {
+    "id": "millennium",
+    "name": "Bank Millennium",
+    "logo": "/images/banks/millennium.png",
+    "baseInterestRate": 7.85,
+    "wibor": 5.85,
+    "margin": 2,
+    "commissionRate": 1.8,
+    "insuranceRate": 0.025,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2500000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": [
+      "purchase",
+      "refinancing",
+      "construction"
+    ],
+    "description": "Bank oferujący kompleksową obsługę kredytową z dedykowanym doradcą",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 5,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "7-10 dni roboczych",
+    "specialOffers": [
+      "Dedykowany doradca kredytowy",
+      "Możliwość negocjacji warunków",
+      "Pakiet ubezpieczeń w promocyjnej cenie"
+    ],
+    "advantages": [
+      "Kompleksowa obsługa",
+      "Dedykowany doradca",
+      "Wszystkie cele kredytowe",
+      "Wysoki limit kredytu",
+      "Darmowe wcześniejsze spłaty"
+    ],
+    "disadvantages": [
+      "Opłata za konto (5 zł/msc)",
+      "Wymóg konta",
+      "Średni czas rozpatrzenia"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.3,
+      "ratio95": 0.65
+    },
+    "updated": "2025-11-01"
+  },
+  {
+    "id": "pekao",
+    "name": "Bank Pekao SA",
+    "logo": "/images/banks/pekao.svg",
+    "baseInterestRate": 7.75,
+    "wibor": 5.85,
+    "margin": 1.9,
+    "commissionRate": 2,
+    "insuranceRate": 0.026,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": [
+      "purchase",
+      "refinancing"
+    ],
+    "description": "Tradycyjny bank z bogatym doświadczeniem i stabilną pozycją na rynku",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "10-14 dni roboczych",
+    "specialOffers": [
+      "Promocja dla młodych - obniżona marża do 35 roku życia",
+      "Dodatkowe benefity dla obecnych klientów",
+      "Możliwość karencji w spłacie"
+    ],
+    "advantages": [
+      "Stabilność i wiarygodność",
+      "Niska marża",
+      "Szeroka sieć oddziałów",
+      "Darmowe wcześniejsze spłaty",
+      "Promocje dla młodych"
+    ],
+    "disadvantages": [
+      "Dłuższy czas rozpatrzenia",
+      "Tylko zakup i refinansowanie",
+      "Wymóg konta"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.28,
+      "ratio95": 0.58
+    },
+    "updated": "2025-11-01",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_2160",
+      "campaignId": "2160",
+      "commission": 1,
+      "cookiesTime": 180,
+      "restrictions": [
+        "Brak zgody na SEM i Facebook na frazy związane z nazwą Banku",
+        "Zakaz mailingów",
+        "Zakaz używania mechanizmów popingowych",
+        "Zakaz stosowania iframe na formularzu",
+        "Zakaz rewalidacji leadów przez własne call center"
+      ],
+      "notes": "Prowizja 1% od wartości udzielonego kredytu. Cookies Time: 180 dni. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
+  },
+  {
+    "id": "citi-handlowy",
+    "name": "Citi Handlowy",
+    "logo": "/images/banks/citi-handlowy.svg",
+    "baseInterestRate": 7.69,
+    "wibor": 5.85,
+    "margin": 1.84,
+    "commissionRate": 1.5,
+    "insuranceRate": 0.025,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": [
+      "purchase",
+      "refinancing",
+      "construction"
+    ],
+    "description": "Międzynarodowy bank z atrakcyjnymi warunkami kredytowymi",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "7-14 dni roboczych",
+    "specialOffers": [
+      "Twój nowy dom jest bliżej niż myślisz!",
+      "Kredyt hipoteczny na atrakcyjnych warunkach",
+      "RRSO 6,84%"
+    ],
+    "advantages": [
+      "Atrakcyjne oprocentowanie",
+      "Międzynarodowe doświadczenie",
+      "Darmowe wcześniejsze spłaty",
+      "Wszystkie cele kredytowe"
+    ],
+    "disadvantages": [
+      "Wymóg otwarcia konta",
+      "Mniejsza sieć oddziałów w Polsce"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.3,
+      "ratio95": 0.6
+    },
+    "updated": "2025-11-07",
+    "affiliate": {
+      "enabled": true,
+      "url": "https://tmlead.pl/redirect/869307_2204",
+      "campaignId": "2204",
+      "commission": 0.75,
+      "restrictions": [
+        "Formularz musi być wypełniony danymi zgodnymi ze stanem faktycznym",
+        "Formularz wypełniony jednokrotnie",
+        "Klient nie może odstąpić od umowy",
+        "Brak prowizji jeśli klient wypełnił inny wniosek w ostatnich 90 dni",
+        "Brak prowizji jeśli klient procesuje wniosek u pośrednika współpracującego z Bankiem"
+      ],
+      "notes": "Prowizja 0.75% od wartości wypłaconego kredytu. Możliwe problemy z przeglądarką Mozilla Firefox."
+    }
+  },
+  {
     "id": "credit-agricole",
     "name": "Credit Agricole",
     "logo": "/images/banks/credit-agricole.png",
@@ -339,7 +242,10 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing"],
+    "supportedPurposes": [
+      "purchase",
+      "refinancing"
+    ],
     "description": "Bank z europejskim doświadczeniem i indywidualnym podejściem do klienta",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -373,21 +279,124 @@
     "updated": "2025-11-01"
   },
   {
-    "id": "citi-handlowy",
-    "name": "Citi Handlowy",
-    "logo": "/images/banks/citi-handlowy.svg",
-    "baseInterestRate": 7.69,
+    "id": "ing",
+    "name": "ING Bank Śląski",
+    "logo": "/images/banks/ing.png",
+    "baseInterestRate": 7.45,
     "wibor": 5.85,
-    "margin": 1.84,
-    "commissionRate": 1.5,
-    "insuranceRate": 0.025,
+    "margin": 1.6,
+    "commissionRate": 2.5,
+    "insuranceRate": 0.027,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 3000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 30,
+    "minDownPaymentPercent": 15,
+    "supportedPurposes": [
+      "purchase",
+      "refinancing",
+      "construction"
+    ],
+    "description": "Bank z najniższym oprocentowaniem i najwyższym limitem kredytowym",
+    "earlyRepaymentFee": 0,
+    "accountRequired": false,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "10-14 dni roboczych",
+    "specialOffers": [
+      "Najniższe oprocentowanie na rynku",
+      "Najwyższy limit kredytowy - do 3 mln zł",
+      "Brak wymogu otwarcia konta"
+    ],
+    "advantages": [
+      "Najniższa marża na rynku",
+      "Bardzo wysoki maksymalny kredyt",
+      "Bez wymogu konta",
+      "Darmowe wcześniejsze spłaty",
+      "Wszystkie cele kredytowe"
+    ],
+    "disadvantages": [
+      "Wyższa prowizja",
+      "Wyższy minimalny wkład własny (15%)",
+      "Krótszy maksymalny okres (30 lat)"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": -0.5,
+      "ratio95": -0.5
+    },
+    "updated": "2025-11-01"
+  },
+  {
+    "id": "mbank",
+    "name": "mBank",
+    "logo": "/images/banks/mbank.svg",
+    "baseInterestRate": 7.65,
+    "wibor": 5.85,
+    "margin": 1.8,
+    "commissionRate": 0,
+    "insuranceRate": 0.021,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2500000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": [
+      "purchase",
+      "refinancing"
+    ],
+    "description": "Nowoczesny bank online z najniższą marżą na rynku i prostym procesem aplikacji",
+    "earlyRepaymentFee": 0,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "5-10 dni roboczych",
+    "specialOffers": [
+      "0% prowizji dla wszystkich klientów",
+      "Możliwość całkowitej obsługi online",
+      "Darmowe konto eKonto przy kredycie"
+    ],
+    "advantages": [
+      "Brak prowizji",
+      "Niska marża",
+      "Szybki proces decyzyjny",
+      "Pełna obsługa online",
+      "Wysoki limit kredytowy"
+    ],
+    "disadvantages": [
+      "Tylko zakup i refinansowanie (brak budowy)",
+      "Wymóg otwarcia konta",
+      "Mniejsza sieć oddziałów"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.25,
+      "ratio95": 0.5
+    },
+    "updated": "2025-11-01"
+  },
+  {
+    "id": "pko-bp",
+    "name": "PKO Bank Polski",
+    "logo": "/images/banks/pko-bp.svg",
+    "baseInterestRate": 7.79,
+    "wibor": 5.85,
+    "margin": 1.94,
+    "commissionRate": 2,
+    "insuranceRate": 0.024,
     "minLoanAmount": 50000,
     "maxLoanAmount": 2000000,
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing", "construction"],
-    "description": "Międzynarodowy bank z atrakcyjnymi warunkami kredytowymi",
+    "supportedPurposes": [
+      "purchase",
+      "refinancing",
+      "construction"
+    ],
+    "description": "Najstarszy bank w Polsce z konkurencyjnymi ofertami i najszerszą siecią oddziałów",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
     "accountFee": 0,
@@ -395,37 +404,74 @@
     "lifeInsuranceRequired": false,
     "processingTime": "7-14 dni roboczych",
     "specialOffers": [
-      "Twój nowy dom jest bliżej niż myślisz!",
-      "Kredyt hipoteczny na atrakcyjnych warunkach",
-      "RRSO 6,84%"
+      "Brak prowizji przy wkładzie własnym powyżej 30%",
+      "Obniżona marża dla klientów z kontem osobistym"
     ],
     "advantages": [
-      "Atrakcyjne oprocentowanie",
-      "Międzynarodowe doświadczenie",
+      "Największa sieć oddziałów w Polsce",
+      "Możliwość załatwienia formalności osobiście",
       "Darmowe wcześniejsze spłaty",
-      "Wszystkie cele kredytowe"
+      "Długa historia i stabilność"
     ],
-    "disadvantages": ["Wymóg otwarcia konta", "Mniejsza sieć oddziałów w Polsce"],
+    "disadvantages": [
+      "Wymóg otwarcia konta",
+      "Standardowy czas rozpatrzenia wniosku"
+    ],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.3,
       "ratio95": 0.6
     },
-    "updated": "2025-11-07",
-    "affiliate": {
-      "enabled": true,
-      "url": "https://tmlead.pl/redirect/869307_2204",
-      "campaignId": "2204",
-      "commission": 0.75,
-      "restrictions": [
-        "Formularz musi być wypełniony danymi zgodnymi ze stanem faktycznym",
-        "Formularz wypełniony jednokrotnie",
-        "Klient nie może odstąpić od umowy",
-        "Brak prowizji jeśli klient wypełnił inny wniosek w ostatnich 90 dni",
-        "Brak prowizji jeśli klient procesuje wniosek u pośrednika współpracującego z Bankiem"
-      ],
-      "notes": "Prowizja 0.75% od wartości wypłaconego kredytu. Możliwe problemy z przeglądarką Mozilla Firefox."
-    }
+    "updated": "2025-11-01"
+  },
+  {
+    "id": "santander",
+    "name": "Santander Bank Polska",
+    "logo": "/images/banks/santander.svg",
+    "baseInterestRate": 7.95,
+    "wibor": 5.85,
+    "margin": 2.1,
+    "commissionRate": 1.5,
+    "insuranceRate": 0.023,
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 2000000,
+    "minLoanPeriod": 5,
+    "maxLoanPeriod": 35,
+    "minDownPaymentPercent": 10,
+    "supportedPurposes": [
+      "purchase",
+      "refinancing"
+    ],
+    "description": "Bank z najszybszym procesem decyzyjnym i elastycznymi warunkami",
+    "earlyRepaymentFee": 3,
+    "accountRequired": true,
+    "accountFee": 0,
+    "propertyInsuranceRequired": true,
+    "lifeInsuranceRequired": false,
+    "processingTime": "3-7 dni roboczych",
+    "specialOffers": [
+      "Najszybsza decyzja kredytowa na rynku",
+      "Obniżona prowizja - tylko 1,5%",
+      "Program lojalnościowy dla stałych klientów"
+    ],
+    "advantages": [
+      "Bardzo szybki czas rozpatrzenia",
+      "Niska prowizja",
+      "Elastyczne warunki",
+      "Dobra obsługa klienta"
+    ],
+    "disadvantages": [
+      "Wyższa marża",
+      "Opłata za wcześniejszą spłatę (3%)",
+      "Tylko zakup i refinansowanie",
+      "Wymóg konta"
+    ],
+    "ltv": {
+      "ratio80": 0,
+      "ratio90": 0.35,
+      "ratio95": 0.7
+    },
+    "updated": "2025-11-01"
   },
   {
     "id": "velobank",
@@ -441,7 +487,10 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing"],
+    "supportedPurposes": [
+      "purchase",
+      "refinancing"
+    ],
     "description": "Nowoczesny bank z 0% prowizji i 100% zdalną obsługą",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -503,7 +552,10 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": ["purchase", "refinancing"],
+    "supportedPurposes": [
+      "purchase",
+      "refinancing"
+    ],
     "description": "Specjalna oferta kredytu hipotecznego dla wybranych zawodów - w uproszczonym trybie",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -567,7 +619,9 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": ["refinancing"],
+    "supportedPurposes": [
+      "refinancing"
+    ],
     "description": "Dedykowana oferta refinansowania kredytu hipotecznego z innymi bankami",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -588,7 +642,11 @@
       "Darmowe wcześniejsze spłaty",
       "Pełna obsługa online"
     ],
-    "disadvantages": ["Tylko refinansowanie", "Wymóg konta z pakietem", "Nowy bank na rynku"],
+    "disadvantages": [
+      "Tylko refinansowanie",
+      "Wymóg konta z pakietem",
+      "Nowy bank na rynku"
+    ],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.25,

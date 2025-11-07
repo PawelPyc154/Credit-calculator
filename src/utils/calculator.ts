@@ -67,6 +67,24 @@ export function calculateTotalInterest(
 }
 
 /**
+ * Oblicza RRSO (Rzeczywistą Roczna Stopę Oprocentowania)
+ * Uproszczony wzór przybliżony uwzględniający wszystkie koszty kredytu
+ */
+export function calculateRRSO(
+  loanAmount: number,
+  totalCost: number,
+  years: number,
+): number {
+  if (loanAmount === 0 || years === 0) return 0
+  
+  // Uproszczony wzór: RRSO ≈ (całkowity koszt / kwota kredytu) ^ (1/lata) - 1
+  const totalCostRatio = totalCost / loanAmount
+  const annualRate = Math.pow(totalCostRatio, 1 / years) - 1
+  
+  return annualRate * 100
+}
+
+/**
  * Oblicza wynik (score) oferty bankowej
  * Im niższy koszt całkowity i niższe oprocentowanie, tym wyższy score
  */
@@ -132,6 +150,8 @@ export function calculateBankOffers(
 
     const totalCost = calculateTotalCost(monthlyPayment, loanPeriod, commission, insurance)
 
+    const rrso = calculateRRSO(loanAmount, totalCost, loanPeriod)
+
     return {
       bankId: bank.id,
       bankName: bank.name,
@@ -142,6 +162,7 @@ export function calculateBankOffers(
       totalInterest,
       commission,
       insurance,
+      rrso,
       score: 0, // Będzie obliczone później
       isRecommended: false, // Będzie oznaczone później
       bank, // Dodajemy pełny obiekt banku z wszystkimi informacjami

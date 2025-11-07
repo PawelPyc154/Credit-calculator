@@ -33,6 +33,7 @@ export interface CalculationResult {
   totalInterest: number
   commission: number
   insurance: number
+  rrso: number // Rzeczywista Roczna Stopa Oprocentowania
   score: number // Wynik oceny oferty (0-100)
   isRecommended: boolean // Czy to top 3 oferta
   bank?: BankOffer // Pełne informacje o banku z dodatkowymi parametrami

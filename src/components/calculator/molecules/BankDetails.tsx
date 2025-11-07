@@ -13,12 +13,91 @@ export type BankDetailsProps = {
 }
 
 export const BankDetails = ({ result }: BankDetailsProps) => {
+  // Generuj rekomendację "Dla kogo ta oferta?"
+  const getTargetAudience = () => {
+    if (!result.bank) return null
+
+    const features: string[] = []
+    const warnings: string[] = []
+
+    // Analiza oferty
+    if (result.commission === 0) {
+      features.push('osoby szukające oferty bez prowizji')
+    }
+    if (result.bank.accountRequired === false) {
+      features.push('osoby, które nie chcą otwierać konta w banku')
+    }
+    if (result.bank.earlyRepaymentFee === 0) {
+      features.push('osoby planujące wcześniejszą spłatę kredytu')
+    }
+    if (result.bank.processingTime && result.bank.processingTime.includes('3-7')) {
+      features.push('osoby potrzebujące szybkiej decyzji')
+    }
+    if (result.bank.maxLoanAmount >= 2500000) {
+      features.push('osoby szukające kredytu na wysoką kwotę')
+    }
+    if (result.bank.supportedPurposes.includes('construction')) {
+      features.push('osoby budujące dom')
+    }
+
+    if (result.bank.accountRequired && result.bank.accountFee && result.bank.accountFee > 0) {
+      warnings.push('wymaga otwarcia konta z opłatą miesięczną')
+    }
+    if (result.bank.minDownPaymentPercent > 10) {
+      warnings.push(`wymaga wyższego wkładu własnego (${result.bank.minDownPaymentPercent}%)`)
+    }
+    if (result.bank.earlyRepaymentFee && result.bank.earlyRepaymentFee > 0) {
+      warnings.push('pobiera opłatę za wcześniejszą spłatę')
+    }
+
+    return { features, warnings }
+  }
+
+  const targetAudience = getTargetAudience()
+
   return (
     <DetailsSection>
       <DetailsSectionTitle>
         <TitleIcon>📊</TitleIcon>
         Szczegółowa kalkulacja i informacje
       </DetailsSectionTitle>
+
+      {/* Sekcja "Dla kogo ta oferta?" */}
+      {targetAudience && (targetAudience.features.length > 0 || targetAudience.warnings.length > 0) && (
+        <>
+          <TargetAudienceSection>
+            <TargetAudienceHeader>
+              <TargetAudienceIcon>👤</TargetAudienceIcon>
+              <TargetAudienceTitle>Dla kogo ta oferta?</TargetAudienceTitle>
+            </TargetAudienceHeader>
+            <TargetAudienceContent>
+              {targetAudience.features.length > 0 && (
+                <TargetAudienceList>
+                  <TargetAudienceListTitle>Idealna dla:</TargetAudienceListTitle>
+                  {targetAudience.features.map((feature, idx) => (
+                    <TargetAudienceItem key={idx} className="text-green-700">
+                      <TargetAudienceBullet className="bg-green-100 text-green-600">✓</TargetAudienceBullet>
+                      <span>{feature}</span>
+                    </TargetAudienceItem>
+                  ))}
+                </TargetAudienceList>
+              )}
+              {targetAudience.warnings.length > 0 && (
+                <TargetAudienceList>
+                  <TargetAudienceListTitle className="text-orange-700">Uwaga:</TargetAudienceListTitle>
+                  {targetAudience.warnings.map((warning, idx) => (
+                    <TargetAudienceItem key={idx} className="text-orange-700">
+                      <TargetAudienceBullet className="bg-orange-100 text-orange-600">!</TargetAudienceBullet>
+                      <span>{warning}</span>
+                    </TargetAudienceItem>
+                  ))}
+                </TargetAudienceList>
+              )}
+            </TargetAudienceContent>
+          </TargetAudienceSection>
+          <SectionDivider />
+        </>
+      )}
 
       {/* Główne koszty */}
       <CostCardsWrapper>
@@ -45,8 +124,8 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               <Tooltip
                 content={
                   <span>
-                    Całkowite odsetki to suma wszystkich odsetek, które zapłacisz w trakcie trwania
-                    kredytu. <strong>Im niższe, tym lepiej.</strong>
+                    To dodatkowa kwota, którą zapłacisz bankowi oprócz pożyczonej kwoty.{' '}
+                    <strong>Im niższe odsetki, tym mniej zapłacisz w sumie.</strong> To jeden z najważniejszych kosztów kredytu.
                   </span>
                 }
               >
@@ -79,8 +158,8 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               <Tooltip
                 content={
                   <span>
-                    Prowizja banku to jednorazowa opłata pobierana przez bank za udzielenie kredytu.{' '}
-                    <strong>Im niższa, tym lepiej.</strong>
+                    Jednorazowa opłata, którą bank pobiera przy udzieleniu kredytu.{' '}
+                    <strong>Niektóre banki oferują 0% prowizji - to duża oszczędność!</strong> Prowizja jest płatna na początku.
                   </span>
                 }
               >
@@ -113,8 +192,8 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               <Tooltip
                 content={
                   <span>
-                    Ubezpieczenie to dodatkowy koszt związany z zabezpieczeniem kredytu.{' '}
-                    <strong>Im niższe, tym lepiej.</strong>
+                    Koszt ubezpieczenia nieruchomości, które bank wymaga przy kredycie.{' '}
+                    <strong>To obowiązkowy koszt, ale różni się w zależności od banku.</strong> Płacisz przez cały okres kredytu.
                   </span>
                 }
               >
@@ -151,25 +230,71 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
           </DetailsSectionSubtitle>
           <ParametersGrid>
             <ParameterCard>
-              <ParameterLabel>WIBOR</ParameterLabel>
+              <ParameterLabel>
+                WIBOR
+                <Tooltip
+                  content={
+                    <span>
+                      WIBOR to referencyjna stopa procentowa, na podstawie której banki ustalają oprocentowanie kredytów.{' '}
+                      <strong>Jest to zmienna część oprocentowania.</strong>
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
               <ParameterValue className="text-blue-600">
                 {formatPercent(result.bank.wibor ?? 0)}
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
-              <ParameterLabel>Marża banku</ParameterLabel>
+              <ParameterLabel>
+                Marża banku
+                <Tooltip
+                  content={
+                    <span>
+                      Marża to stała część oprocentowania, którą bank dolicza do WIBOR. <strong>Im niższa marża, tym lepsza oferta.</strong>
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
               <ParameterValue className="text-indigo-600">
                 {formatPercent(result.bank.margin ?? 0)}
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
-              <ParameterLabel>Czas rozpatrzenia</ParameterLabel>
+              <ParameterLabel>
+                Czas rozpatrzenia
+                <Tooltip
+                  content={
+                    <span>
+                      Szacowany czas, w jakim bank rozpatrzy Twój wniosek kredytowy.{' '}
+                      <strong>Im krótszy, tym szybciej otrzymasz decyzję.</strong>
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
               <ParameterValue className="text-purple-600">
                 {result.bank.processingTime ?? 'Brak danych'}
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
-              <ParameterLabel>Wcześniejsza spłata</ParameterLabel>
+              <ParameterLabel>
+                Wcześniejsza spłata
+                <Tooltip
+                  content={
+                    <span>
+                      Opłata za wcześniejszą spłatę kredytu. <strong>Darmowa spłata to duża zaleta</strong> - możesz spłacić kredyt szybciej bez dodatkowych kosztów.
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
               <ParameterValue
                 className={
                   result.bank.earlyRepaymentFee === 0 ? 'text-green-600' : 'text-orange-600'
@@ -181,7 +306,19 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
-              <ParameterLabel>Wymagane konto</ParameterLabel>
+              <ParameterLabel>
+                Wymagane konto
+                <Tooltip
+                  content={
+                    <span>
+                      Czy bank wymaga otwarcia konta osobistego przy kredycie.{' '}
+                      <strong>Brak wymogu to zaleta</strong> - nie musisz zmieniać banku.
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
               <ParameterValue
                 className={result.bank.accountRequired ? 'text-gray-600' : 'text-green-600'}
               >
@@ -194,7 +331,19 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
-              <ParameterLabel>Zakres kwotowy</ParameterLabel>
+              <ParameterLabel>
+                Zakres kwotowy
+                <Tooltip
+                  content={
+                    <span>
+                      Minimalna i maksymalna kwota kredytu oferowana przez bank.{' '}
+                      <strong>Sprawdź, czy Twoja kwota mieści się w tym zakresie.</strong>
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
               <ParameterValue className="text-gray-600 text-xs!">
                 {formatCurrency(result.bank.minLoanAmount)} -{' '}
                 {formatCurrency(result.bank.maxLoanAmount)}
@@ -342,7 +491,21 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                       />
                     </svg>
                   </LtvIconWrapper>
-                  <LtvTitle>Wpływ wkładu własnego na marżę (LTV)</LtvTitle>
+                  <LtvTitleWrapper>
+                    <LtvTitle>
+                      Wpływ wkładu własnego na marżę (LTV)
+                    </LtvTitle>
+                    <Tooltip
+                      content={
+                        <span>
+                          LTV (Loan-to-Value) to stosunek kwoty kredytu do wartości nieruchomości.{' '}
+                          <strong>Im wyższy wkład własny (więcej własnych pieniędzy), tym lepsze warunki kredytu.</strong> Banki oferują niższe marże przy wyższym wkładzie własnym.
+                        </span>
+                      }
+                    >
+                      <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                    </Tooltip>
+                  </LtvTitleWrapper>
                 </LtvHeader>
                 <LtvGrid>
                   <LtvCard className="border-green-200 bg-linear-to-br from-green-50 to-emerald-50">
@@ -550,6 +713,11 @@ const ParameterCard = tw.div`
 const ParameterLabel = tw.div`
   text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide
   transition-colors duration-300
+  flex items-center gap-1.5
+`
+
+const ParameterTooltipIcon = tw.span`
+  text-xs cursor-help opacity-60 hover:opacity-100 transition-opacity
 `
 
 const ParameterValue = tw.span`
@@ -651,6 +819,10 @@ const LtvIconWrapper = tw.div`
   bg-linear-to-br from-blue-500 to-indigo-600
 `
 
+const LtvTitleWrapper = tw.div`
+  flex items-center gap-2
+`
+
 const LtvTitle = tw.h5`
   font-bold text-base md:text-lg text-gray-900
 `
@@ -712,6 +884,45 @@ const DescriptionTitle = tw.h5`
 
 const DescriptionText = tw.p`
   text-sm text-gray-700 leading-relaxed
+`
+
+// Target audience section
+const TargetAudienceSection = tw.div`
+  rounded-2xl border-2 border-blue-200 p-6 shadow-sm
+  bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50
+  mb-8
+`
+
+const TargetAudienceHeader = tw.div`
+  flex items-center gap-3 mb-4
+`
+
+const TargetAudienceIcon = tw.span`text-3xl`
+
+const TargetAudienceTitle = tw.h4`
+  font-bold text-lg md:text-xl text-gray-900
+`
+
+const TargetAudienceContent = tw.div`
+  flex flex-col gap-4
+`
+
+const TargetAudienceList = tw.div`
+  flex flex-col gap-2
+`
+
+const TargetAudienceListTitle = tw.h5`
+  font-semibold text-sm uppercase tracking-wide text-gray-700 mb-2
+`
+
+const TargetAudienceItem = tw.div`
+  flex items-start gap-3 text-sm leading-relaxed
+`
+
+const TargetAudienceBullet = tw.span`
+  w-6 h-6 rounded-lg
+  flex items-center justify-center
+  font-bold text-xs shrink-0
 `
 
 // Update info

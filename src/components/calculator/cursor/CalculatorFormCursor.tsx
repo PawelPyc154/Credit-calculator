@@ -1107,7 +1107,7 @@ const ErrorMessage = tw.p`text-xs text-red-200`
 
 const PurposeSection = tw.section`flex flex-col gap-2`
 
-const PurposeLabel = tw.span`text-xs text-green-50/90 uppercase tracking-wide`
+const PurposeLabel = tw.span`text-xs font-bold text-green-50/90 uppercase tracking-wide`
 
 const PurposeList = tw.div`flex flex-wrap gap-2`
 

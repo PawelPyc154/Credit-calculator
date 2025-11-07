@@ -155,12 +155,11 @@ export const BankRanking = ({ results, selectedParams, formRef }: BankRankingPro
                     >
                       <CTAIconWrapper>
                         <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
+                          className="w-full h-full"
+                          viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="2"
+                          strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           aria-hidden="true"
@@ -171,7 +170,10 @@ export const BankRanking = ({ results, selectedParams, formRef }: BankRankingPro
                           <path d="M18 9l-8 8-8-8" />
                         </svg>
                       </CTAIconWrapper>
-                      <CTAText>Złóż wniosek online</CTAText>
+                      <CTAContent>
+                        <CTAText>Złóż wniosek online</CTAText>
+                        <CTASubtext>Przejdź do formularza banku</CTASubtext>
+                      </CTAContent>
                       <CTAArrow>→</CTAArrow>
                     </AffiliateCTAButton>
                   )}
@@ -184,8 +186,7 @@ export const BankRanking = ({ results, selectedParams, formRef }: BankRankingPro
                     <ButtonText>{isExpanded ? 'Ukryj szczegóły' : 'Zobacz szczegóły'}</ButtonText>
                     <ButtonIcon className={clsx(isExpanded && 'rotate-180')}>
                       <svg
-                        width="20"
-                        height="20"
+                        className="w-full h-full"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                         aria-hidden="true"
@@ -266,16 +267,18 @@ const ActionsWrapper = tw.div`
   flex flex-col sm:flex-row gap-3 sm:gap-4
   border-t border-gray-100
   bg-linear-to-r from-gray-50/50 to-transparent
-  px-5 pb-4 sm:px-6 sm:pb-5 md:px-7 md:pb-6 lg:px-8
+  px-4 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6 lg:px-8 lg:py-6
+  pt-4 sm:pt-5 md:pt-6 lg:pt-6
 `
 
 const AffiliateCTAButton = tw.a`
   group/cta
-  flex flex-1 items-center justify-center gap-3
-  rounded-xl sm:rounded-2xl
+  relative
+  flex flex-1 items-center justify-center sm:justify-start gap-2.5 sm:gap-3 md:gap-4
+  rounded-xl md:rounded-2xl
   bg-linear-to-r from-emerald-600 to-green-600
-  px-6 py-3.5 sm:px-8 sm:py-4
-  text-base font-bold text-white sm:text-lg
+  px-5 py-3.5 sm:px-6 sm:py-4 md:px-8 md:py-5
+  text-sm sm:text-base md:text-lg font-bold text-white
   shadow-lg shadow-emerald-500/30
   ring-2 ring-transparent
   transition-all duration-300 ease-out
@@ -284,43 +287,53 @@ const AffiliateCTAButton = tw.a`
   hover:shadow-xl hover:shadow-emerald-500/40
   active:scale-[0.98]
   focus:outline-none focus:ring-4 focus:ring-emerald-300/50
+  min-h-[48px] sm:min-h-[52px] md:min-h-[56px]
 `
 
 const CTAIconWrapper = tw.span`
-  flex items-center justify-center
+  flex items-center justify-center shrink-0
+  w-5 h-5 sm:w-6 sm:h-6
   transition-transform duration-300
   group-hover/cta:scale-110 group-hover/cta:-translate-y-0.5
 `
 
-const CTAText = tw.span`text-sm sm:text-base font-semibold`
+const CTAContent = tw.div`flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left`
+
+const CTAText = tw.span`text-sm sm:text-base md:text-lg font-bold leading-tight`
+
+const CTASubtext = tw.span`text-xs sm:text-sm font-normal text-emerald-50 opacity-90 leading-tight mt-0.5 hidden sm:block`
 
 const CTAArrow = tw.span`
-  text-xl font-bold
+  text-xl sm:text-2xl font-bold shrink-0
   transition-transform duration-300
   group-hover/cta:translate-x-1
+  hidden sm:block
 `
 
 const DetailsButton = tw.button`
   group/button
-  flex items-center justify-center gap-2 sm:gap-3
-  min-w-[200px] sm:min-w-[220px]
-  rounded-xl border-2 border-gray-200 sm:rounded-2xl
+  flex items-center justify-center gap-2 sm:gap-2.5 md:gap-3
+  w-full sm:w-auto sm:min-w-[180px] md:min-w-[200px]
+  rounded-xl md:rounded-2xl
+  border-2 border-gray-200
   bg-white
-  px-6 py-3 sm:px-6 sm:py-3.5
-  text-sm font-semibold text-gray-700 sm:text-base
+  px-5 py-3 sm:px-6 sm:py-3.5 md:px-6 md:py-4
+  text-sm sm:text-base font-semibold text-gray-700
   shadow-sm 
   transition-all duration-300 ease-out
-  hover:scale-105 hover:border-gray-300
+  hover:scale-[1.02] hover:border-gray-300
   hover:bg-gray-50
   hover:shadow-md
-  active:scale-95
+  active:scale-[0.98]
   focus:outline-none focus:ring-4 focus:ring-gray-200/50
+  min-h-[48px] sm:min-h-[52px] md:min-h-[56px]
 `
 
 const ButtonText = tw.span`text-sm sm:text-base`
 
 const ButtonIcon = tw.span`
   flex items-center justify-center
+  w-5 h-5 sm:w-5 sm:h-5
   transition-transform duration-300 ease-out
   group-hover/button:scale-110
 `
