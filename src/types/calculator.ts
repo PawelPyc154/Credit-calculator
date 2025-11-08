@@ -14,7 +14,7 @@ export const calculatorFormSchema = z.object({
   loanAmount: z
     .number()
     .min(50000, 'Minimalna kwota kredytu to 50 000 zł')
-    .max(5000000, 'Maksymalna kwota kredytu to 5 000 000 zł'),
+    .max(2500000, 'Maksymalna kwota kredytu to 2 500 000 zł'),
   loanPeriod: z
     .number()
     .min(5, 'Minimalny okres kredytowania to 5 lat')

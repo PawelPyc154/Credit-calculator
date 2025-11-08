@@ -18,7 +18,7 @@ import { Chart } from 'react-chartjs-2'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
 import type { CalculatorFormData } from 'types/calculator'
-import { formatCurrency, formatPercent } from 'utils/calculator'
+import { formatCurrency, formatCurrencyNoCents, formatPercent } from 'utils/calculator'
 
 // Rejestrujemy komponenty Chart.js
 ChartJS.register(
@@ -231,7 +231,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       }
       return `${Math.round(amount)} zł`
     }
-    return formatCurrency(amount)
+    return formatCurrencyNoCents(amount)
   }
 
   // Konfiguracja wykresu
@@ -272,7 +272,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           label: (context: any) => {
             const value = context.parsed.y
             if (value === null || value === undefined) return ''
-            return `${context.dataset.label}: ${formatCurrency(value)}`
+            return `${context.dataset.label}: ${formatCurrencyNoCents(value)}`
           },
         },
       },
@@ -295,7 +295,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
         },
         ticks: {
           callback: (value: any) => {
-            return formatCurrency(value as number)
+            return formatCurrencyNoCents(value as number)
           },
           font: {
             size: isMobile ? 9 : 11,
@@ -324,7 +324,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
         },
         ticks: {
           callback: (value: any) => {
-            return formatCurrency(value as number)
+            return formatCurrencyNoCents(value as number)
           },
           font: {
             size: isMobile ? 9 : 11,
@@ -448,24 +448,24 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
         <SimpleInfoRow className="border-blue-200 border-b-2 bg-blue-50">
           <SimpleInfoLabel className="text-blue-700">Miesięczna rata</SimpleInfoLabel>
           <SimpleInfoValue className="text-blue-600">
-            {formatCurrency(result.monthlyPayment)}
+            {formatCurrencyNoCents(result.monthlyPayment)}
           </SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Całkowity koszt kredytu</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrency(result.totalCost)}</SimpleInfoValue>
+          <SimpleInfoValue>{formatCurrencyNoCents(result.totalCost)}</SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Suma odsetek w okresie kredytowania</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrency(result.totalInterest)}</SimpleInfoValue>
+          <SimpleInfoValue>{formatCurrencyNoCents(result.totalInterest)}</SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Prowizja za udzielenie kredytu</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrency(result.commission)}</SimpleInfoValue>
+          <SimpleInfoValue>{formatCurrencyNoCents(result.commission)}</SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Ubezpieczenie kredytu</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrency(result.insurance)}</SimpleInfoValue>
+          <SimpleInfoValue>{formatCurrencyNoCents(result.insurance)}</SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Liczba rat</SimpleInfoLabel>
@@ -606,16 +606,16 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                         <PaymentScheduleTableRow key={payment.month}>
                           <PaymentScheduleTableCell>{payment.month}</PaymentScheduleTableCell>
                           <PaymentScheduleTableCell className="font-semibold">
-                            {formatCurrency(payment.payment)}
+                            {formatCurrencyNoCents(payment.payment)}
                           </PaymentScheduleTableCell>
                           <PaymentScheduleTableCell>
-                            {formatCurrency(payment.principal)}
+                            {formatCurrencyNoCents(payment.principal)}
                           </PaymentScheduleTableCell>
                           <PaymentScheduleTableCell className="text-orange-600">
-                            {formatCurrency(payment.interest)}
+                            {formatCurrencyNoCents(payment.interest)}
                           </PaymentScheduleTableCell>
                           <PaymentScheduleTableCell className="text-gray-600">
-                            {formatCurrency(payment.remaining)}
+                            {formatCurrencyNoCents(payment.remaining)}
                           </PaymentScheduleTableCell>
                         </PaymentScheduleTableRow>
                       ))}
@@ -936,8 +936,8 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue className="text-gray-600! text-xs">
-                {formatCurrency(result.bank.minLoanAmount)} -{' '}
-                {formatCurrency(result.bank.maxLoanAmount)}
+                {formatCurrencyNoCents(result.bank.minLoanAmount)} -{' '}
+                {formatCurrencyNoCents(result.bank.maxLoanAmount)}
               </ParameterValue>
             </ParameterCard>
           </ParametersGrid>

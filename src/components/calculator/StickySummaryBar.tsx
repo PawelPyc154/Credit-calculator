@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import tw from 'tw-tailwind'
-import { formatCurrency } from 'utils/calculator'
+import { formatCurrencyNoCents } from 'utils/calculator'
 
 export type StickySummaryBarProps = {
   formData: {
@@ -86,7 +86,7 @@ export const StickySummaryBar = ({ formData, onEditClick }: StickySummaryBarProp
         <MetricsRow>
           <MetricChip>
             <MetricLabel>Kwota:</MetricLabel>
-            <MetricValue>{formatCurrency(formData.loanAmount)}</MetricValue>
+            <MetricValue>{formatCurrencyNoCents(formData.loanAmount)}</MetricValue>
           </MetricChip>
           <MetricChip>
             <MetricLabel>Okres:</MetricLabel>
@@ -95,13 +95,13 @@ export const StickySummaryBar = ({ formData, onEditClick }: StickySummaryBarProp
           <MetricChip>
             <MetricLabel>Wkład:</MetricLabel>
             <MetricValue>
-              {formatCurrency(formData.downPayment)}
+              {formatCurrencyNoCents(formData.downPayment)}
               <PercentText> ({downPaymentPercent}%)</PercentText>
             </MetricValue>
           </MetricChip>
           <MetricChip>
             <MetricLabel>Dochód:</MetricLabel>
-            <MetricValue>{formatCurrency(formData.monthlyIncome)}</MetricValue>
+            <MetricValue>{formatCurrencyNoCents(formData.monthlyIncome)}</MetricValue>
           </MetricChip>
         </MetricsRow>
         <EditButton onClick={onEditClick}>

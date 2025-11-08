@@ -1,6 +1,6 @@
 import { Tooltip } from 'components/common/tooltip'
 import tw from 'tw-tailwind'
-import { formatCurrency, formatPercent } from 'utils/calculator'
+import { formatCurrencyNoCents, formatPercent } from 'utils/calculator'
 
 export type BankMetricsProps = {
   monthlyPayment: number
@@ -29,7 +29,7 @@ export const BankMetrics = ({ monthlyPayment, interestRate, totalCost }: BankMet
           }
         >
           <MetricValue className="text-3xl text-blue-600 md:text-4xl">
-            {formatCurrency(monthlyPayment)}
+            {formatCurrencyNoCents(monthlyPayment)}
           </MetricValue>
         </Tooltip>
       </MetricCard>
@@ -72,7 +72,7 @@ export const BankMetrics = ({ monthlyPayment, interestRate, totalCost }: BankMet
             </span>
           }
         >
-          <MetricValue className="text-2xl">{formatCurrency(totalCost)}</MetricValue>
+          <MetricValue className="text-2xl">{formatCurrencyNoCents(totalCost)}</MetricValue>
         </Tooltip>
       </MetricCard>
     </MetricsGrid>

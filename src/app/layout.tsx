@@ -7,10 +7,49 @@ import Script from 'next/script'
 
 import { TRPCReactProvider } from 'trpc/react'
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+
 export const metadata: Metadata = {
-  title: 'Kalkulator Kredytowy | Porównaj oferty kredytów hipotecznych',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'Kalkulator kredytu hipotecznego | Kalkulator Kredytowy',
+    template: '%s | Kalkulator Kredytowy',
+  },
   description:
-    'Porównaj oferty kredytów hipotecznych z różnych banków w Polsce. Znajdź najlepszy kredyt dostosowany do Twoich potrzeb. Oblicz ratę miesięczną i całkowity koszt kredytu.',
+    'Oblicz ratę kredytu hipotecznego i porównaj aktualne oferty banków w Polsce. Analizuj koszty, porównuj scenariusze i znajdź najlepiej dopasowane finansowanie.',
+  keywords: [
+    'kalkulator kredytu hipotecznego',
+    'rata kredytu',
+    'porównanie kredytów',
+    'ranking banków',
+    'zdolność kredytowa',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'pl_PL',
+    url: siteUrl,
+    siteName: 'Kalkulator Kredytowy',
+    title: 'Kalkulator kredytu hipotecznego | Kalkulator Kredytowy',
+    description:
+      'Porównaj oferty kredytów hipotecznych z polskich banków i sprawdź realny koszt finansowania.',
+    images: [
+      {
+        url: `${siteUrl}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'Kalkulator kredytu hipotecznego',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kalkulator kredytu hipotecznego | Kalkulator Kredytowy',
+    description: 'Oblicz ratę kredytu hipotecznego i porównaj oferty banków w jednym miejscu.',
+    images: [`${siteUrl}/og-image.jpg`],
+  },
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 }
 
@@ -25,10 +64,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pl" className={`${geist.variable}`}>
       <head>
-        {isProduction && (
+        {isProduction && process.env.NEXT_PUBLIC_GA_TRACKING_ID && (
           <>
             <Script
-              src="https://www.googletagmanager.com/gtag/js?id=G-ZZ0BQ4CWZE"
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_TRACKING_ID}`}
               strategy="afterInteractive"
             />
             <Script id="google-analytics" strategy="afterInteractive">
@@ -36,7 +75,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'G-ZZ0BQ4CWZE');
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_TRACKING_ID}');
               `}
             </Script>
           </>

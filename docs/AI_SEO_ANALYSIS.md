@@ -112,3 +112,4 @@ AI:
 
 **Gotowy?** Po prostu zapytaj w Cursorze: *"Przeanalizuj moje SEO"* 🚀
 
+

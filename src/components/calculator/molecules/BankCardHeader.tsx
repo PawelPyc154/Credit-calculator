@@ -3,7 +3,7 @@ import { BankLogo } from 'components/common/BankLogo'
 import { IoStar, IoStarOutline } from 'react-icons/io5'
 import tw from 'tw-tailwind'
 import type { CalculationResult } from 'types/calculator'
-import { formatCurrency } from 'utils/calculator'
+import { formatCurrencyNoCents } from 'utils/calculator'
 import { BankMetrics } from './BankMetrics'
 
 export type BankCardHeaderProps = {
@@ -109,14 +109,14 @@ export const BankCardHeader = ({ result, index, isTopThree }: BankCardHeaderProp
           <QuickFactItem>
             <QuickFactIcon>🏦</QuickFactIcon>
             <QuickFactText>
-              Prowizja: <strong>{formatCurrency(result.commission)}</strong>
+              Prowizja: <strong>{formatCurrencyNoCents(result.commission)}</strong>
             </QuickFactText>
           </QuickFactItem>
           <QuickFactDivider>•</QuickFactDivider>
           <QuickFactItem>
             <QuickFactIcon>🛡️</QuickFactIcon>
             <QuickFactText>
-              Ubezpieczenie: <strong>{formatCurrency(result.insurance)}</strong>
+              Ubezpieczenie: <strong>{formatCurrencyNoCents(result.insurance)}</strong>
             </QuickFactText>
           </QuickFactItem>
           {result.bank?.processingTime && (

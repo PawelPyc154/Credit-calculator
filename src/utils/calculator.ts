@@ -208,6 +208,19 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
+ * Formatuje liczbę do formatu waluty PLN bez groszy (tylko pełne złote)
+ * Używane dla kwot kredytu, wkładu własnego i dochodu
+ */
+export function formatCurrencyNoCents(amount: number): string {
+  return new Intl.NumberFormat('pl-PL', {
+    style: 'currency',
+    currency: 'PLN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Math.round(amount))
+}
+
+/**
  * Formatuje liczbę jako procent
  */
 export function formatPercent(value: number): string {

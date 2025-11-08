@@ -1,19 +1,19 @@
 'use client'
 
+import Link from 'next/link'
 import tw from 'tw-tailwind'
 
 export type TabType = 'hipoteczny' | 'gotowkowy' | 'refinansowanie'
 
 export type NavigationTabsProps = {
   activeTab: TabType
-  onTabChange: (tab: TabType) => void
 }
 
-export const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
+export const NavigationTabs = ({ activeTab }: NavigationTabsProps) => {
   return (
     <NavContainer>
       <NavContent>
-        <NavLogo>
+        <LogoLink href="/">
           <LogoIcon>
             <svg
               width="24"
@@ -25,13 +25,19 @@ export const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) 
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <title>Kalkulator</title>
+              <title>Kalkulator Kredytowy</title>
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <path d="M9 3v18M3 9h18" />
             </svg>
           </LogoIcon>
           <LogoText>Kalkulator kredytu hipotecznego</LogoText>
-        </NavLogo>
+        </LogoLink>
+
+        <NavLinks>
+          <NavLink href="/kalkulator/kredyt-hipoteczny" $active={activeTab === 'hipoteczny'}>
+            Kredyt hipoteczny
+          </NavLink>
+        </NavLinks>
       </NavContent>
     </NavContainer>
   )
@@ -52,10 +58,13 @@ const NavContent = tw.div`
   px-4 sm:px-6 lg:px-8
   py-4
   flex items-center justify-between
+  gap-4
 `
 
-const NavLogo = tw.div`
+const LogoLink = tw(Link)`
   flex items-center gap-2
+  text-inherit
+  no-underline
 `
 
 const LogoIcon = tw.span`
@@ -67,4 +76,17 @@ const LogoIcon = tw.span`
 const LogoText = tw.span`
   text-lg font-bold
   text-gray-900
+`
+
+const NavLinks = tw.div`
+  flex items-center gap-2
+  text-sm
+`
+
+const NavLink = tw(Link)<{ $active?: boolean }>`
+  inline-flex items-center rounded-full border px-4 py-2 font-medium transition-colors
+  ${({ $active }) =>
+    $active
+      ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:text-gray-900'}
 `

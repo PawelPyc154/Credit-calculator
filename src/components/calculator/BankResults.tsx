@@ -6,7 +6,7 @@ import { useRef, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
-import { formatCurrency, formatPercent } from 'utils/calculator'
+import { formatCurrencyNoCents, formatPercent } from 'utils/calculator'
 import { BankDetails } from './molecules/BankDetails'
 
 type BankResultsProps = {
@@ -137,7 +137,7 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
                     </MetricItem>
                     <MetricItem className="text-left sm:text-center lg:text-left">
                       <MetricLabel>Całkowity koszt</MetricLabel>
-                      <MetricValue>{formatCurrency(offer.totalCost)}</MetricValue>
+                      <MetricValue>{formatCurrencyNoCents(offer.totalCost)}</MetricValue>
                     </MetricItem>
                     <MetricItemHighlight
                       className={clsx(
@@ -157,7 +157,7 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
                         Miesięczna rata
                       </MetricLabelHighlight>
                       <MetricValueHighlight>
-                        {formatCurrency(offer.monthlyPayment)}
+                        {formatCurrencyNoCents(offer.monthlyPayment)}
                       </MetricValueHighlight>
                     </MetricItemHighlight>
                   </OfferMetrics>

@@ -269,36 +269,53 @@ export const analyticsRouter = createTRPCRouter({
           },
         })
 
-        // Pobierz parametry z eventów (jeśli są dostępne jako custom dimensions)
-        const [purposeResponse] = await client.runReport({
-          property,
-          dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
-          dimensions: [{ name: 'customEvent:purpose' }],
-          metrics: [{ name: 'eventCount' }],
-          dimensionFilter: {
-            filter: {
-              fieldName: 'eventName',
-              stringFilter: { matchType: 'EXACT', value: 'calculate_loan' },
-            },
-          },
-          orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
-          limit: 1,
-        })
+        // Pobierz parametry z eventów (używamy eventParameter zamiast customEvent)
+        // Uwaga: Te wymiary mogą nie być dostępne jeśli nie są zdefiniowane jako custom dimensions w GA4
+        let mostCommonPurpose = ''
+        let mostCommonInterestType = ''
 
-        const [interestTypeResponse] = await client.runReport({
-          property,
-          dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
-          dimensions: [{ name: 'customEvent:interest_rate_type' }],
-          metrics: [{ name: 'eventCount' }],
-          dimensionFilter: {
-            filter: {
-              fieldName: 'eventName',
-              stringFilter: { matchType: 'EXACT', value: 'calculate_loan' },
+        try {
+          const [purposeResponse] = await client.runReport({
+            property,
+            dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
+            dimensions: [{ name: 'eventParameter:purpose' }],
+            metrics: [{ name: 'eventCount' }],
+            dimensionFilter: {
+              filter: {
+                fieldName: 'eventName',
+                stringFilter: { matchType: 'EXACT', value: 'calculate_loan' },
+              },
             },
-          },
-          orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
-          limit: 1,
-        })
+            orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
+            limit: 1,
+          })
+          mostCommonPurpose = purposeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
+        } catch (error) {
+          // Ignoruj błąd jeśli wymiar nie istnieje
+          console.warn('Nie można pobrać wymiaru purpose:', error)
+        }
+
+        try {
+          const [interestTypeResponse] = await client.runReport({
+            property,
+            dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
+            dimensions: [{ name: 'eventParameter:interest_rate_type' }],
+            metrics: [{ name: 'eventCount' }],
+            dimensionFilter: {
+              filter: {
+                fieldName: 'eventName',
+                stringFilter: { matchType: 'EXACT', value: 'calculate_loan' },
+              },
+            },
+            orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
+            limit: 1,
+          })
+          mostCommonInterestType =
+            interestTypeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
+        } catch (error) {
+          // Ignoruj błąd jeśli wymiar nie istnieje
+          console.warn('Nie można pobrać wymiaru interest_rate_type:', error)
+        }
 
         // Parsuj eventy
         let calculations = 0
@@ -326,9 +343,6 @@ export const analyticsRouter = createTRPCRouter({
           }
         })
 
-        const mostCommonPurpose = purposeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
-        const mostCommonInterestType =
-          interestTypeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
 
         return {
           period: `${days} dni`,
@@ -398,18 +412,30 @@ export const analyticsRouter = createTRPCRouter({
         const property = `properties/${propertyId}`
 
         // Pobierz affiliate clicks z parametrami banku
-        const [conversionsResponse] = await client.runReport({
-          property,
-          dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
-          dimensions: [{ name: 'customEvent:bank_name' }, { name: 'customEvent:position' }],
-          metrics: [{ name: 'eventCount' }, { name: 'eventValue' }],
-          dimensionFilter: {
-            filter: {
-              fieldName: 'eventName',
-              stringFilter: { matchType: 'EXACT', value: 'affiliate_click' },
+        // Uwaga: Używamy eventParameter zamiast customEvent - te wymiary mogą nie być dostępne
+        let conversionsResponse
+        try {
+          const [response] = await client.runReport({
+            property,
+            dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
+            dimensions: [
+              { name: 'eventParameter:bank_name' },
+              { name: 'eventParameter:position' },
+            ],
+            metrics: [{ name: 'eventCount' }, { name: 'eventValue' }],
+            dimensionFilter: {
+              filter: {
+                fieldName: 'eventName',
+                stringFilter: { matchType: 'EXACT', value: 'affiliate_click' },
+              },
             },
-          },
-        })
+          })
+          conversionsResponse = response
+        } catch (error) {
+          // Jeśli wymiary nie istnieją, użyj tylko podstawowych metryk
+          console.warn('Nie można pobrać wymiarów konwersji, używam tylko podstawowych metryk:', error)
+          conversionsResponse = { rows: [] }
+        }
 
         // Pobierz total conversions
         const [totalResponse] = await client.runReport({
@@ -436,23 +462,26 @@ export const analyticsRouter = createTRPCRouter({
 
         conversionsResponse.rows?.forEach((row) => {
           const bankName = row.dimensionValues?.[0]?.value || 'Unknown'
-          const position = parseInt(row.dimensionValues?.[1]?.value || '0', 10)
+          const positionStr = row.dimensionValues?.[1]?.value || '0'
+          const position = parseInt(positionStr, 10)
           const clicks = parseInt(row.metricValues?.[0]?.value || '0', 10)
           const value = parseFloat(row.metricValues?.[1]?.value || '0')
 
-          if (!bankMap.has(bankName)) {
-            bankMap.set(bankName, { clicks: 0, position, conversionValue: 0 })
+          if (bankName && bankName !== 'Unknown') {
+            if (!bankMap.has(bankName)) {
+              bankMap.set(bankName, { clicks: 0, position, conversionValue: 0 })
+            }
+
+            const bank = bankMap.get(bankName)!
+            bank.clicks += clicks
+            bank.conversionValue += value
+
+            // Zlicz po pozycji
+            if (position === 1) byPosition.first += clicks
+            else if (position === 2) byPosition.second += clicks
+            else if (position === 3) byPosition.third += clicks
+            else if (position > 0) byPosition.other += clicks
           }
-
-          const bank = bankMap.get(bankName)!
-          bank.clicks += clicks
-          bank.conversionValue += value
-
-          // Zlicz po pozycji
-          if (position === 1) byPosition.first += clicks
-          else if (position === 2) byPosition.second += clicks
-          else if (position === 3) byPosition.third += clicks
-          else byPosition.other += clicks
         })
 
         const byBank = Array.from(bankMap.entries())

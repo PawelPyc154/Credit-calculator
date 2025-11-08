@@ -144,3 +144,4 @@ const SettingCheckbox = tw.input`
 const SettingItemLabel = tw.span`
   text-sm text-gray-700
 `
+

@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult } from 'types/calculator'
-import { formatCurrency } from 'utils/calculator'
+import { formatCurrencyNoCents } from 'utils/calculator'
 
 export type SummaryBannerProps = {
   results: CalculationResult[]
@@ -30,7 +30,7 @@ export const SummaryBanner = ({ results, formData, formComponent }: SummaryBanne
         <MetricsGrid>
           <MetricBox>
             <MetricLabel>Kwota kredytu</MetricLabel>
-            <MetricValue>{formatCurrency(formData.loanAmount)}</MetricValue>
+            <MetricValue>{formatCurrencyNoCents(formData.loanAmount)}</MetricValue>
           </MetricBox>
           <MetricBox>
             <MetricLabel>Okres kredytowania</MetricLabel>
@@ -39,12 +39,12 @@ export const SummaryBanner = ({ results, formData, formComponent }: SummaryBanne
           <MetricBox>
             <MetricLabel>Wkład własny</MetricLabel>
             <MetricValue>
-              {formatCurrency(formData.downPayment)} ({downPaymentPercent}%)
+              {formatCurrencyNoCents(formData.downPayment)} ({downPaymentPercent}%)
             </MetricValue>
           </MetricBox>
           <MetricBox>
             <MetricLabel>Dochód miesięczny</MetricLabel>
-            <MetricValue>{formatCurrency(formData.monthlyIncome)}</MetricValue>
+            <MetricValue>{formatCurrencyNoCents(formData.monthlyIncome)}</MetricValue>
           </MetricBox>
         </MetricsGrid>
       </BannerContent>

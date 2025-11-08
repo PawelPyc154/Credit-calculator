@@ -2,19 +2,66 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([name])
+  @@index([name])
+}
+
+model Bank {
+  id                         String   @id // np. "alior", "mbank"
+  name                       String
+  logo                       String?
+  baseInterestRate           Float
+  wibor                      Float?
+  margin                     Float?
+  commissionRate             Float
+  insuranceRate              Float
+  minLoanAmount              Int
+  maxLoanAmount              Int
+  minLoanPeriod              Int
+  maxLoanPeriod              Int
+  minDownPaymentPercent      Int
+  supportedPurposes          String[] // ["purchase", "refinancing", "construction"]
+  supportedInterestRateTypes String[] // ["fixed", "variable"]
+  fixedInterestRate          Float?
+  description                String?
+  earlyRepaymentFee          Float?
+  accountRequired            Boolean? @default(false)
+  accountFee                 Float?   @default(0)
+  propertyInsuranceRequired  Boolean? @default(true)
+  lifeInsuranceRequired      Boolean? @default(false)
+  processingTime             String?
+  specialOffers              String[]
+  advantages                 String[]
+  disadvantages              String[]
+  ltvRatio80                 Float?   @default(0)
+  ltvRatio90                 Float?   @default(0)
+  ltvRatio95                 Float?   @default(0)
+  updated                    DateTime @default(now())
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  // Pola dla programu afiliacyjnego
+  affiliateEnabled      Boolean? @default(false)
+  affiliateUrl          String?
+  affiliateCampaignId   String?
+  affiliateCommission   Float?
+  affiliateCookiesTime  Int?
+  affiliateRestrictions String[]
+  affiliateNotes        String?
+
+  @@index([id])
+  @@index([updated])
 }

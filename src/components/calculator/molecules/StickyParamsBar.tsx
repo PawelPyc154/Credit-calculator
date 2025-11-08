@@ -1,5 +1,5 @@
 import tw from 'tw-tailwind'
-import { formatCurrency } from 'utils/calculator'
+import { formatCurrencyNoCents } from 'utils/calculator'
 
 export type StickyParamsBarProps = {
   loanAmount: number
@@ -20,7 +20,7 @@ export const StickyParamsBar = ({
         <StickyParams>
           <ParamChip>
             <ParamLabel>Kredyt:</ParamLabel>
-            <ParamValue>{formatCurrency(loanAmount)}</ParamValue>
+            <ParamValue>{formatCurrencyNoCents(loanAmount)}</ParamValue>
           </ParamChip>
           <ParamDivider>•</ParamDivider>
           <ParamChip>
@@ -30,7 +30,7 @@ export const StickyParamsBar = ({
           <ParamDivider>•</ParamDivider>
           <ParamChip>
             <ParamLabel>Wkład:</ParamLabel>
-            <ParamValue>{formatCurrency(downPayment)}</ParamValue>
+            <ParamValue>{formatCurrencyNoCents(downPayment)}</ParamValue>
           </ParamChip>
         </StickyParams>
         <EditButton onClick={onEditClick}>
