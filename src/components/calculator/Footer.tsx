@@ -88,7 +88,6 @@ const FooterSection = tw.footer`
   bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
   text-white 
   pt-12 pb-8 
-  mt-8 sm:mt-10 md:mt-12 lg:mt-16
   border-t border-slate-700
 `
 

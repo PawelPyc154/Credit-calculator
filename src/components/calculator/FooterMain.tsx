@@ -16,6 +16,8 @@ export const FooterMain = () => {
           <Separator>•</Separator>
           <FooterLink href="/polityka-prywatnosci">Polityka prywatności</FooterLink>
           <Separator>•</Separator>
+          <FooterLink href="/zagrozenia-kredytowe">Zagrożenia kredytowe</FooterLink>
+          <Separator>•</Separator>
           <FooterLink href="/kontakt">Kontakt</FooterLink>
         </Links>
         <Copyright>© {currentYear} Kalkulator Kredytowy</Copyright>
@@ -24,7 +26,7 @@ export const FooterMain = () => {
   )
 }
 
-const FooterSection = tw.footer`w-full border-t border-gray-200 bg-white mt-8 sm:mt-10 md:mt-12 lg:mt-16`
+const FooterSection = tw.footer`w-full border-t border-gray-200 bg-white`
 
 const FooterContent = tw.div`
   mx-auto

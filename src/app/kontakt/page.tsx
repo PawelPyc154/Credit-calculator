@@ -1,408 +1,369 @@
-'use client'
-
-import { Footer } from 'components/calculator/Footer'
-import { motion } from 'framer-motion'
+import { FooterMain } from 'components/calculator/FooterMain'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
-  HiChatBubbleLeftRight,
-  HiCheck,
-  HiClock,
-  HiHandRaised,
-  HiInformationCircle,
+  HiOutlineArrowLeft,
+  HiOutlineArrowLongRight,
+  HiOutlineBuildingOffice2,
+  HiOutlineEnvelope,
+  HiOutlineLightBulb,
+  HiOutlineMegaphone,
+  HiOutlinePaperAirplane,
+  HiOutlineQuestionMarkCircle,
+  HiOutlineSparkles,
+  HiOutlineUsers,
 } from 'react-icons/hi2'
-import { MdBarChart, MdBuild, MdBusiness, MdEmail, MdLink, MdMailOutline } from 'react-icons/md'
 import tw from 'tw-tailwind'
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+
+export const metadata: Metadata = {
+  title: 'Kontakt | Kalkulator Kredytowy',
+  description:
+    'Skontaktuj się z zespołem Kalkulatora Kredytowego. Odpowiemy na pytania, przyjmiemy sugestie funkcji oraz porozmawiamy o współpracy partnerkiej.',
+  alternates: {
+    canonical: `${siteUrl}/kontakt`,
   },
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: 'easeOut' as const,
-    },
+const contactChannels = [
+  {
+    title: 'Pomoc dla użytkowników',
+    description:
+      'Masz pytanie dotyczące działania kalkulatora, wyników symulacji lub potrzebujesz pomocy technicznej?',
+    icon: HiOutlineQuestionMarkCircle,
+    points: [
+      'Wyjaśnienie wyników kalkulacji',
+      'Instrukcje korzystania z funkcji',
+      'Zgłoszenie błędów i sugestii',
+    ],
+    ctaLabel: 'Napisz do wsparcia',
+    href: 'mailto:kontakt@kalkulatorkredytowy.pl?subject=Wsparcie%20u%C5%BCytkownika',
   },
-  hover: {
-    y: -4,
-    transition: {
-      duration: 0.2,
-      ease: 'easeOut' as const,
-    },
+  {
+    title: 'Współpraca i partnerstwa',
+    description:
+      'Poszukujesz partnera do wspólnych działań marketingowych, afiliacji lub integracji danych bankowych?',
+    icon: HiOutlineBuildingOffice2,
+    points: [
+      'Wspólne kampanie content marketingowe',
+      'Integracje API i aktualizacja danych bankowych',
+      'Dedykowane edycje kalkulatora dla partnerów',
+    ],
+    ctaLabel: 'Porozmawiajmy o współpracy',
+    href: 'mailto:kontakt@kalkulatorkredytowy.pl?subject=Wsp%C3%B3%C5%82praca',
   },
-}
+  {
+    title: 'Media i eksperci',
+    description:
+      'Tworzysz materiał o rynku kredytowym i potrzebujesz komentarza, danych lub demonstracji narzędzia?',
+    icon: HiOutlineMegaphone,
+    points: [
+      'Komentarze eksperckie i dane rynkowe',
+      'Materiały prasowe i case studies',
+      'Wystąpienia na wydarzeniach branżowych',
+    ],
+    ctaLabel: 'Poproś o materiały',
+    href: 'mailto:kontakt@kalkulatorkredytowy.pl?subject=Media%20i%20wypowiedzi',
+  },
+]
+
+const responseHighlights = [
+  {
+    title: 'Czas odpowiedzi',
+    detail: 'Odpowiadamy najczęściej w ciągu 1 dnia roboczego, maksymalnie 48 godzin.',
+  },
+  {
+    title: 'Forma kontaktu',
+    detail:
+      'Preferujemy e-mail – daje nam możliwość przygotowania precyzyjnej odpowiedzi i materiałów.',
+  },
+  {
+    title: 'Przejrzystość',
+    detail:
+      'Każde zgłoszenie otrzymuje numer referencyjny, aby łatwo wrócić do wcześniejszych rozmów.',
+  },
+]
+
+const preparationSteps = [
+  {
+    title: 'Opisz kontekst i cel',
+    detail: 'Napisz, czego dotyczy zgłoszenie i jaki efekt chcesz osiągnąć.',
+  },
+  {
+    title: 'Dodaj dane i materiały',
+    detail: 'Załącz zrzuty ekranu, wyniki kalkulatora lub link do oferty banku.',
+  },
+  {
+    title: 'Zaproponuj termin rozmowy',
+    detail: 'Jeżeli chcesz porozmawiać, zaproponuj okno czasowe lub formę kontaktu.',
+  },
+]
+
+const faqEntries = [
+  {
+    question: 'Czy kalkulator jest darmowy?',
+    answer: 'Tak – nie pobieramy opłat za korzystanie z kalkulatora ani nie wymagamy rejestracji.',
+  },
+  {
+    question: 'Czy udzielacie kredytów lub pośredniczycie w formalnościach?',
+    answer:
+      'Nie. Naszym celem jest edukacja i porównanie ofert banków. Decyzję kredytową podejmujesz bezpośrednio z bankiem.',
+  },
+  {
+    question: 'Czy mogę poprosić o dedykowaną wersję kalkulatora?',
+    answer:
+      'Tak. Tworzymy rozwiązania white-label oraz integracje pod konkretne potrzeby partnerów biznesowych.',
+  },
+  {
+    question: 'Jak często aktualizujecie dane bankowe?',
+    answer:
+      'Automatycznie każdego dnia roboczego, a zmiany od razu trafiają do kalkulatora oraz rankingów.',
+  },
+]
 
 export default function KontaktPage() {
   return (
-    <PageContainer>
-      <ContentWrapper>
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <BackLink href="/" aria-label="Powrót do strony głównej">
-            <BackArrow aria-hidden="true">←</BackArrow>
-            <BackText>Powrót do kalkulatora</BackText>
-          </BackLink>
-        </motion.div>
+    <PageWrapper>
+      <ContentContainer>
+        <BackLink href="/">
+          <BackIcon aria-hidden="true">
+            <HiOutlineArrowLeft size={18} />
+          </BackIcon>
+          Wróć do strony głównej
+        </BackLink>
 
-        {/* Hero Section - Full Width */}
-        <HeroSection
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <HeroContent>
-            <HeroTitle>Skontaktuj się z nami</HeroTitle>
-            <HeroDescription>
-              Masz pytania dotyczące kalkulatora? Chcesz zgłosić błąd lub zaproponować nową funkcję?
-              Jesteśmy tutaj, aby pomóc!
-            </HeroDescription>
-            <HeroEmailWrapper whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <HeroEmailIcon aria-hidden="true">
-                <MdMailOutline />
-              </HeroEmailIcon>
-              <HeroEmail
-                href="mailto:kontakt@kalkulatorkredytowy.pl"
-                aria-label="Wyślij email do kontakt@kalkulatorkredytowy.pl"
-              >
-                kontakt@kalkulatorkredytowy.pl
-              </HeroEmail>
-            </HeroEmailWrapper>
-            <HeroResponseTime>
-              <ResponseIcon aria-hidden="true">
-                <MdEmail />
-              </ResponseIcon>
-              Odpowiadamy w ciągu <ResponseHighlight>48 godzin roboczych</ResponseHighlight>
-            </HeroResponseTime>
-          </HeroContent>
+        <HeroSection>
+          <HeroBadge>Porozmawiajmy</HeroBadge>
+          <HeroTitle>Skontaktuj się z zespołem Kalkulatora Kredytowego</HeroTitle>
+          <HeroLead>
+            Chętnie odpowiemy na pytania dotyczące narzędzia, porozmawiamy o współpracy i pomożemy
+            przygotować materiały do publikacji. Napisz, a wrócimy z konkretną odpowiedzią.
+          </HeroLead>
+          <HeroActions>
+            <PrimaryCta href="mailto:kontakt@kalkulatorkredytowy.pl">
+              kontakt@kalkulatorkredytowy.pl
+              <HiOutlineArrowLongRight size={18} />
+            </PrimaryCta>
+            <SecondaryCta href="/zagrozenia-kredytowe">
+              Zobacz przewodnik o ryzykach kredytowych
+            </SecondaryCta>
+          </HeroActions>
+          <ResponseStrip>
+            {responseHighlights.map(({ title, detail }) => (
+              <ResponseItem key={title}>
+                <ResponseTitle>{title}</ResponseTitle>
+                <ResponseDetail>{detail}</ResponseDetail>
+              </ResponseItem>
+            ))}
+          </ResponseStrip>
         </HeroSection>
 
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          {/* Bento Grid - Asymmetric Layout */}
-          <BentoGrid>
-            {/* Large Card - Help Topics */}
-            <HelpCard variants={cardVariants} whileHover="hover">
-              <CardHeader>
-                <CardIcon aria-hidden="true">
-                  <HiChatBubbleLeftRight />
-                </CardIcon>
-                <CardTitle>W czym możemy pomóc?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <HelpDescription>
-                  Jesteśmy tutaj, aby odpowiedzieć na Twoje pytania i pomóc w każdym aspekcie
-                  związanym z kalkulatorem kredytowym. Skontaktuj się z nami w sprawie:
-                </HelpDescription>
-                <HelpList role="list">
-                  {[
-                    'Pytania dotyczące kalkulatora i jego funkcji',
-                    'Zgłaszanie błędów i problemów technicznych',
-                    'Sugestie nowych funkcji i ulepszeń',
-                    'Współpraca biznesowa i partnerstwa',
-                    'Aktualizacja ofert bankowych i danych',
-                    'Pytania dotyczące kredytów hipotecznych',
-                    'Pomoc w interpretacji wyników kalkulacji',
-                    'Problemy z wyświetlaniem lub działaniem strony',
-                  ].map((text, index) => (
-                    <motion.li
-                      key={text}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      className="group flex items-start gap-3"
-                    >
-                      <IconWrapper aria-hidden="true">
-                        <HiCheck />
-                      </IconWrapper>
-                      <HelpText>{text}</HelpText>
-                    </motion.li>
+        <Section>
+          <SectionHeader>
+            <SectionBadge aria-hidden="true">
+              <HiOutlineEnvelope size={18} />
+              Wybierz temat rozmowy
+            </SectionBadge>
+            <SectionTitle>Jak możemy Ci pomóc?</SectionTitle>
+            <SectionSubtitle>
+              Wybierz obszar, w którym potrzebujesz wsparcia. Każde zgłoszenie trafia do
+              odpowiedniej osoby w zespole.
+            </SectionSubtitle>
+          </SectionHeader>
+          <ChannelGrid role="list">
+            {contactChannels.map(({ title, description, icon: Icon, points, ctaLabel, href }) => (
+              <ChannelCard key={title} role="listitem">
+                <ChannelIcon aria-hidden="true">
+                  <Icon size={24} />
+                </ChannelIcon>
+                <ChannelTitle>{title}</ChannelTitle>
+                <ChannelDescription>{description}</ChannelDescription>
+                <ChannelList>
+                  {points.map((point) => (
+                    <li key={point}>{point}</li>
                   ))}
-                </HelpList>
-              </CardContent>
-            </HelpCard>
+                </ChannelList>
+                <ChannelCta href={href}>{ctaLabel}</ChannelCta>
+              </ChannelCard>
+            ))}
+          </ChannelGrid>
+        </Section>
 
-            {/* Medium Card - Contact Info */}
-            <ContactCard variants={cardVariants} whileHover="hover">
-              <CardHeader>
-                <CardIcon aria-hidden="true">
-                  <MdEmail />
-                </CardIcon>
-                <CardTitle>Jak się skontaktować</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Paragraph>W wiadomości prosimy podać:</Paragraph>
-                <CheckList role="list">
-                  {[
-                    'Temat zgłoszenia',
-                    'Szczegółowy opis sprawy',
-                    'Kroki do odtworzenia (w przypadku błędów)',
-                    'Zrzuty ekranu (opcjonalnie)',
-                  ].map((item) => (
-                    <CheckItem key={item}>{item}</CheckItem>
-                  ))}
-                </CheckList>
-              </CardContent>
-            </ContactCard>
+        <Section>
+          <SectionHeader>
+            <SectionBadge aria-hidden="true">
+              <HiOutlinePaperAirplane size={18} />
+              Przygotowanie zgłoszenia
+            </SectionBadge>
+            <SectionTitle>Co ułatwi nam szybką odpowiedź</SectionTitle>
+            <SectionSubtitle>
+              Kilka wskazówek, dzięki którym szybciej wrócimy z konkretnymi propozycjami lub
+              rozwiązaniem.
+            </SectionSubtitle>
+          </SectionHeader>
+          <PreparationGrid role="list">
+            {preparationSteps.map(({ title, detail }) => (
+              <PreparationCard key={title} role="listitem">
+                <PreparationMarker aria-hidden="true">
+                  <HiOutlineLightBulb size={20} />
+                </PreparationMarker>
+                <PreparationTitle>{title}</PreparationTitle>
+                <PreparationDetail>{detail}</PreparationDetail>
+              </PreparationCard>
+            ))}
+          </PreparationGrid>
+        </Section>
 
-            {/* Small Card - Response Time */}
-            <TimeCard variants={cardVariants} whileHover="hover">
-              <TimeCardIcon aria-hidden="true">
-                <HiClock />
-              </TimeCardIcon>
-              <TimeCardTitle>Szybka odpowiedź</TimeCardTitle>
-              <TimeCardText>
-                Odpowiadamy na wszystkie zgłoszenia w ciągu{' '}
-                <TimeHighlight>48 godzin roboczych</TimeHighlight>
-              </TimeCardText>
-            </TimeCard>
+        <Section>
+          <SectionHeader>
+            <SectionBadge aria-hidden="true">
+              <HiOutlineUsers size={18} />
+              Jak współpracujemy
+            </SectionBadge>
+            <SectionTitle>Ścieżka kontaktu krok po kroku</SectionTitle>
+            <SectionSubtitle>
+              Oto jak wygląda standardowa współpraca – od pierwszej wiadomości po wdrożenie ustaleń.
+            </SectionSubtitle>
+          </SectionHeader>
+          <Timeline>
+            <TimelineItem>
+              <TimelineStep>1</TimelineStep>
+              <TimelineContent>
+                <TimelineTitle>Wiadomość i doprecyzowanie potrzeb</TimelineTitle>
+                <TimelineDetail>
+                  Odpowiadamy na Twoją wiadomość, uzupełniamy informacje i proponujemy termin
+                  rozmowy.
+                </TimelineDetail>
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineStep>2</TimelineStep>
+              <TimelineContent>
+                <TimelineTitle>Analiza i rekomendacje</TimelineTitle>
+                <TimelineDetail>
+                  Przygotowujemy propozycje rozwiązań, materiały lub wyceny – w zależności od
+                  tematu.
+                </TimelineDetail>
+              </TimelineContent>
+            </TimelineItem>
+            <TimelineItem>
+              <TimelineStep>3</TimelineStep>
+              <TimelineContent>
+                <TimelineTitle>Wdrożenie i kolejne kroki</TimelineTitle>
+                <TimelineDetail>
+                  Po akceptacji realizujemy ustalenia, a Ty otrzymujesz plan dalszych działań i
+                  podsumowanie.
+                </TimelineDetail>
+              </TimelineContent>
+            </TimelineItem>
+          </Timeline>
+        </Section>
 
-            {/* Wide Card - Cooperation */}
-            <CooperationCard variants={cardVariants} whileHover="hover">
-              <CardHeader>
-                <CardIcon aria-hidden="true">
-                  <HiHandRaised />
-                </CardIcon>
-                <CardTitle>Współpraca</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Paragraph>
-                  Jesteś zainteresowany współpracą? Skontaktuj się z nami w sprawie:
-                </Paragraph>
-                <CooperationGrid>
-                  {[
-                    { icon: MdBarChart, text: 'Partnerstwa z bankami' },
-                    { icon: MdBusiness, text: 'Content marketing' },
-                    { icon: MdLink, text: 'Współpraca SEO' },
-                    { icon: MdBuild, text: 'Rozwój kalkulatora' },
-                  ].map((item, index) => {
-                    const IconComponent = item.icon
-                    return (
-                      <CooperationItem
-                        key={item.text}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.8 + index * 0.1 }}
-                      >
-                        <CooperationIcon aria-hidden="true">
-                          <IconComponent />
-                        </CooperationIcon>
-                        <CooperationText>{item.text}</CooperationText>
-                      </CooperationItem>
-                    )
-                  })}
-                </CooperationGrid>
-              </CardContent>
-            </CooperationCard>
+        <Section id="faq">
+          <SectionHeader>
+            <SectionBadge aria-hidden="true">
+              <HiOutlineSparkles size={18} />
+              Najczęstsze pytania
+            </SectionBadge>
+            <SectionTitle>Zanim napiszesz – sprawdź FAQ</SectionTitle>
+            <SectionSubtitle>
+              Zebraliśmy odpowiedzi na pytania, które pojawiają się najczęściej w wiadomościach od
+              użytkowników.
+            </SectionSubtitle>
+          </SectionHeader>
+          <FaqList role="list">
+            {faqEntries.map(({ question, answer }) => (
+              <FaqItem key={question}>
+                <FaqQuestion>{question}</FaqQuestion>
+                <FaqAnswer>{answer}</FaqAnswer>
+              </FaqItem>
+            ))}
+          </FaqList>
+        </Section>
 
-            {/* Info Card - Important Information */}
-            <InfoCard variants={cardVariants} whileHover="hover">
-              <CardHeader>
-                <CardIcon aria-hidden="true">
-                  <HiInformationCircle />
-                </CardIcon>
-                <CardTitle>Ważne informacje</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <InfoGrid>
-                  {[
-                    {
-                      title: 'Nie jesteśmy bankiem',
-                      text: 'nie udzielamy kredytów ani nie oferujemy pośrednictwa kredytowego.',
-                    },
-                    {
-                      title: 'Nie zbieramy danych',
-                      text: 'kalkulator działa lokalnie w Twojej przeglądarce.',
-                    },
-                    {
-                      title: 'Wyniki są orientacyjne',
-                      text: 'rzeczywiste warunki zależą od oceny banku.',
-                    },
-                  ].map((info) => (
-                    <InfoItem key={info.title}>
-                      <InfoBullet aria-hidden="true">●</InfoBullet>
-                      <InfoText>
-                        <Strong>{info.title}</Strong> - {info.text}
-                      </InfoText>
-                    </InfoItem>
-                  ))}
-                </InfoGrid>
-              </CardContent>
-            </InfoCard>
-          </BentoGrid>
-
-          {/* FAQ Section */}
-          <FAQSection variants={cardVariants} aria-labelledby="faq-heading">
-            <FAQTitle id="faq-heading">Najczęściej zadawane pytania</FAQTitle>
-            <FAQGrid>
-              {[
-                {
-                  q: 'Czy kalkulator jest darmowy?',
-                  a: 'Tak, kalkulator jest całkowicie darmowy i nie wymaga rejestracji.',
-                },
-                {
-                  q: 'Czy muszę podawać dane osobowe?',
-                  a: 'Nie, kalkulator działa bez podawania danych osobowych. Wszystkie obliczenia są wykonywane lokalnie w Twojej przeglądarce.',
-                },
-                {
-                  q: 'Czy mogę uzyskać kredyt przez kalkulator?',
-                  a: 'Nie, kalkulator służy tylko do porównania ofert. W celu uzyskania kredytu należy skontaktować się bezpośrednio z bankiem.',
-                },
-                {
-                  q: 'Jak często aktualizujecie dane bankowe?',
-                  a: 'Dane są aktualizowane regularnie, jednak zalecamy weryfikację warunków bezpośrednio w banku.',
-                },
-              ].map((faq, index) => (
-                <FAQItem
-                  key={faq.q}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1 + index * 0.1 }}
-                  whileHover={{ x: 4 }}
-                >
-                  <Question>{faq.q}</Question>
-                  <Answer>{faq.a}</Answer>
-                </FAQItem>
-              ))}
-            </FAQGrid>
-          </FAQSection>
-        </motion.div>
-      </ContentWrapper>
-      <Footer />
-    </PageContainer>
+        <FinalSection>
+          <FinalContent>
+            <FinalTitle>Gotowy, by rozpocząć rozmowę?</FinalTitle>
+            <FinalText>
+              Opisz swoją sprawę i załącz potrzebne materiały. Wrócimy z odpowiedzią najpóźniej w
+              ciągu 48 godzin roboczych.
+            </FinalText>
+            <FinalActions>
+              <PrimaryCta href="mailto:kontakt@kalkulatorkredytowy.pl">
+                Wyślij wiadomość
+                <HiOutlineArrowLongRight size={18} />
+              </PrimaryCta>
+              <SecondaryCta href="/kalkulator/kredyt-hipoteczny">
+                Przelicz kredyt ponownie
+              </SecondaryCta>
+            </FinalActions>
+          </FinalContent>
+        </FinalSection>
+      </ContentContainer>
+      <FooterMain />
+    </PageWrapper>
   )
 }
 
-// Styled Components
-const PageContainer = tw.div`min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50`
-const ContentWrapper = tw.div`mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16`
+const PageWrapper = tw.main`min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100`
+const ContentContainer = tw.div`mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20`
 
-const BackLink = tw(Link)`
-  group -ml-2 mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 font-medium text-green-600 
-  transition-all duration-200 hover:gap-3 hover:bg-green-50 hover:text-green-700 
-  focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
-  sm:mb-8 lg:mb-10
-`
-const BackArrow = tw.span`text-xl transition-transform duration-200 group-hover:-translate-x-1`
-const BackText = tw.span`text-sm sm:text-base`
+const BackLink = tw(
+  Link,
+)`mb-8 inline-flex items-center gap-2 text-sm font-medium text-emerald-700 no-underline hover:text-emerald-800`
+const BackIcon = tw.span`inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700`
 
-// Hero Section
-const HeroSection = tw(motion.section)`
-  mb-10 rounded-3xl border border-green-100 bg-linear-to-r from-green-600 to-emerald-600 
-  p-8 shadow-xl sm:mb-12 sm:p-10 lg:mb-16 lg:p-14
-`
-const HeroContent = tw.div`mx-auto max-w-3xl text-center`
-const HeroTitle = tw.h1`mb-4 text-3xl font-bold text-white sm:text-4xl lg:text-5xl lg:mb-6`
-const HeroDescription = tw.p`mb-8 text-base leading-relaxed text-green-50 sm:text-lg lg:mb-10`
-const HeroEmailWrapper = tw(
-  motion.div,
-)`mx-auto inline-flex items-center gap-3 rounded-2xl border-2 border-white/30 bg-white/10 px-6 py-4 backdrop-blur-sm transition-all duration-200 hover:border-white/50 hover:bg-white/20 sm:gap-4 sm:px-8 sm:py-5`
-const HeroEmailIcon = tw.span`flex items-center justify-center text-2xl sm:text-3xl`
-const HeroEmail = tw.a`text-lg font-semibold text-white no-underline transition-colors hover:text-green-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-green-600 sm:text-xl`
-const HeroResponseTime = tw.p`mt-6 flex items-center justify-center gap-2 text-sm text-green-50 sm:text-base lg:mt-8`
-const ResponseIcon = tw.span`flex items-center justify-center text-lg`
-const ResponseHighlight = tw.span`font-semibold text-white`
+const HeroSection = tw.section`mx-auto max-w-3xl text-center`
+const HeroBadge = tw.span`mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700`
+const HeroTitle = tw.h1`mb-4 text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl`
+const HeroLead = tw.p`mx-auto mb-8 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg`
+const HeroActions = tw.div`flex flex-col items-center justify-center gap-3 sm:flex-row`
 
-// Bento Grid Layout
-const BentoGrid = tw.div`grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8`
+const PrimaryCta = tw.a`inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500`
+const SecondaryCta = tw(
+  Link,
+)`inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white/95 px-5 py-3 font-semibold text-emerald-700 shadow-sm transition-colors hover:border-emerald-200 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white`
 
-// Card Variants
-const HelpCard = tw(motion.div)`
-  rounded-2xl border border-gray-200 bg-white p-6 shadow-md 
-  transition-all duration-300 hover:border-green-300 hover:shadow-lg 
-  sm:p-8 lg:col-span-2 lg:row-span-2
-`
-const ContactCard = tw(motion.div)`
-  rounded-2xl border border-gray-200 bg-white p-6 shadow-md 
-  transition-all duration-300 hover:border-green-300 hover:shadow-lg sm:p-8
-`
-const TimeCard = tw(motion.div)`
-  rounded-2xl border border-green-200 bg-linear-to-br from-green-50 to-emerald-50 p-6 shadow-md 
-  transition-all duration-300 hover:border-green-300 hover:shadow-lg sm:p-8
-`
-const CooperationCard = tw(motion.div)`
-  rounded-2xl border border-gray-200 bg-white p-6 shadow-md 
-  transition-all duration-300 hover:border-green-300 hover:shadow-lg 
-  sm:p-8 lg:col-span-2
-`
-const InfoCard = tw(motion.div)`
-  rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-yellow-50 p-6 shadow-md 
-  transition-all duration-300 hover:border-amber-300 hover:shadow-lg 
-  sm:p-8 lg:col-span-3
-`
+const ResponseStrip = tw.div`mt-8 grid gap-4 rounded-3xl border border-emerald-100 bg-white/80 p-6 text-left shadow-sm sm:grid-cols-3 sm:gap-6`
+const ResponseItem = tw.div`flex flex-col gap-2`
+const ResponseTitle = tw.span`text-sm font-semibold text-emerald-700`
+const ResponseDetail = tw.p`text-sm leading-relaxed text-gray-600`
 
-const CardHeader = tw.div`mb-5 flex items-center gap-3 sm:mb-6 sm:gap-4`
-const CardIcon = tw.span`flex items-center justify-center text-2xl sm:text-3xl text-green-600`
-const CardTitle = tw.h2`text-xl font-bold text-gray-900 sm:text-2xl`
-const CardContent = tw.div`flex flex-col gap-4 sm:gap-5`
+const Section = tw.section`mt-16`
+const SectionHeader = tw.div`mx-auto mb-10 max-w-3xl text-center`
+const SectionBadge = tw.span`mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700`
+const SectionTitle = tw.h2`text-3xl font-bold text-gray-900 sm:text-4xl`
+const SectionSubtitle = tw.p`mt-3 text-sm leading-relaxed text-gray-600 sm:text-base`
 
-const HelpDescription = tw.p`mb-4 text-sm leading-relaxed text-gray-600 sm:text-base sm:mb-5`
-const HelpList = tw.ul`flex flex-col gap-3 sm:gap-4`
-const IconWrapper = tw.span`
-  mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full 
-  bg-linear-to-br from-green-500 to-emerald-600 text-white 
-  shadow-sm transition-transform duration-200 group-hover:scale-110
-`
-const HelpText = tw.span`pt-0.5 text-sm leading-relaxed text-gray-700 sm:text-base`
+const ChannelGrid = tw.ul`grid grid-cols-1 gap-6 sm:grid-cols-2`
+const ChannelCard = tw.li`flex h-full flex-col rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm transition-transform hover:-translate-y-1 hover:shadow-lg`
+const ChannelIcon = tw.span`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700`
+const ChannelTitle = tw.h3`mb-2 text-xl font-semibold text-gray-900`
+const ChannelDescription = tw.p`mb-4 text-sm leading-relaxed text-gray-600`
+const ChannelList = tw.ul`mb-6 grid gap-2 text-sm text-gray-600 [&_li]:relative [&_li]:pl-4 [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:text-emerald-500 [&_li]:before:content-['•']`
+const ChannelCta = tw.a`mt-auto inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 no-underline hover:text-emerald-900`
 
-const Paragraph = tw.p`text-sm leading-relaxed text-gray-700 sm:text-base`
+const PreparationGrid = tw.ul`grid grid-cols-1 gap-5 sm:grid-cols-3`
+const PreparationCard = tw.li`rounded-2xl border border-emerald-100 bg-white/90 p-5 shadow-sm`
+const PreparationMarker = tw.span`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700`
+const PreparationTitle = tw.h3`mb-1 text-lg font-semibold text-gray-900`
+const PreparationDetail = tw.p`text-sm leading-relaxed text-gray-600`
 
-const CheckList = tw.ul`flex flex-col gap-2.5 sm:gap-3`
-const CheckItem = tw.li`
-  relative pl-6 text-sm text-gray-700 sm:pl-7 sm:text-base
-  before:absolute before:left-0 before:text-base before:font-bold before:text-green-600 before:content-['✓'] sm:before:text-lg
-`
+const Timeline = tw.ol`mx-auto max-w-3xl space-y-6`
+const TimelineItem = tw.li`flex items-start gap-4 rounded-2xl border border-gray-200 bg-white/90 p-5 shadow-sm`
+const TimelineStep = tw.span`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-sm font-semibold text-white`
+const TimelineContent = tw.div`flex flex-col gap-2`
+const TimelineTitle = tw.h3`text-lg font-semibold text-gray-900`
+const TimelineDetail = tw.p`text-sm leading-relaxed text-gray-600`
 
-// Time Card
-const TimeCardIcon = tw.span`mb-3 flex items-center justify-center text-3xl text-green-600 sm:mb-4 sm:text-4xl`
-const TimeCardTitle = tw.h3`mb-2 text-lg font-bold text-gray-900 sm:mb-3 sm:text-xl`
-const TimeCardText = tw.p`text-sm leading-relaxed text-gray-700 sm:text-base`
-const TimeHighlight = tw.span`font-semibold text-green-600`
+const FaqList = tw.ul`grid grid-cols-1 gap-4 sm:grid-cols-2`
+const FaqItem = tw.li`rounded-2xl border border-gray-200 bg-white/90 p-5 text-left shadow-sm`
+const FaqQuestion = tw.h3`mb-2 text-lg font-semibold text-gray-900`
+const FaqAnswer = tw.p`text-sm leading-relaxed text-gray-600`
 
-// Cooperation
-const CooperationGrid = tw.div`grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4`
-const CooperationItem = tw(motion.div)`
-  flex items-center gap-3 rounded-xl bg-green-50/70 p-3.5 
-  transition-colors duration-200 hover:bg-green-100/70 sm:p-4
-`
-const CooperationIcon = tw.span`shrink-0 flex items-center justify-center text-xl text-green-600 sm:text-2xl`
-const CooperationText = tw.span`text-sm font-medium text-gray-700 sm:text-base`
-
-// Info
-const InfoGrid = tw.div`grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5`
-const InfoItem = tw.div`flex items-start gap-2.5 sm:gap-3`
-const InfoBullet = tw.span`mt-1 shrink-0 text-xs text-green-600`
-const InfoText = tw.p`text-sm leading-relaxed text-gray-600 sm:text-base`
-const Strong = tw.strong`font-semibold text-gray-900`
-
-// FAQ Section
-const FAQSection = tw(motion.section)`
-  mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-md 
-  sm:mt-12 sm:p-8 lg:p-10
-`
-const FAQTitle = tw.h2`
-  mb-8 text-center text-2xl font-bold bg-linear-to-r from-green-600 to-emerald-600 
-  bg-clip-text text-transparent sm:mb-10 sm:text-3xl
-`
-const FAQGrid = tw.div`grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6`
-const FAQItem = tw(motion.div)`
-  rounded-xl border border-transparent p-4 transition-all duration-200 
-  hover:border-green-200 hover:bg-green-50/50 sm:p-5
-`
-const Question = tw.h3`
-  mb-2 flex items-start gap-2 text-base font-semibold text-gray-900 
-  before:font-bold before:text-green-600 before:content-['Q:'] sm:mb-3 sm:text-lg
-`
-const Answer = tw.p`pl-6 text-sm leading-relaxed text-gray-600 sm:pl-7 sm:text-base`
+const FinalSection = tw.section`mt-20 rounded-3xl border border-emerald-200 bg-linear-to-r from-emerald-600 to-teal-600 p-8 shadow-xl sm:p-10`
+const FinalContent = tw.div`mx-auto flex max-w-3xl flex-col items-center text-center text-white`
+const FinalTitle = tw.h2`text-2xl font-bold sm:text-3xl`
+const FinalText = tw.p`mt-3 text-base leading-relaxed text-emerald-50`
+const FinalActions = tw.div`mt-6 flex flex-col gap-3 sm:flex-row`

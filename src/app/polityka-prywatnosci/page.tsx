@@ -1,224 +1,269 @@
-import { Footer } from 'components/calculator/Footer'
+import { FooterMain } from 'components/calculator/FooterMain'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import {
+  HiOutlineArrowLeft,
+  HiOutlineArrowLongRight,
+  HiOutlineLockClosed,
+  HiOutlineShieldCheck,
+  HiOutlineSparkles,
+} from 'react-icons/hi2'
 import tw from 'tw-tailwind'
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+
 export const metadata: Metadata = {
-  title: 'Polityka Prywatności - Kalkulator Kredytowy',
+  title: 'Polityka prywatności | Kalkulator Kredytowy',
   description:
-    'Polityka prywatności kalkulatora kredytowego. Informacje o przetwarzaniu danych osobowych zgodnie z RODO.',
+    'Dowiedz się, jakie dane gromadzi Kalkulator Kredytowy, jak je chronimy i jakie prawa przysługują użytkownikom zgodnie z RODO.',
+  alternates: {
+    canonical: `${siteUrl}/polityka-prywatnosci`,
+  },
 }
+
+type PolicySection = {
+  title: string
+  paragraphs?: string[]
+  bulletIntro?: string
+  bullets?: string[]
+}
+
+const policySections: PolicySection[] = [
+  {
+    title: '1. Administrator danych osobowych',
+    paragraphs: [
+      'Administratorem danych osobowych jest właściciel serwisu Kalkulator Kredytowy.',
+      'W sprawach dotyczących przetwarzania danych osobowych można kontaktować się poprzez stronę kontaktową lub podany adres e-mail.',
+    ],
+  },
+  {
+    title: '2. Zakres przetwarzanych danych',
+    paragraphs: [
+      'Kalkulator kredytowy działa w oparciu o dane wprowadzane lokalnie przez użytkownika. Podstawowe funkcje kalkulatora nie wymagają podawania danych osobowych.',
+      'Serwis może przetwarzać następujące dane techniczne i statystyczne:',
+    ],
+    bullets: [
+      'Adres IP, typ przeglądarki, system operacyjny i czas wizyty',
+      'Dane z plików cookies, np. preferencje użytkownika oraz statystyki odwiedzin',
+      'Dane analityczne, takie jak interakcje z kalkulatorem i czas spędzony na stronie',
+    ],
+    paragraphs: [
+      'Dane wprowadzane do kalkulatora (kwoty kredytu, dochody, okres kredytowania) są przetwarzane wyłącznie lokalnie w przeglądarce użytkownika i nie są przesyłane na serwer.',
+    ],
+  },
+  {
+    title: '3. Cele i podstawy przetwarzania',
+    paragraphs: ['Dane są przetwarzane w następujących celach i w oparciu o podane podstawy prawne:'],
+    bullets: [
+      'Zapewnienie prawidłowego działania kalkulatora (art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes administratora)',
+      'Analiza statystyk i optymalizacja serwisu (art. 6 ust. 1 lit. f RODO)',
+      'Wyświetlanie spersonalizowanych reklam po uzyskaniu zgody (art. 6 ust. 1 lit. a RODO)',
+      'Zapewnienie bezpieczeństwa serwisu (art. 6 ust. 1 lit. f RODO)',
+    ],
+  },
+  {
+    title: '4. Pliki cookies',
+    paragraphs: [
+      'Serwis wykorzystuje pliki cookies (ciasteczka) do prawidłowego funkcjonowania strony oraz analizy ruchu.',
+      'Wykorzystujemy następujące rodzaje cookies:',
+    ],
+    bullets: [
+      'Cookies niezbędne – umożliwiają podstawowe funkcje serwisu',
+      'Cookies analityczne – pomagają zrozumieć, jak użytkownicy korzystają ze strony (np. Google Analytics)',
+      'Cookies reklamowe – służą do wyświetlania spersonalizowanych reklam (np. Google AdSense)',
+    ],
+    paragraphs: [
+      'Użytkownik może zarządzać cookies w ustawieniach swojej przeglądarki. Wyłączenie cookies może wpłynąć na funkcjonalność serwisu.',
+    ],
+  },
+  {
+    title: '5. Udostępnianie danych',
+    paragraphs: ['Dane mogą być udostępniane następującym podmiotom:'],
+    bullets: [
+      'Google Analytics – w celu analizy statystyk odwiedzin',
+      'Google AdSense – w celu wyświetlania reklam',
+      'Dostawcom usług hostingowych – w zakresie niezbędnym do utrzymania serwisu',
+    ],
+    paragraphs: [
+      'Dane nie są sprzedawane ani udostępniane osobom trzecim do celów marketingowych bez zgody użytkownika.',
+    ],
+  },
+  {
+    title: '6. Okres przechowywania danych',
+    paragraphs: ['Dane techniczne i analityczne przechowujemy przez następujące okresy:'],
+    bullets: [
+      'Cookies – maksymalnie 24 miesiące',
+      'Dane analityczne – 26 miesięcy (domyślne ustawienie Google Analytics)',
+      'Logi serwera – maksymalnie 90 dni (w celach bezpieczeństwa)',
+    ],
+  },
+  {
+    title: '7. Prawa użytkownika',
+    paragraphs: ['Zgodnie z RODO, użytkownik ma prawo do:'],
+    bullets: [
+      'Dostępu do swoich danych osobowych (art. 15 RODO)',
+      'Sprostowania danych (art. 16 RODO)',
+      'Usunięcia danych – „prawo do bycia zapomnianym” (art. 17 RODO)',
+      'Ograniczenia przetwarzania danych (art. 18 RODO)',
+      'Przenoszenia danych (art. 20 RODO)',
+      'Wniesienia sprzeciwu wobec przetwarzania (art. 21 RODO)',
+      'Cofnięcia zgody w dowolnym momencie (art. 7 ust. 3 RODO)',
+      'Wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych',
+    ],
+    paragraphs: ['W celu realizacji swoich praw prosimy o kontakt poprzez formularz na stronie kontaktowej.'],
+  },
+  {
+    title: '8. Bezpieczeństwo danych',
+    paragraphs: ['Wdrożyliśmy środki techniczne i organizacyjne zapewniające bezpieczeństwo danych osobowych:'],
+    bullets: [
+      'Szyfrowane połączenie SSL/TLS (HTTPS)',
+      'Regularne aktualizacje oprogramowania i komponentów serwisu',
+      'Monitoring i ochrona przed nieautoryzowanym dostępem',
+      'Minimalizacja zbieranych danych (privacy by design)',
+    ],
+  },
+  {
+    title: '9. Linki zewnętrzne',
+    paragraphs: [
+      'Serwis może zawierać linki do stron zewnętrznych (np. banków). Administrator nie ponosi odpowiedzialności za politykę prywatności tych stron.',
+      'Zachęcamy do zapoznania się z polityką prywatności każdej odwiedzanej strony internetowej.',
+    ],
+  },
+  {
+    title: '10. Zmiany w polityce prywatności',
+    paragraphs: [
+      'Administrator zastrzega sobie prawo do wprowadzania zmian w polityce prywatności.',
+      'O istotnych zmianach użytkownicy zostaną poinformowani poprzez komunikat na stronie głównej.',
+      'Aktualna wersja polityki prywatności jest zawsze dostępna pod tym adresem.',
+    ],
+  },
+  {
+    title: '11. Kontakt',
+    paragraphs: [
+      'W sprawach dotyczących przetwarzania danych osobowych lub realizacji praw wynikających z RODO prosimy o kontakt poprzez stronę kontaktową.',
+    ],
+  },
+]
+
+const policyLastUpdated = '8 listopada 2025'
 
 export default function PolitykaPrywatnosciPage() {
   return (
-    <PageContainer>
-      <ContentWrapper>
+    <PageWrapper>
+      <ContentContainer>
         <BackLink href="/">
-          <BackArrow>←</BackArrow>
-          <BackText>Powrót do kalkulatora</BackText>
+          <BackIcon aria-hidden="true">
+            <HiOutlineArrowLeft size={18} />
+          </BackIcon>
+          Wróć do strony głównej
         </BackLink>
 
-        <Header>
-          <Title>Polityka Prywatności</Title>
-          <Subtitle>Informacje o przetwarzaniu danych osobowych zgodnie z RODO</Subtitle>
-        </Header>
+        <HeroSection>
+          <HeroBadge>
+            <HiOutlineShieldCheck size={16} />
+            Ochrona danych
+          </HeroBadge>
+          <HeroTitle>Polityka prywatności Kalkulatora Kredytowego</HeroTitle>
+          <HeroLead>
+            Szanujemy Twoje bezpieczeństwo oraz prawo do prywatności. Na tej stronie opisujemy, jakie dane
+            gromadzimy, w jakim celu oraz jakie prawa przysługują Ci zgodnie z RODO.
+          </HeroLead>
+          <HeroHint>
+            Wprowadzane do kalkulatora dane finansowe pozostają w Twojej przeglądarce. Sprawdź szczegóły i
+            dowiedz się, jak możesz zarządzać swoimi ustawieniami.
+          </HeroHint>
+        </HeroSection>
 
-        <Content>
-          <Section>
-            <SectionTitle>1. Administrator danych osobowych</SectionTitle>
-            <Paragraph>
-              Administratorem danych osobowych jest właściciel serwisu kalkulatora kredytowego.
-            </Paragraph>
-            <Paragraph>
-              W sprawach dotyczących przetwarzania danych osobowych można kontaktować się poprzez
-              formularz kontaktowy lub adres e-mail podany na stronie kontaktowej.
-            </Paragraph>
-          </Section>
+        <Section>
+          <SectionHeader>
+            <SectionBadge aria-hidden="true">
+              <HiOutlineLockClosed size={18} />
+              Przetwarzanie danych
+            </SectionBadge>
+            <SectionTitle>Jak dbamy o bezpieczeństwo informacji</SectionTitle>
+            <SectionSubtitle>
+              Poniższe sekcje wyjaśniają, jakie dane przetwarzamy, komu je powierzamy oraz jak możesz
+              sprawdzić i zaktualizować swoje ustawienia prywatności.
+            </SectionSubtitle>
+          </SectionHeader>
+          <PolicyGrid role="list">
+            {policySections.map(({ title, paragraphs, bulletIntro, bullets }) => (
+              <PolicyCard key={title} role="listitem">
+                <CardTitle>{title}</CardTitle>
+                {paragraphs?.map((paragraph) => (
+                  <Paragraph key={paragraph}>{paragraph}</Paragraph>
+                ))}
+                {bulletIntro ? <Paragraph>{bulletIntro}</Paragraph> : null}
+                {bullets ? (
+                  <BulletList>
+                    {bullets.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </BulletList>
+                ) : null}
+              </PolicyCard>
+            ))}
+          </PolicyGrid>
+          <LastUpdated>Ostatnia aktualizacja: {policyLastUpdated}</LastUpdated>
+        </Section>
 
-          <Section>
-            <SectionTitle>2. Zakres przetwarzanych danych</SectionTitle>
-            <Paragraph>
-              Kalkulator kredytowy działa w oparciu o dane wprowadzane lokalnie przez użytkownika.
-              Podstawowe funkcje kalkulatora nie wymagają podawania danych osobowych.
-            </Paragraph>
-            <Paragraph>Serwis może przetwarzać następujące dane:</Paragraph>
-            <List>
-              <ListItem>
-                Dane techniczne: adres IP, typ przeglądarki, system operacyjny, czas wizyty
-              </ListItem>
-              <ListItem>
-                Dane z plików cookies: preferencje użytkownika, statystyki odwiedzin
-              </ListItem>
-              <ListItem>
-                Dane analityczne: interakcje z kalkulatorem, czas spędzony na stronie
-              </ListItem>
-            </List>
-            <Paragraph>
-              Dane wprowadzane do kalkulatora (kwoty kredytu, dochody, okres kredytowania) są
-              przetwarzane wyłącznie lokalnie w przeglądarce użytkownika i nie są przesyłane na
-              serwer.
-            </Paragraph>
-          </Section>
-
-          <Section>
-            <SectionTitle>3. Cele i podstawy przetwarzania</SectionTitle>
-            <Paragraph>Dane są przetwarzane w następujących celach:</Paragraph>
-            <List>
-              <ListItem>
-                Zapewnienie prawidłowego działania kalkulatora (podstawa: art. 6 ust. 1 lit. f RODO
-                - prawnie uzasadniony interes administratora)
-              </ListItem>
-              <ListItem>
-                Analiza statystyk i optymalizacja serwisu (podstawa: art. 6 ust. 1 lit. f RODO)
-              </ListItem>
-              <ListItem>
-                Wyświetlanie spersonalizowanych reklam (podstawa: art. 6 ust. 1 lit. a RODO - zgoda)
-              </ListItem>
-              <ListItem>
-                Zapewnienie bezpieczeństwa serwisu (podstawa: art. 6 ust. 1 lit. f RODO)
-              </ListItem>
-            </List>
-          </Section>
-
-          <Section>
-            <SectionTitle>4. Pliki cookies</SectionTitle>
-            <Paragraph>
-              Serwis wykorzystuje pliki cookies (ciasteczka) do prawidłowego funkcjonowania strony
-              oraz analizy ruchu.
-            </Paragraph>
-            <Paragraph>Rodzaje wykorzystywanych cookies:</Paragraph>
-            <List>
-              <ListItem>Cookies niezbędne - umożliwiają podstawowe funkcje serwisu</ListItem>
-              <ListItem>
-                Cookies analityczne - pomagają zrozumieć, jak użytkownicy korzystają ze strony
-                (Google Analytics)
-              </ListItem>
-              <ListItem>
-                Cookies reklamowe - służą do wyświetlania spersonalizowanych reklam (Google AdSense)
-              </ListItem>
-            </List>
-            <Paragraph>
-              Użytkownik może zarządzać cookies w ustawieniach swojej przeglądarki. Wyłączenie
-              cookies może wpłynąć na funkcjonalność serwisu.
-            </Paragraph>
-          </Section>
-
-          <Section>
-            <SectionTitle>5. Udostępnianie danych</SectionTitle>
-            <Paragraph>Dane mogą być udostępniane:</Paragraph>
-            <List>
-              <ListItem>Google Analytics - w celu analizy statystyk odwiedzin</ListItem>
-              <ListItem>Google AdSense - w celu wyświetlania reklam</ListItem>
-              <ListItem>
-                Dostawcom usług hostingowych - w zakresie niezbędnym do utrzymania serwisu
-              </ListItem>
-            </List>
-            <Paragraph>
-              Dane nie są sprzedawane ani udostępniane osobom trzecim do celów marketingowych bez
-              zgody użytkownika.
-            </Paragraph>
-          </Section>
-
-          <Section>
-            <SectionTitle>6. Okres przechowywania danych</SectionTitle>
-            <Paragraph>Dane techniczne i analityczne są przechowywane przez okres:</Paragraph>
-            <List>
-              <ListItem>Dane z cookies: maksymalnie 24 miesiące</ListItem>
-              <ListItem>
-                Dane analityczne: 26 miesięcy (domyślne ustawienie Google Analytics)
-              </ListItem>
-              <ListItem>Logi serwera: maksymalnie 90 dni (w celach bezpieczeństwa)</ListItem>
-            </List>
-          </Section>
-
-          <Section>
-            <SectionTitle>7. Prawa użytkownika</SectionTitle>
-            <Paragraph>Zgodnie z RODO, użytkownik ma prawo do:</Paragraph>
-            <List>
-              <ListItem>Dostępu do swoich danych osobowych (art. 15 RODO)</ListItem>
-              <ListItem>Sprostowania danych (art. 16 RODO)</ListItem>
-              <ListItem>Usunięcia danych - "prawo do bycia zapomnianym" (art. 17 RODO)</ListItem>
-              <ListItem>Ograniczenia przetwarzania danych (art. 18 RODO)</ListItem>
-              <ListItem>Przenoszenia danych (art. 20 RODO)</ListItem>
-              <ListItem>Wniesienia sprzeciwu wobec przetwarzania (art. 21 RODO)</ListItem>
-              <ListItem>Cofnięcia zgody w dowolnym momencie (art. 7 ust. 3 RODO)</ListItem>
-              <ListItem>Wniesienia skargi do organu nadzorczego (Prezes UODO)</ListItem>
-            </List>
-            <Paragraph>
-              W celu realizacji swoich praw, prosimy o kontakt poprzez formularz kontaktowy.
-            </Paragraph>
-          </Section>
-
-          <Section>
-            <SectionTitle>8. Bezpieczeństwo danych</SectionTitle>
-            <Paragraph>
-              Administrator stosuje odpowiednie środki techniczne i organizacyjne zapewniające
-              bezpieczeństwo danych osobowych:
-            </Paragraph>
-            <List>
-              <ListItem>Szyfrowanie połączenia SSL/TLS (HTTPS)</ListItem>
-              <ListItem>Regularne aktualizacje oprogramowania</ListItem>
-              <ListItem>Monitoring i ochrona przed nieautoryzowanym dostępem</ListItem>
-              <ListItem>Minimalizacja zbieranych danych (privacy by design)</ListItem>
-            </List>
-          </Section>
-
-          <Section>
-            <SectionTitle>9. Linki zewnętrzne</SectionTitle>
-            <Paragraph>
-              Serwis może zawierać linki do stron zewnętrznych (np. stron bankowych). Administrator
-              nie ponosi odpowiedzialności za politykę prywatności tych stron.
-            </Paragraph>
-            <Paragraph>
-              Zachęcamy do zapoznania się z polityką prywatności każdej odwiedzanej strony
-              internetowej.
-            </Paragraph>
-          </Section>
-
-          <Section>
-            <SectionTitle>10. Zmiany w polityce prywatności</SectionTitle>
-            <Paragraph>
-              Administrator zastrzega sobie prawo do wprowadzania zmian w polityce prywatności.
-            </Paragraph>
-            <Paragraph>
-              O istotnych zmianach użytkownicy zostaną poinformowani poprzez komunikat na stronie
-              głównej.
-            </Paragraph>
-            <Paragraph>
-              Aktualna wersja polityki prywatności jest zawsze dostępna pod tym adresem.
-            </Paragraph>
-          </Section>
-
-          <Section>
-            <SectionTitle>11. Kontakt</SectionTitle>
-            <Paragraph>
-              W sprawach dotyczących przetwarzania danych osobowych lub realizacji praw wynikających
-              z RODO, prosimy o kontakt poprzez stronę kontaktową.
-            </Paragraph>
-          </Section>
-
-          <LastUpdated>Ostatnia aktualizacja: 2 listopada 2025</LastUpdated>
-        </Content>
-      </ContentWrapper>
-      <Footer />
-    </PageContainer>
+        <FinalSection>
+          <FinalContent>
+            <FinalTitle>Chcesz zmienić swoje ustawienia prywatności?</FinalTitle>
+            <FinalText>
+              Skontaktuj się z nami, jeśli potrzebujesz dostępu do danych, chcesz je poprawić lub
+              wycofać zgodę. Pomożemy w realizacji każdego z Twoich praw wynikających z RODO.
+            </FinalText>
+            <FinalActions>
+              <PrimaryCta href="/kontakt">
+                Napisz do nas
+                <HiOutlineArrowLongRight size={18} />
+              </PrimaryCta>
+              <SecondaryCta href="/regulamin">Zobacz regulamin</SecondaryCta>
+            </FinalActions>
+          </FinalContent>
+        </FinalSection>
+      </ContentContainer>
+      <FooterMain />
+    </PageWrapper>
   )
 }
 
-const PageContainer = tw.div`min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-50`
-const ContentWrapper = tw.div`max-w-4xl mx-auto px-4 py-12`
+const PageWrapper = tw.main`min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100`
+const ContentContainer = tw.div`mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20`
+
 const BackLink = tw(
   Link,
-)`inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium mb-8 transition-colors`
-const BackArrow = tw.span`text-xl`
-const BackText = tw.span``
-const Header = tw.header`text-center mb-12`
-const Title = tw.h1`text-4xl md:text-5xl font-bold text-gray-900 mb-4`
-const Subtitle = tw.p`text-lg text-gray-600`
-const Content = tw.div`bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12`
-const Section = tw.section`mb-8 last:mb-0`
-const SectionTitle = tw.h2`text-2xl font-bold text-gray-900 mb-4`
-const Paragraph = tw.p`text-gray-700 leading-relaxed mb-3`
-const List = tw.ul`list-disc list-inside flex flex-col gap-2 ml-4`
-const ListItem = tw.li`text-gray-700`
-const LastUpdated = tw.p`text-sm text-gray-500 text-center mt-8 pt-8 border-t border-gray-200`
+)`mb-8 inline-flex items-center gap-2 text-sm font-medium text-emerald-700 no-underline hover:text-emerald-800`
+const BackIcon = tw.span`inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700`
+
+const HeroSection = tw.section`mx-auto max-w-3xl text-center`
+const HeroBadge = tw.span`mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700`
+const HeroTitle = tw.h1`mb-4 text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl`
+const HeroLead = tw.p`mx-auto mb-6 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg`
+const HeroHint = tw.p`mx-auto max-w-2xl text-sm leading-relaxed text-gray-500 sm:text-base`
+
+const Section = tw.section`mt-16`
+const SectionHeader = tw.div`mx-auto mb-10 max-w-3xl text-center`
+const SectionBadge = tw.span`mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700`
+const SectionTitle = tw.h2`text-3xl font-bold text-gray-900 sm:text-4xl`
+const SectionSubtitle = tw.p`mt-3 text-sm leading-relaxed text-gray-600 sm:text-base`
+
+const PolicyGrid = tw.ul`grid grid-cols-1 gap-5`
+const PolicyCard = tw.li`rounded-2xl border border-gray-200 bg-white/90 p-6 text-left shadow-sm backdrop-blur-sm`
+const CardTitle = tw.h3`mb-3 text-xl font-semibold text-gray-900`
+const Paragraph = tw.p`mb-3 text-sm leading-relaxed text-gray-600 last:mb-0`
+const BulletList = tw.ul`mb-3 grid gap-2 text-sm text-gray-600 [&_li]:relative [&_li]:pl-4 [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:text-emerald-500 [&_li]:before:content-['•']`
+const LastUpdated = tw.p`mt-8 text-sm text-gray-500`
+
+const FinalSection = tw.section`mt-20 rounded-3xl border border-emerald-200 bg-linear-to-r from-emerald-600 to-teal-600 p-8 shadow-xl sm:p-10`
+const FinalContent = tw.div`mx-auto flex max-w-3xl flex-col items-center text-center text-white`
+const FinalTitle = tw.h2`text-2xl font-bold sm:text-3xl`
+const FinalText = tw.p`mt-3 text-base leading-relaxed text-emerald-50`
+const FinalActions = tw.div`mt-6 flex flex-col gap-3 sm:flex-row`
+const PrimaryCta = tw(
+  Link,
+)`inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white`
+const SecondaryCta = tw(
+  Link,
+)`inline-flex items-center gap-2 rounded-full border border-white/70 px-5 py-3 font-semibold text-white transition-colors hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white`
