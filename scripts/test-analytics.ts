@@ -47,7 +47,11 @@ async function testAnalytics() {
 
   // Sprawdź parsowanie credentials
   try {
-    const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON!
+    const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+    if (!credentialsJson) {
+      console.log('❌ Brak zmiennej GOOGLE_APPLICATION_CREDENTIALS_JSON')
+      process.exit(1)
+    }
 
     // Usuń ewentualne przełamy linii i spacje
     const cleanedJson = credentialsJson.replace(/\n/g, '').replace(/\s+/g, ' ').trim()

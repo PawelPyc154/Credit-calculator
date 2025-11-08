@@ -1,5 +1,6 @@
 import { analyticsRouter } from 'server/api/routers/analytics'
 import { postRouter } from 'server/api/routers/post'
+import { searchConsoleRouter } from 'server/api/routers/searchConsole'
 import { createCallerFactory, createTRPCRouter } from 'server/api/trpc'
 
 /**
@@ -10,6 +11,7 @@ import { createCallerFactory, createTRPCRouter } from 'server/api/trpc'
 export const appRouter = createTRPCRouter({
   post: postRouter,
   analytics: analyticsRouter,
+  searchConsole: searchConsoleRouter,
 })
 
 // export type definition of API

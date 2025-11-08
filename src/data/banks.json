@@ -13,11 +13,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 30,
     "minDownPaymentPercent": 15,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing",
-      "construction"
-    ],
+    "supportedPurposes": ["purchase", "refinancing", "construction"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 8.35,
     "description": "Dynamiczny bank z innowacyjnymi rozwiązaniami i bez prowizji",
@@ -68,11 +64,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing",
-      "construction"
-    ],
+    "supportedPurposes": ["purchase", "refinancing", "construction"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 8.15,
     "description": "Bank oferujący kompleksową obsługę kredytową z dedykowanym doradcą",
@@ -94,11 +86,7 @@
       "Wysoki limit kredytu",
       "Darmowe wcześniejsze spłaty"
     ],
-    "disadvantages": [
-      "Opłata za konto (5 zł/msc)",
-      "Wymóg konta",
-      "Średni czas rozpatrzenia"
-    ],
+    "disadvantages": ["Opłata za konto (5 zł/msc)", "Wymóg konta", "Średni czas rozpatrzenia"],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.3,
@@ -120,10 +108,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing"
-    ],
+    "supportedPurposes": ["purchase", "refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 8.05,
     "description": "Tradycyjny bank z bogatym doświadczeniem i stabilną pozycją na rynku",
@@ -145,11 +130,7 @@
       "Darmowe wcześniejsze spłaty",
       "Promocje dla młodych"
     ],
-    "disadvantages": [
-      "Dłuższy czas rozpatrzenia",
-      "Tylko zakup i refinansowanie",
-      "Wymóg konta"
-    ],
+    "disadvantages": ["Dłuższy czas rozpatrzenia", "Tylko zakup i refinansowanie", "Wymóg konta"],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.28,
@@ -186,11 +167,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing",
-      "construction"
-    ],
+    "supportedPurposes": ["purchase", "refinancing", "construction"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 7.99,
     "description": "Międzynarodowy bank z atrakcyjnymi warunkami kredytowymi",
@@ -211,10 +188,7 @@
       "Darmowe wcześniejsze spłaty",
       "Wszystkie cele kredytowe"
     ],
-    "disadvantages": [
-      "Wymóg otwarcia konta",
-      "Mniejsza sieć oddziałów w Polsce"
-    ],
+    "disadvantages": ["Wymóg otwarcia konta", "Mniejsza sieć oddziałów w Polsce"],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.3,
@@ -250,10 +224,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing"
-    ],
+    "supportedPurposes": ["purchase", "refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 8.2,
     "description": "Bank z europejskim doświadczeniem i indywidualnym podejściem do klienta",
@@ -302,11 +273,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 30,
     "minDownPaymentPercent": 15,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing",
-      "construction"
-    ],
+    "supportedPurposes": ["purchase", "refinancing", "construction"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 7.75,
     "description": "Bank z najniższym oprocentowaniem i najwyższym limitem kredytowym",
@@ -354,10 +321,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing"
-    ],
+    "supportedPurposes": ["purchase", "refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 7.95,
     "description": "Nowoczesny bank online z najniższą marżą na rynku i prostym procesem aplikacji",
@@ -405,11 +369,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing",
-      "construction"
-    ],
+    "supportedPurposes": ["purchase", "refinancing", "construction"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 8.09,
     "description": "Najstarszy bank w Polsce z konkurencyjnymi ofertami i najszerszą siecią oddziałów",
@@ -429,10 +389,7 @@
       "Darmowe wcześniejsze spłaty",
       "Długa historia i stabilność"
     ],
-    "disadvantages": [
-      "Wymóg otwarcia konta",
-      "Standardowy czas rozpatrzenia wniosku"
-    ],
+    "disadvantages": ["Wymóg otwarcia konta", "Standardowy czas rozpatrzenia wniosku"],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.3,
@@ -454,10 +411,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing"
-    ],
+    "supportedPurposes": ["purchase", "refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 8.25,
     "description": "Bank z najszybszym procesem decyzyjnym i elastycznymi warunkami",
@@ -505,10 +459,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing"
-    ],
+    "supportedPurposes": ["purchase", "refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 7.88,
     "description": "Nowoczesny bank z 0% prowizji i 100% zdalną obsługą",
@@ -572,10 +523,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "purchase",
-      "refinancing"
-    ],
+    "supportedPurposes": ["purchase", "refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 7.78,
     "description": "Specjalna oferta kredytu hipotecznego dla wybranych zawodów - w uproszczonym trybie",
@@ -641,9 +589,7 @@
     "minLoanPeriod": 5,
     "maxLoanPeriod": 35,
     "minDownPaymentPercent": 10,
-    "supportedPurposes": [
-      "refinancing"
-    ],
+    "supportedPurposes": ["refinancing"],
     "supportedInterestRateTypes": ["fixed", "variable"],
     "fixedInterestRate": 7.88,
     "description": "Dedykowana oferta refinansowania kredytu hipotecznego z innymi bankami",
@@ -666,11 +612,7 @@
       "Darmowe wcześniejsze spłaty",
       "Pełna obsługa online"
     ],
-    "disadvantages": [
-      "Tylko refinansowanie",
-      "Wymóg konta z pakietem",
-      "Nowy bank na rynku"
-    ],
+    "disadvantages": ["Tylko refinansowanie", "Wymóg konta z pakietem", "Nowy bank na rynku"],
     "ltv": {
       "ratio80": 0,
       "ratio90": 0.25,

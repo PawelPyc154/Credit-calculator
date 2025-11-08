@@ -30,9 +30,7 @@ export const SettingsPanel = ({ formData, onFormDataChange }: SettingsPanelProps
         </SettingsIcon>
         <SettingsTitle>Ustawienia</SettingsTitle>
       </SettingsHeader>
-      <SettingsDescription>
-        Dodatkowe opcje i preferencje kalkulacji
-      </SettingsDescription>
+      <SettingsDescription>Dodatkowe opcje i preferencje kalkulacji</SettingsDescription>
 
       <SettingsContent>
         <SettingGroup>
@@ -146,4 +144,3 @@ const SettingCheckbox = tw.input`
 const SettingItemLabel = tw.span`
   text-sm text-gray-700
 `
-

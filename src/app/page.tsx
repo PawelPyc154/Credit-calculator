@@ -11,8 +11,8 @@ import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
 import { parseBankOffers } from 'types/bank'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
-import { calculateBankOffers } from 'utils/calculator'
 import { pageView, trackCalculation, trackTimeOnPage } from 'utils/analytics'
+import { calculateBankOffers } from 'utils/calculator'
 import banksData from '../data/banks.json'
 
 const defaultFormData: CalculatorFormData = {
@@ -45,7 +45,7 @@ export default function Home() {
         const calculatedResults = calculateBankOffers(formData, banks)
         setResults(calculatedResults)
         setFormData(formData)
-        
+
         // Śledź obliczenie kredytu
         trackCalculation({
           loanAmount: formData.loanAmount,

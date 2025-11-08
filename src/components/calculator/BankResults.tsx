@@ -5,8 +5,8 @@ import { BankLogo } from 'components/common/BankLogo'
 import { useRef, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
-import { formatCurrency, formatPercent } from 'utils/calculator'
 import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
+import { formatCurrency, formatPercent } from 'utils/calculator'
 import { BankDetails } from './molecules/BankDetails'
 
 type BankResultsProps = {

@@ -68,4 +68,3 @@ const LogoText = tw.span`
   text-lg font-bold
   text-gray-900
 `
-

@@ -1,11 +1,10 @@
 /**
  * Helper functions do analizy danych z Google Analytics
- * 
+ *
  * Te funkcje mogą być wywoływane przez AI (Cursor) do automatycznej analizy danych.
  * Użyj endpointów tRPC: api.analytics.*
  */
 
-import type { AppRouter } from 'server/api/root'
 import { createCaller } from 'server/api/root'
 import { createTRPCContext } from 'server/api/trpc'
 
@@ -17,10 +16,58 @@ export async function getAnalyticsCaller() {
   return createCaller(context)
 }
 
+type OverviewData = {
+  period: string
+  users: { total: number; new: number; returning: number }
+  sessions: number
+  pageViews: number
+  events: Record<string, number>
+  conversions: { total: number; rate: number }
+  topBanks: unknown[]
+  topPages: Array<{ path: string; views: number }>
+  error?: string
+}
+
+type OverviewSummary = {
+  period: string
+  users: {
+    total: number
+    new: number
+    returning: number
+    newUserRate: string
+  }
+  engagement: {
+    sessions: number
+    pageViews: number
+    pagesPerSession: string
+  }
+  events: {
+    calculations: number
+    affiliateClicks: number
+    bankDetailsViews: number
+  }
+  conversions: {
+    total: number
+    rate: string
+  }
+  topPages: Array<{ path: string; views: number }>
+}
+
+type OverviewResult =
+  | {
+      data: OverviewData
+      summary: OverviewSummary
+      insights: string[]
+    }
+  | {
+      error: string
+      summary: string
+    }
+
 /**
  * Analizuje podstawowe metryki i zwraca podsumowanie
  */
-export async function analyzeOverview(days = 30) {
+export async function analyzeOverview(days = 30): Promise<OverviewResult> {
   const caller = await getAnalyticsCaller()
   const data = await caller.analytics.getOverview({ days })
 
@@ -37,16 +84,13 @@ export async function analyzeOverview(days = 30) {
       total: data.users.total,
       new: data.users.new,
       returning: data.users.returning,
-      newUserRate: data.users.total > 0 
-        ? ((data.users.new / data.users.total) * 100).toFixed(1) + '%'
-        : '0%',
+      newUserRate:
+        data.users.total > 0 ? ((data.users.new / data.users.total) * 100).toFixed(1) + '%' : '0%',
     },
     engagement: {
       sessions: data.sessions,
       pageViews: data.pageViews,
-      pagesPerSession: data.sessions > 0 
-        ? (data.pageViews / data.sessions).toFixed(2)
-        : '0',
+      pagesPerSession: data.sessions > 0 ? (data.pageViews / data.sessions).toFixed(2) : '0',
     },
     events: {
       calculations: data.events.calculate_loan,
@@ -67,10 +111,42 @@ export async function analyzeOverview(days = 30) {
   }
 }
 
+type ConversionsData = {
+  period: string
+  total: number
+  byBank: Array<{ bankName: string; clicks: number; position: number; conversionValue: number }>
+  byPosition: { first: number; second: number; third: number; other: number }
+  error?: string
+}
+
+type ConversionsSummary = {
+  period: string
+  totalConversions: number
+  topBank: {
+    name: string
+    clicks: number
+    position: number
+    value: number
+  } | null
+  positionDistribution: { first: number; second: number; third: number; other: number }
+  firstPositionRate: string
+}
+
+type ConversionsResult =
+  | {
+      data: ConversionsData
+      summary: ConversionsSummary
+      recommendations: string[]
+    }
+  | {
+      error: string
+      summary: string
+    }
+
 /**
  * Analizuje konwersje i zwraca rekomendacje
  */
-export async function analyzeConversions(days = 30) {
+export async function analyzeConversions(days = 30): Promise<ConversionsResult> {
   const caller = await getAnalyticsCaller()
   const data = await caller.analytics.getConversions({ days })
 
@@ -89,9 +165,8 @@ export async function analyzeConversions(days = 30) {
     other: data.byPosition.other,
   }
 
-  const firstPositionRate = data.total > 0
-    ? ((data.byPosition.first / data.total) * 100).toFixed(1) + '%'
-    : '0%'
+  const firstPositionRate =
+    data.total > 0 ? ((data.byPosition.first / data.total) * 100).toFixed(1) + '%' : '0%'
 
   return {
     data,
@@ -113,10 +188,45 @@ export async function analyzeConversions(days = 30) {
   }
 }
 
+type CalculatorEventsData = {
+  period: string
+  calculations: number
+  parameterChanges: number
+  affiliateClicks: number
+  bankDetailsViews: number
+  averageLoanAmount: number
+  averageLoanPeriod: number
+  mostCommonPurpose: string
+  mostCommonInterestType: string
+  error?: string
+}
+
+type CalculatorEventsSummary = {
+  period: string
+  calculations: number
+  parameterChanges: number
+  affiliateClicks: number
+  bankDetailsViews: number
+  calculationToConversionRate: string
+  mostCommonPurpose: string
+  mostCommonInterestType: string
+}
+
+type CalculatorEventsResult =
+  | {
+      data: CalculatorEventsData
+      summary: CalculatorEventsSummary
+      insights: string[]
+    }
+  | {
+      error: string
+      summary: string
+    }
+
 /**
  * Analizuje eventy kalkulatora
  */
-export async function analyzeCalculatorEvents(days = 30) {
+export async function analyzeCalculatorEvents(days = 30): Promise<CalculatorEventsResult> {
   const caller = await getAnalyticsCaller()
   const data = await caller.analytics.getCalculatorEvents({ days })
 
@@ -127,9 +237,10 @@ export async function analyzeCalculatorEvents(days = 30) {
     }
   }
 
-  const calculationRate = data.calculations > 0 && data.affiliateClicks > 0
-    ? ((data.affiliateClicks / data.calculations) * 100).toFixed(2) + '%'
-    : '0%'
+  const calculationRate =
+    data.calculations > 0 && data.affiliateClicks > 0
+      ? ((data.affiliateClicks / data.calculations) * 100).toFixed(2) + '%'
+      : '0%'
 
   return {
     data,
@@ -147,10 +258,38 @@ export async function analyzeCalculatorEvents(days = 30) {
   }
 }
 
+type EngagementData = {
+  period: string
+  averageTimeOnPage: number
+  averageSessionDuration: number
+  bounceRate: number
+  pagesPerSession: number
+  error?: string
+}
+
+type EngagementSummary = {
+  period: string
+  averageTimeOnPage: string
+  averageSessionDuration: string
+  bounceRate: string
+  pagesPerSession: string
+}
+
+type EngagementResult =
+  | {
+      data: EngagementData
+      summary: EngagementSummary
+      recommendations: string[]
+    }
+  | {
+      error: string
+      summary: string
+    }
+
 /**
  * Analizuje engagement
  */
-export async function analyzeEngagement(days = 30) {
+export async function analyzeEngagement(days = 30): Promise<EngagementResult> {
   const caller = await getAnalyticsCaller()
   const data = await caller.analytics.getEngagement({ days })
 
@@ -177,9 +316,9 @@ export async function analyzeEngagement(days = 30) {
 /**
  * Kompleksowa analiza wszystkich danych
  */
-export async function fullAnalysis(caller: Awaited<ReturnType<typeof getAnalyticsCaller>>, options: { days?: number } = {}) {
+export async function fullAnalysis(options: { days?: number } = {}): Promise<string> {
   const days = options.days ?? 30
-  
+
   const [overview, conversions, events, engagement] = await Promise.all([
     analyzeOverview(days),
     analyzeConversions(days),
@@ -206,7 +345,7 @@ export async function fullAnalysis(caller: Awaited<ReturnType<typeof getAnalytic
 
 // Helper functions do generowania insights
 
-function generateInsights(summary: ReturnType<typeof analyzeOverview>['summary']) {
+function generateInsights(summary: OverviewSummary) {
   const insights: string[] = []
 
   if (summary.users.newUserRate && parseFloat(summary.users.newUserRate) > 70) {
@@ -228,7 +367,7 @@ function generateInsights(summary: ReturnType<typeof analyzeOverview>['summary']
   return insights
 }
 
-function generateConversionRecommendations(data: Awaited<ReturnType<typeof analyzeConversions>>['data']) {
+function generateConversionRecommendations(data: ConversionsData) {
   const recommendations: string[] = []
 
   if (data.byPosition.first > data.byPosition.second * 3) {
@@ -237,25 +376,31 @@ function generateConversionRecommendations(data: Awaited<ReturnType<typeof analy
 
   if (data.byBank.length > 0) {
     const topBank = data.byBank[0]
-    if (topBank.clicks > data.total * 0.5) {
-      recommendations.push(`✅ ${topBank.bankName} ma ${((topBank.clicks / data.total) * 100).toFixed(0)}% kliknięć - rozważ negocjacje lepszych warunków`)
+    if (topBank && topBank.clicks > data.total * 0.5) {
+      recommendations.push(
+        `✅ ${topBank.bankName} ma ${((topBank.clicks / data.total) * 100).toFixed(0)}% kliknięć - rozważ negocjacje lepszych warunków`,
+      )
     }
   }
 
   if (data.byPosition.other > data.byPosition.first) {
-    recommendations.push('⚠️ Wiele kliknięć poza top 3 - rozważ poprawę widoczności najlepszych ofert')
+    recommendations.push(
+      '⚠️ Wiele kliknięć poza top 3 - rozważ poprawę widoczności najlepszych ofert',
+    )
   }
 
   return recommendations
 }
 
-function generateCalculatorInsights(data: Awaited<ReturnType<typeof analyzeCalculatorEvents>>['data']) {
+function generateCalculatorInsights(data: CalculatorEventsData) {
   const insights: string[] = []
 
   if (data.calculations > 0) {
     const conversionRate = (data.affiliateClicks / data.calculations) * 100
     if (conversionRate < 5) {
-      insights.push('⚠️ Niska konwersja z obliczeń na kliknięcia - sprawdź ranking i widoczność linków')
+      insights.push(
+        '⚠️ Niska konwersja z obliczeń na kliknięcia - sprawdź ranking i widoczność linków',
+      )
     } else if (conversionRate > 20) {
       insights.push('✅ Wysoka konwersja - ranking działa dobrze!')
     }
@@ -272,7 +417,7 @@ function generateCalculatorInsights(data: Awaited<ReturnType<typeof analyzeCalcu
   return insights
 }
 
-function generateEngagementRecommendations(data: Awaited<ReturnType<typeof analyzeEngagement>>['data']) {
+function generateEngagementRecommendations(data: EngagementData) {
   const recommendations: string[] = []
 
   if (data.bounceRate > 60) {
@@ -291,31 +436,47 @@ function generateEngagementRecommendations(data: Awaited<ReturnType<typeof analy
 }
 
 function generateOverallRecommendations(analysis: {
-  overview: Awaited<ReturnType<typeof analyzeOverview>>
-  conversions: Awaited<ReturnType<typeof analyzeConversions>>
-  events: Awaited<ReturnType<typeof analyzeCalculatorEvents>>
-  engagement: Awaited<ReturnType<typeof analyzeEngagement>>
+  overview: OverviewResult
+  conversions: ConversionsResult
+  events: CalculatorEventsResult
+  engagement: EngagementResult
 }) {
   const recommendations: string[] = []
 
   // Priorytetowe rekomendacje na podstawie wszystkich danych
-  if (analysis.overview.summary && !analysis.overview.error) {
+  if (
+    'summary' in analysis.overview &&
+    typeof analysis.overview.summary !== 'string' &&
+    !('error' in analysis.overview)
+  ) {
     const convRate = parseFloat(analysis.overview.summary.conversions.rate)
     if (convRate < 2) {
       recommendations.push('🔴 PRIORYTET: Niska konwersja - optymalizuj ranking i UX formularza')
     }
   }
 
-  if (analysis.engagement.summary && !analysis.engagement.error) {
+  if (
+    'summary' in analysis.engagement &&
+    typeof analysis.engagement.summary !== 'string' &&
+    !('error' in analysis.engagement)
+  ) {
     const bounceRate = parseFloat(analysis.engagement.summary.bounceRate)
     if (bounceRate > 60) {
-      recommendations.push('🟡 PRIORYTET: Wysoki bounce rate - sprawdź szybkość i pierwsze wrażenie')
+      recommendations.push(
+        '🟡 PRIORYTET: Wysoki bounce rate - sprawdź szybkość i pierwsze wrażenie',
+      )
     }
   }
 
-  if (analysis.conversions.summary && !analysis.conversions.error) {
+  if (
+    'summary' in analysis.conversions &&
+    typeof analysis.conversions.summary !== 'string' &&
+    !('error' in analysis.conversions)
+  ) {
     if (analysis.conversions.summary.topBank) {
-      recommendations.push(`💡 Oportunność: ${analysis.conversions.summary.topBank.name} generuje najwięcej kliknięć - rozważ partnerstwo`)
+      recommendations.push(
+        `💡 Oportunność: ${analysis.conversions.summary.topBank.name} generuje najwięcej kliknięć - rozważ partnerstwo`,
+      )
     }
   }
 
@@ -326,58 +487,74 @@ function generateOverallRecommendations(analysis: {
  * Formatuje wyniki analizy jako czytelny raport tekstowy
  */
 function formatAnalysisReport(analysis: {
-  overview: Awaited<ReturnType<typeof analyzeOverview>>
-  conversions: Awaited<ReturnType<typeof analyzeConversions>>
-  events: Awaited<ReturnType<typeof analyzeCalculatorEvents>>
-  engagement: Awaited<ReturnType<typeof analyzeEngagement>>
+  overview: OverviewResult
+  conversions: ConversionsResult
+  events: CalculatorEventsResult
+  engagement: EngagementResult
   overallRecommendations: string[]
 }) {
   const lines: string[] = []
-  
+
   // Overview
-  if (analysis.overview.error) {
+  if ('error' in analysis.overview) {
     lines.push('❌ Błąd pobierania danych overview')
-  } else if (analysis.overview.summary) {
+  } else if ('summary' in analysis.overview && typeof analysis.overview.summary !== 'string') {
     lines.push('📊 PODSUMOWANIE')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.overview.summary.period}`)
-    lines.push(`Użytkownicy: ${analysis.overview.summary.users.total} (nowi: ${analysis.overview.summary.users.new}, ${analysis.overview.summary.users.newUserRate} nowych)`)
+    lines.push(
+      `Użytkownicy: ${analysis.overview.summary.users.total} (nowi: ${analysis.overview.summary.users.new}, ${analysis.overview.summary.users.newUserRate} nowych)`,
+    )
     lines.push(`Sesje: ${analysis.overview.summary.engagement.sessions}`)
-    lines.push(`Page Views: ${analysis.overview.summary.engagement.pageViews} (${analysis.overview.summary.engagement.pagesPerSession} na sesję)`)
+    lines.push(
+      `Page Views: ${analysis.overview.summary.engagement.pageViews} (${analysis.overview.summary.engagement.pagesPerSession} na sesję)`,
+    )
     lines.push(`Obliczenia: ${analysis.overview.summary.events.calculations}`)
     lines.push(`Kliknięcia affiliate: ${analysis.overview.summary.events.affiliateClicks}`)
-    lines.push(`Konwersje: ${analysis.overview.summary.conversions.total} (${analysis.overview.summary.conversions.rate})`)
-    if (analysis.overview.insights && analysis.overview.insights.length > 0) {
+    lines.push(
+      `Konwersje: ${analysis.overview.summary.conversions.total} (${analysis.overview.summary.conversions.rate})`,
+    )
+    if ('insights' in analysis.overview && analysis.overview.insights.length > 0) {
       lines.push('\n💡 Insights:')
-      analysis.overview.insights.forEach(insight => lines.push(`   ${insight}`))
+      analysis.overview.insights.forEach((insight: string) => lines.push(`   ${insight}`))
     }
     lines.push('')
   }
-  
+
   // Conversions
-  if (analysis.conversions.error) {
+  if ('error' in analysis.conversions) {
     lines.push('❌ Błąd pobierania danych konwersji')
-  } else if (analysis.conversions.summary) {
+  } else if (
+    'summary' in analysis.conversions &&
+    typeof analysis.conversions.summary !== 'string'
+  ) {
     lines.push('💰 KONWERSJE')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.conversions.summary.period}`)
     lines.push(`Łączne konwersje: ${analysis.conversions.summary.totalConversions}`)
     if (analysis.conversions.summary.topBank) {
-      lines.push(`Top bank: ${analysis.conversions.summary.topBank.name} (${analysis.conversions.summary.topBank.clicks} kliknięć, pozycja ${analysis.conversions.summary.topBank.position})`)
+      lines.push(
+        `Top bank: ${analysis.conversions.summary.topBank.name} (${analysis.conversions.summary.topBank.clicks} kliknięć, pozycja ${analysis.conversions.summary.topBank.position})`,
+      )
     }
-    lines.push(`Rozkład pozycji: 1. ${analysis.conversions.summary.positionDistribution.first}, 2. ${analysis.conversions.summary.positionDistribution.second}, 3. ${analysis.conversions.summary.positionDistribution.third}, inne: ${analysis.conversions.summary.positionDistribution.other}`)
+    lines.push(
+      `Rozkład pozycji: 1. ${analysis.conversions.summary.positionDistribution.first}, 2. ${analysis.conversions.summary.positionDistribution.second}, 3. ${analysis.conversions.summary.positionDistribution.third}, inne: ${analysis.conversions.summary.positionDistribution.other}`,
+    )
     lines.push(`Pozycja 1: ${analysis.conversions.summary.firstPositionRate} wszystkich kliknięć`)
-    if (analysis.conversions.recommendations && analysis.conversions.recommendations.length > 0) {
+    if (
+      'recommendations' in analysis.conversions &&
+      analysis.conversions.recommendations.length > 0
+    ) {
       lines.push('\n💡 Rekomendacje:')
-      analysis.conversions.recommendations.forEach(rec => lines.push(`   ${rec}`))
+      analysis.conversions.recommendations.forEach((rec: string) => lines.push(`   ${rec}`))
     }
     lines.push('')
   }
-  
+
   // Events
-  if (analysis.events.error) {
+  if ('error' in analysis.events) {
     lines.push('❌ Błąd pobierania danych eventów')
-  } else if (analysis.events.summary) {
+  } else if ('summary' in analysis.events && typeof analysis.events.summary !== 'string') {
     lines.push('🎯 EVENTY KALKULATORA')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.events.summary.period}`)
@@ -385,20 +562,22 @@ function formatAnalysisReport(analysis: {
     lines.push(`Zmiany parametrów: ${analysis.events.summary.parameterChanges}`)
     lines.push(`Kliknięcia affiliate: ${analysis.events.summary.affiliateClicks}`)
     lines.push(`Szczegóły banków: ${analysis.events.summary.bankDetailsViews}`)
-    lines.push(`Konwersja obliczeń→kliknięć: ${analysis.events.summary.calculationToConversionRate}`)
+    lines.push(
+      `Konwersja obliczeń→kliknięć: ${analysis.events.summary.calculationToConversionRate}`,
+    )
     lines.push(`Najczęstszy cel: ${analysis.events.summary.mostCommonPurpose}`)
     lines.push(`Najczęstszy typ oprocentowania: ${analysis.events.summary.mostCommonInterestType}`)
-    if (analysis.events.insights && analysis.events.insights.length > 0) {
+    if ('insights' in analysis.events && analysis.events.insights.length > 0) {
       lines.push('\n💡 Insights:')
-      analysis.events.insights.forEach(insight => lines.push(`   ${insight}`))
+      analysis.events.insights.forEach((insight: string) => lines.push(`   ${insight}`))
     }
     lines.push('')
   }
-  
+
   // Engagement
-  if (analysis.engagement.error) {
+  if ('error' in analysis.engagement) {
     lines.push('❌ Błąd pobierania danych engagement')
-  } else if (analysis.engagement.summary) {
+  } else if ('summary' in analysis.engagement && typeof analysis.engagement.summary !== 'string') {
     lines.push('⏱️  ENGAGEMENT')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.engagement.summary.period}`)
@@ -406,21 +585,23 @@ function formatAnalysisReport(analysis: {
     lines.push(`Średni czas sesji: ${analysis.engagement.summary.averageSessionDuration}`)
     lines.push(`Bounce rate: ${analysis.engagement.summary.bounceRate}`)
     lines.push(`Strony na sesję: ${analysis.engagement.summary.pagesPerSession}`)
-    if (analysis.engagement.recommendations && analysis.engagement.recommendations.length > 0) {
+    if (
+      'recommendations' in analysis.engagement &&
+      analysis.engagement.recommendations.length > 0
+    ) {
       lines.push('\n💡 Rekomendacje:')
-      analysis.engagement.recommendations.forEach(rec => lines.push(`   ${rec}`))
+      analysis.engagement.recommendations.forEach((rec: string) => lines.push(`   ${rec}`))
     }
     lines.push('')
   }
-  
+
   // Overall Recommendations
   if (analysis.overallRecommendations.length > 0) {
     lines.push('🎯 OGÓLNE REKOMENDACJE')
     lines.push('─'.repeat(60))
-    analysis.overallRecommendations.forEach(rec => lines.push(`   ${rec}`))
+    analysis.overallRecommendations.forEach((rec) => lines.push(`   ${rec}`))
     lines.push('')
   }
-  
+
   return lines.join('\n')
 }
-

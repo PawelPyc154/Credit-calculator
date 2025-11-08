@@ -87,6 +87,7 @@ export const FormField = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
+                  <title>Zmniejsz wartość</title>
                   <path d="M5 12h14" />
                 </svg>
               </SliderButton>
@@ -117,6 +118,7 @@ export const FormField = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
+                  <title>Zwiększ wartość</title>
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </SliderButton>

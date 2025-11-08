@@ -70,17 +70,13 @@ export function calculateTotalInterest(
  * Oblicza RRSO (Rzeczywistą Roczna Stopę Oprocentowania)
  * Uproszczony wzór przybliżony uwzględniający wszystkie koszty kredytu
  */
-export function calculateRRSO(
-  loanAmount: number,
-  totalCost: number,
-  years: number,
-): number {
+export function calculateRRSO(loanAmount: number, totalCost: number, years: number): number {
   if (loanAmount === 0 || years === 0) return 0
-  
+
   // Uproszczony wzór: RRSO ≈ (całkowity koszt / kwota kredytu) ^ (1/lata) - 1
   const totalCostRatio = totalCost / loanAmount
-  const annualRate = Math.pow(totalCostRatio, 1 / years) - 1
-  
+  const annualRate = totalCostRatio ** (1 / years) - 1
+
   return annualRate * 100
 }
 

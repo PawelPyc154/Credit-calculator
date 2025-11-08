@@ -231,6 +231,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz kwotę kredytu</title>
                         <path d="M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -258,6 +259,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ kwotę kredytu</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -289,6 +291,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz okres spłaty</title>
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
@@ -322,6 +325,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ kwotę kredytu</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </IncreaseButton>
@@ -416,6 +420,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz okres spłaty</title>
                         <path d="M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -443,6 +448,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ okres spłaty</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -472,6 +478,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz okres spłaty</title>
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
@@ -505,6 +512,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ okres spłaty</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </IncreaseButton>
@@ -607,6 +615,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz wkład własny</title>
                         <path d="M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -634,6 +643,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ wkład własny</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -666,6 +676,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz wkład własny</title>
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
@@ -699,6 +710,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ wkład własny</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </IncreaseButton>
@@ -798,6 +810,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz dochód miesięczny</title>
                         <path d="M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -825,6 +838,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ dochód miesięczny</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </SliderButton>
@@ -856,6 +870,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zmniejsz dochód miesięczny</title>
                         <path d="M5 12h14" />
                       </svg>
                     </DecreaseButton>
@@ -889,6 +904,7 @@ export const CalculatorForm = ({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
+                        <title>Zwiększ dochód miesięczny</title>
                         <path d="M12 5v14M5 12h14" />
                       </svg>
                     </IncreaseButton>
@@ -1253,7 +1269,7 @@ const TooltipContent = tw.div`
   max-w-xs
   text-sm
   p-4
-  bg-gradient-to-br from-green-50 to-emerald-50
+  bg-linear-to-br from-green-50 to-emerald-50
   border border-green-200/50
   rounded-xl
   shadow-lg

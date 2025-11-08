@@ -5,19 +5,12 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   HiChatBubbleLeftRight,
+  HiCheck,
   HiClock,
   HiHandRaised,
   HiInformationCircle,
-  HiCheck,
 } from 'react-icons/hi2'
-import {
-  MdEmail,
-  MdMailOutline,
-  MdBarChart,
-  MdBusiness,
-  MdLink,
-  MdBuild,
-} from 'react-icons/md'
+import { MdBarChart, MdBuild, MdBusiness, MdEmail, MdLink, MdMailOutline } from 'react-icons/md'
 import tw from 'tw-tailwind'
 
 const containerVariants = {
@@ -110,7 +103,8 @@ export default function KontaktPage() {
               </CardHeader>
               <CardContent>
                 <HelpDescription>
-                  Jesteśmy tutaj, aby odpowiedzieć na Twoje pytania i pomóc w każdym aspekcie związanym z kalkulatorem kredytowym. Skontaktuj się z nami w sprawie:
+                  Jesteśmy tutaj, aby odpowiedzieć na Twoje pytania i pomóc w każdym aspekcie
+                  związanym z kalkulatorem kredytowym. Skontaktuj się z nami w sprawie:
                 </HelpDescription>
                 <HelpList role="list">
                   {[

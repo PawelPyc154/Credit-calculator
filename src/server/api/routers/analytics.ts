@@ -1,11 +1,11 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data'
 import { createTRPCRouter, publicProcedure } from 'server/api/trpc'
-import { z } from 'zod'
 import { env } from 'utils/env'
+import { z } from 'zod'
 
 /**
  * Router do pobierania danych z Google Analytics
- * 
+ *
  * Wymaga konfiguracji:
  * 1. Service Account w Google Cloud Console
  * 2. GA4 Property ID
@@ -40,9 +40,11 @@ export const analyticsRouter = createTRPCRouter({
    */
   getOverview: publicProcedure
     .input(
-      z.object({
-        days: z.number().min(1).max(365).default(30),
-      }).optional(),
+      z
+        .object({
+          days: z.number().min(1).max(365).default(30),
+        })
+        .optional(),
     )
     .query(async ({ input }) => {
       const days = input?.days ?? 30
@@ -202,9 +204,11 @@ export const analyticsRouter = createTRPCRouter({
    */
   getCalculatorEvents: publicProcedure
     .input(
-      z.object({
-        days: z.number().min(1).max(365).default(30),
-      }).optional(),
+      z
+        .object({
+          days: z.number().min(1).max(365).default(30),
+        })
+        .optional(),
     )
     .query(async ({ input }) => {
       const days = input?.days ?? 30
@@ -322,8 +326,7 @@ export const analyticsRouter = createTRPCRouter({
           }
         })
 
-        const mostCommonPurpose =
-          purposeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
+        const mostCommonPurpose = purposeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
         const mostCommonInterestType =
           interestTypeResponse.rows?.[0]?.dimensionValues?.[0]?.value || ''
 
@@ -360,9 +363,11 @@ export const analyticsRouter = createTRPCRouter({
    */
   getConversions: publicProcedure
     .input(
-      z.object({
-        days: z.number().min(1).max(365).default(30),
-      }).optional(),
+      z
+        .object({
+          days: z.number().min(1).max(365).default(30),
+        })
+        .optional(),
     )
     .query(async ({ input }) => {
       const days = input?.days ?? 30
@@ -396,10 +401,7 @@ export const analyticsRouter = createTRPCRouter({
         const [conversionsResponse] = await client.runReport({
           property,
           dateRanges: [{ startDate: `${days}daysAgo`, endDate: 'today' }],
-          dimensions: [
-            { name: 'customEvent:bank_name' },
-            { name: 'customEvent:position' },
-          ],
+          dimensions: [{ name: 'customEvent:bank_name' }, { name: 'customEvent:position' }],
           metrics: [{ name: 'eventCount' }, { name: 'eventValue' }],
           dimensionFilter: {
             filter: {
@@ -422,10 +424,7 @@ export const analyticsRouter = createTRPCRouter({
           },
         })
 
-        const total = parseInt(
-          totalResponse.rows?.[0]?.metricValues?.[0]?.value || '0',
-          10,
-        )
+        const total = parseInt(totalResponse.rows?.[0]?.metricValues?.[0]?.value || '0', 10)
 
         // Grupuj po bankach
         const bankMap = new Map<
@@ -486,9 +485,11 @@ export const analyticsRouter = createTRPCRouter({
    */
   getEngagement: publicProcedure
     .input(
-      z.object({
-        days: z.number().min(1).max(365).default(30),
-      }).optional(),
+      z
+        .object({
+          days: z.number().min(1).max(365).default(30),
+        })
+        .optional(),
     )
     .query(async ({ input }) => {
       const days = input?.days ?? 30
@@ -533,9 +534,7 @@ export const analyticsRouter = createTRPCRouter({
         })
 
         const row = engagementResponse.rows?.[0]
-        const averageSessionDuration = parseFloat(
-          row?.metricValues?.[0]?.value || '0',
-        )
+        const averageSessionDuration = parseFloat(row?.metricValues?.[0]?.value || '0')
         const bounceRate = parseFloat(row?.metricValues?.[1]?.value || '0')
         const pagesPerSession = parseFloat(row?.metricValues?.[2]?.value || '0')
 
@@ -570,4 +569,3 @@ export const analyticsRouter = createTRPCRouter({
       }
     }),
 })
-
