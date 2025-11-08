@@ -5,6 +5,7 @@ import {
   HiOutlineArrowRight,
   HiOutlineChartBar,
   HiOutlineCheck,
+  HiOutlineCheckCircle,
   HiOutlineClock,
   HiOutlineCollection,
   HiOutlineCurrencyDollar,
@@ -369,30 +370,48 @@ export default function LandingPage() {
       </Section>
 
       <FinalSection>
-        <CtaCard>
-          <CtaContent>
-            <CtaTextWrapper>
-              <CtaEyebrow>Gotowy do działania</CtaEyebrow>
-              <CtaText>
-                Sprawdź, ile naprawdę zapłacisz za kredyt hipoteczny — w kilka minut.
-              </CtaText>
-              <CtaHint>
-                Kalkulator wyliczy raty, koszty dodatkowe i wskaże banki najlepiej dopasowane do
-                Twojego profilu finansowego.
-              </CtaHint>
-              <CtaActions>
-                <PrimaryCta href="/kalkulator/kredyt-hipoteczny">
-                  Uruchom kalkulator
-                  <HiOutlineArrowRight size={18} />
-                </PrimaryCta>
-                <SecondaryCta href="#faq">
-                  Przeczytaj najczęstsze pytania
-                  <HiOutlineArrowRight size={18} />
-                </SecondaryCta>
-              </CtaActions>
-            </CtaTextWrapper>
-          </CtaContent>
-        </CtaCard>
+        <FinalContent>
+          <FinalEyebrow>Bezpieczna decyzja kredytowa</FinalEyebrow>
+          <FinalTitle>Przelicz kredyt i porównaj banki w kilka minut</FinalTitle>
+          <FinalText>
+            Uruchom kalkulator, zobacz pełny koszt finansowania i sprawdź, które oferty najlepiej
+            pasują do Twojego budżetu.
+          </FinalText>
+          <FinalHighlights>
+            <HighlightCard>
+              <HighlightIcon aria-hidden="true">
+                <HiOutlineCheckCircle size={22} />
+              </HighlightIcon>
+              <HighlightCopy>
+                <HighlightTitle>Symulacje rat na żywych danych</HighlightTitle>
+                <HighlightDescription>
+                  Widzisz wpływ aktualnych stóp i marż bankowych na wysokość raty.
+                </HighlightDescription>
+              </HighlightCopy>
+            </HighlightCard>
+            <HighlightCard>
+              <HighlightIcon aria-hidden="true">
+                <HiOutlineCheckCircle size={22} />
+              </HighlightIcon>
+              <HighlightCopy>
+                <HighlightTitle>Pełny obraz kosztów</HighlightTitle>
+                <HighlightDescription>
+                  Uwzględniamy opłaty dodatkowe, ubezpieczenia i prowizje, aby nic Cię nie
+                  zaskoczyło.
+                </HighlightDescription>
+              </HighlightCopy>
+            </HighlightCard>
+          </FinalHighlights>
+          <FinalActions>
+            <FinalPrimaryCta href="/kalkulator/kredyt-hipoteczny">
+              Uruchom kalkulator
+              <HiOutlineArrowRight size={18} />
+            </FinalPrimaryCta>
+            <FinalSecondaryCta href="/zagrozenia-kredytowe">
+              Poznaj ryzyka kredytowe
+            </FinalSecondaryCta>
+          </FinalActions>
+        </FinalContent>
       </FinalSection>
 
       <FooterMain />
@@ -508,25 +527,21 @@ const FaqItem = tw.div`rounded-2xl border border-slate-200 bg-white p-5 shadow-s
 const FaqQuestion = tw.h3`text-base font-semibold text-slate-900`
 const FaqAnswer = tw.p`mt-2 text-sm leading-relaxed text-slate-600`
 
-const CtaCard = tw.div`mx-auto max-w-3xl rounded-3xl bg-linear-to-r from-emerald-600 via-emerald-500 to-teal-500 p-px shadow-lg shadow-emerald-800/10`
-const CtaContent = tw.div`
-  rounded-[calc(24px-1px)]
-  bg-white
-  px-6 py-8 sm:px-8 sm:py-9
-  flex flex-col items-center gap-5 text-center
-  sm:flex-row sm:items-center sm:justify-between sm:text-left
-`
-const CtaTextWrapper = tw.div`
-  flex flex-col gap-4 text-center sm:text-left sm:items-start
-`
-const CtaEyebrow = tw.span`
-  rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700
-`
-const CtaText = tw.h3`text-2xl font-semibold text-slate-900 sm:text-3xl`
-const CtaHint = tw.p`max-w-xl text-sm text-slate-600 sm:text-base`
-const CtaActions = tw.div`mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center`
-const SecondaryCta = tw(
+const FinalSection = tw.section`px-4 sm:px-6 md:px-10 pb-12 sm:pb-16 pt-10 sm:pt-16 bg-transparent`
+const FinalContent = tw.div`mx-auto max-w-4xl rounded-3xl border border-emerald-200 bg-linear-to-r from-emerald-600 to-teal-600 p-8 text-center text-white shadow-xl shadow-emerald-900/30 sm:p-10`
+const FinalEyebrow = tw.span`inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/90`
+const FinalTitle = tw.h3`mt-4 text-2xl font-semibold sm:text-3xl`
+const FinalText = tw.p`mt-4 text-base leading-relaxed text-emerald-50 sm:text-lg`
+const FinalHighlights = tw.ul`mt-8 grid gap-4 sm:grid-cols-2`
+const HighlightCard = tw.li`flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 p-5 text-left shadow-sm shadow-emerald-900/20 backdrop-blur-sm`
+const HighlightIcon = tw.span`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white`
+const HighlightCopy = tw.div`flex flex-col gap-1`
+const HighlightTitle = tw.span`text-sm font-semibold text-white`
+const HighlightDescription = tw.p`text-sm leading-relaxed text-emerald-50/90`
+const FinalActions = tw.div`mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center`
+const FinalPrimaryCta = tw(
   BaseCta,
-)`bg-transparent border border-emerald-200 text-emerald-700 hover:border-emerald-400 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 sm:px-6 sm:py-3`
-
-const FinalSection = tw.section`px-4 sm:px-6 md:px-10 pt-6 sm:pt-8 pb-0 bg-transparent`
+)`bg-white text-emerald-700 hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-white/60 sm:px-6 sm:py-3`
+const FinalSecondaryCta = tw(
+  BaseCta,
+)`border border-white/70 bg-transparent text-white hover:border-white hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/40 sm:px-6 sm:py-3`

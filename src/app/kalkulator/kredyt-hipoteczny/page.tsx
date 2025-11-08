@@ -12,7 +12,7 @@ import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
 import { parseBankOffers } from 'types/bank'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
-import { pageView, trackCalculation, trackTimeOnPage } from 'utils/analytics'
+import { trackCalculation, trackTimeOnPage } from 'utils/analytics'
 import { calculateBankOffers } from 'utils/calculator'
 import banksData from '../../../data/banks.json'
 
@@ -83,10 +83,6 @@ export default function HipotecznyCalculatorPage() {
     },
     [banks],
   )
-
-  useEffect(() => {
-    pageView(window.location.pathname)
-  }, [])
 
   useEffect(() => {
     const startTime = Date.now()

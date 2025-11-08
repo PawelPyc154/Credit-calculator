@@ -41,14 +41,12 @@ const policySections: PolicySection[] = [
     paragraphs: [
       'Kalkulator kredytowy działa w oparciu o dane wprowadzane lokalnie przez użytkownika. Podstawowe funkcje kalkulatora nie wymagają podawania danych osobowych.',
       'Serwis może przetwarzać następujące dane techniczne i statystyczne:',
+      'Dane wprowadzane do kalkulatora (kwoty kredytu, dochody, okres kredytowania) są przetwarzane wyłącznie lokalnie w przeglądarce użytkownika i nie są przesyłane na serwer.',
     ],
     bullets: [
       'Adres IP, typ przeglądarki, system operacyjny i czas wizyty',
       'Dane z plików cookies, np. preferencje użytkownika oraz statystyki odwiedzin',
       'Dane analityczne, takie jak interakcje z kalkulatorem i czas spędzony na stronie',
-    ],
-    paragraphs: [
-      'Dane wprowadzane do kalkulatora (kwoty kredytu, dochody, okres kredytowania) są przetwarzane wyłącznie lokalnie w przeglądarce użytkownika i nie są przesyłane na serwer.',
     ],
   },
   {
@@ -71,8 +69,6 @@ const policySections: PolicySection[] = [
       'Cookies niezbędne – umożliwiają podstawowe funkcje serwisu',
       'Cookies analityczne – pomagają zrozumieć, jak użytkownicy korzystają ze strony (np. Google Analytics)',
       'Cookies reklamowe – służą do wyświetlania spersonalizowanych reklam (np. Google AdSense)',
-    ],
-    paragraphs: [
       'Użytkownik może zarządzać cookies w ustawieniach swojej przeglądarki. Wyłączenie cookies może wpłynąć na funkcjonalność serwisu.',
     ],
   },
@@ -83,8 +79,6 @@ const policySections: PolicySection[] = [
       'Google Analytics – w celu analizy statystyk odwiedzin',
       'Google AdSense – w celu wyświetlania reklam',
       'Dostawcom usług hostingowych – w zakresie niezbędnym do utrzymania serwisu',
-    ],
-    paragraphs: [
       'Dane nie są sprzedawane ani udostępniane osobom trzecim do celów marketingowych bez zgody użytkownika.',
     ],
   },
@@ -99,7 +93,10 @@ const policySections: PolicySection[] = [
   },
   {
     title: '7. Prawa użytkownika',
-    paragraphs: ['Zgodnie z RODO, użytkownik ma prawo do:'],
+    paragraphs: [
+      'Zgodnie z RODO, użytkownik ma prawo do:',
+      'W celu realizacji swoich praw prosimy o kontakt poprzez formularz na stronie kontaktowej.',
+    ],
     bullets: [
       'Dostępu do swoich danych osobowych (art. 15 RODO)',
       'Sprostowania danych (art. 16 RODO)',
@@ -110,7 +107,6 @@ const policySections: PolicySection[] = [
       'Cofnięcia zgody w dowolnym momencie (art. 7 ust. 3 RODO)',
       'Wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych',
     ],
-    paragraphs: ['W celu realizacji swoich praw prosimy o kontakt poprzez formularz na stronie kontaktowej.'],
   },
   {
     title: '8. Bezpieczeństwo danych',

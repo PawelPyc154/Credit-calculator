@@ -81,3 +81,4 @@ Prawdopodobne przyczyny:
 4. **Nie rób drastycznych zmian** - projekt jest online dopiero od paru dni
 
 
+

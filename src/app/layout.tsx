@@ -1,5 +1,7 @@
 import 'styles/globals.css'
 
+import { Suspense } from 'react'
+import { AnalyticsTracker } from 'components/common/AnalyticsTracker'
 import { CookieBanner } from 'components/common/CookieBanner'
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
@@ -82,6 +84,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         )}
       </head>
       <body>
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <CookieBanner />
       </body>
