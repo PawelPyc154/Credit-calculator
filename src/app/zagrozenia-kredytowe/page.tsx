@@ -2,6 +2,7 @@ import { FooterMain } from 'components/calculator/FooterMain'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
+  HiOutlineArrowLeft,
   HiOutlineArrowLongRight,
   HiOutlineBanknotes,
   HiOutlineChartBar,
@@ -226,6 +227,13 @@ export default function CreditRisksPage() {
           {articleJsonLd}
         </script>
 
+        <BackLink href="/">
+          <BackIcon aria-hidden="true">
+            <HiOutlineArrowLeft size={18} />
+          </BackIcon>
+          Wróć do strony głównej
+        </BackLink>
+
         <HeroSection>
           <HeroEyebrow>Świadome finansowanie</HeroEyebrow>
           <HeroTitle>Zanim podpiszesz umowę kredytową, poznaj największe zagrożenia</HeroTitle>
@@ -403,6 +411,11 @@ export default function CreditRisksPage() {
 
 const PageWrapper = tw.main`min-h-screen bg-linear-to-b from-gray-50 via-white to-gray-100`
 const ContentContainer = tw.div`mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20`
+
+const BackLink = tw(
+  Link,
+)`mb-8 inline-flex items-center gap-2 text-sm font-medium text-emerald-700 no-underline hover:text-emerald-800`
+const BackIcon = tw.span`inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700`
 
 const HeroSection = tw.section`mx-auto max-w-3xl text-center`
 const HeroEyebrow = tw.span`mb-4 inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700`
