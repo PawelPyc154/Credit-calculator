@@ -242,11 +242,11 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       legend: {
         display: true,
         position: 'top' as const,
-        align: 'center',
+        align: 'center' as const,
         labels: {
           font: {
             size: isMobile ? 11 : 13,
-            weight: '600',
+            weight: 'bold' as const,
             family: 'system-ui, -apple-system, sans-serif',
           },
           padding: isMobile ? 12 : 18,
@@ -263,7 +263,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
         padding: isMobile ? 8 : 12,
         titleFont: {
           size: isMobile ? 11 : 13,
-          weight: '600',
+          weight: 'bold' as const,
         },
         bodyFont: {
           size: isMobile ? 10 : 12,
@@ -288,7 +288,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           text: 'Pozostała kwota do spłaty',
           font: {
             size: isMobile ? 10 : 12,
-            weight: '600',
+            weight: 'bold' as const,
           },
           color: '#3b82f6',
           padding: isMobile ? 5 : 10,
@@ -317,7 +317,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           text: 'Kapitał i odsetki',
           font: {
             size: isMobile ? 10 : 12,
-            weight: '600',
+            weight: 'bold' as const,
           },
           color: '#10b981',
           padding: isMobile ? 5 : 10,
