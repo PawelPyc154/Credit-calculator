@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  BarController,
   BarElement,
   CategoryScale,
   Chart as ChartJS,
@@ -8,6 +9,7 @@ import {
   Filler,
   Legend,
   LinearScale,
+  LineController,
   LineElement,
   PointElement,
   Title,
@@ -18,12 +20,14 @@ import { Chart } from 'react-chartjs-2'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
 import type { CalculatorFormData } from 'types/calculator'
-import { formatCurrency, formatCurrencyNoCents, formatPercent } from 'utils/calculator'
+import { formatCurrencyNoCents, formatPercent } from 'utils/calculator'
 
 // Rejestrujemy komponenty Chart.js
 ChartJS.register(
+  BarController,
   CategoryScale,
   LinearScale,
+  LineController,
   PointElement,
   LineElement,
   BarElement,
@@ -51,12 +55,13 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const loanAmount = result.loanAmount ?? formData?.loanAmount ?? 0
   const loanPeriod = result.loanPeriod ?? formData?.loanPeriod ?? 0
   const totalPayments = loanPeriod * 12
+  const bank = result.bank
 
   // Oblicz wszystkie raty dla wykresu
   const calculateAllPayments = () => {
     if (!loanAmount || !loanPeriod || !result.monthlyPayment) return null
 
-    const monthlyRate = (result.bank?.baseInterestRate ?? 0) / 100 / 12
+    const monthlyRate = (bank?.baseInterestRate ?? 0) / 100 / 12
     let remainingBalance = loanAmount
     const allPayments: Array<{
       month: number
@@ -171,7 +176,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
 
   // Generuj rekomendację "Dla kogo ta oferta?"
   const getTargetAudience = () => {
-    if (!result.bank) return null
+    if (!bank) return null
 
     const features: string[] = []
     const warnings: string[] = []
@@ -180,29 +185,29 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     if (result.commission === 0) {
       features.push('osoby szukające oferty bez prowizji')
     }
-    if (result.bank.accountRequired === false) {
+    if (bank.accountRequired === false) {
       features.push('osoby, które nie chcą otwierać konta w banku')
     }
-    if (result.bank.earlyRepaymentFee === 0) {
+    if (bank.earlyRepaymentFee === 0) {
       features.push('osoby planujące wcześniejszą spłatę kredytu')
     }
-    if (result.bank.processingTime?.includes('3-7')) {
+    if (bank.processingTime?.includes('3-7')) {
       features.push('osoby potrzebujące szybkiej decyzji')
     }
-    if (result.bank.maxLoanAmount >= 2500000) {
+    if (bank.maxLoanAmount >= 2500000) {
       features.push('osoby szukające kredytu na wysoką kwotę')
     }
-    if (result.bank.supportedPurposes.includes('construction')) {
+    if (bank.supportedPurposes.includes('construction')) {
       features.push('osoby budujące dom')
     }
 
-    if (result.bank.accountRequired && result.bank.accountFee && result.bank.accountFee > 0) {
+    if (bank.accountRequired && bank.accountFee && bank.accountFee > 0) {
       warnings.push('wymaga otwarcia konta z opłatą miesięczną')
     }
-    if (result.bank.minDownPaymentPercent > 10) {
-      warnings.push(`wymaga wyższego wkładu własnego (${result.bank.minDownPaymentPercent}%)`)
+    if (bank.minDownPaymentPercent > 10) {
+      warnings.push(`wymaga wyższego wkładu własnego (${bank.minDownPaymentPercent}%)`)
     }
-    if (result.bank.earlyRepaymentFee && result.bank.earlyRepaymentFee > 0) {
+    if (bank.earlyRepaymentFee && bank.earlyRepaymentFee > 0) {
       warnings.push('pobiera opłatę za wcześniejszą spłatę')
     }
 
@@ -629,7 +634,17 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       )}
 
       {/* Parametry oferty - zawsze widoczne */}
-      {result.bank && (
+      {!bank && (
+        <MissingDetailsAlert>
+          <MissingDetailsIcon>ℹ️</MissingDetailsIcon>
+          <MissingDetailsText>
+            Rozszerzone dane banku są chwilowo niedostępne. Podstawowe wartości obliczeń pozostają
+            poprawne.
+          </MissingDetailsText>
+        </MissingDetailsAlert>
+      )}
+
+      {bank && (
         <ParametersSection>
           <DetailsSectionSubtitle>
             <SubtitleIcon>
@@ -688,7 +703,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                   </Tooltip>
                 </ParameterLabel>
                 <ParameterValue className="text-blue-600">
-                  {formatPercent(result.bank.wibor ?? 0)}
+                  {formatPercent(bank.wibor ?? 0)}
                 </ParameterValue>
               </ParameterCard>
             )}
@@ -769,7 +784,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                   </Tooltip>
                 </ParameterLabel>
                 <ParameterValue className="text-indigo-600">
-                  {formatPercent(result.bank.margin ?? 0)}
+                  {formatPercent(bank.margin ?? 0)}
                 </ParameterValue>
               </ParameterCard>
             )}
@@ -808,7 +823,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue className="text-purple-600">
-                {result.bank.processingTime ?? 'Brak danych'}
+                {bank.processingTime ?? 'Brak danych'}
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
@@ -847,13 +862,9 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue
-                className={
-                  result.bank.earlyRepaymentFee === 0 ? 'text-green-600' : 'text-orange-600'
-                }
+                className={bank.earlyRepaymentFee === 0 ? 'text-green-600' : 'text-orange-600'}
               >
-                {result.bank.earlyRepaymentFee === 0
-                  ? '✓ Darmowa'
-                  : `${result.bank.earlyRepaymentFee}% opłaty`}
+                {bank.earlyRepaymentFee === 0 ? '✓ Darmowa' : `${bank.earlyRepaymentFee}% opłaty`}
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
@@ -890,15 +901,11 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                   </ParameterTooltipIcon>
                 </Tooltip>
               </ParameterLabel>
-              <ParameterValue
-                className={result.bank.accountRequired ? 'text-gray-600' : 'text-green-600'}
-              >
-                {result.bank.accountRequired ? 'Tak' : '✓ Nie'}
-                {result.bank.accountRequired &&
-                  !!result.bank.accountFee &&
-                  result.bank.accountFee > 0 && (
-                    <ParameterSubvalue> ({result.bank.accountFee} zł/msc)</ParameterSubvalue>
-                  )}
+              <ParameterValue className={bank.accountRequired ? 'text-gray-600' : 'text-green-600'}>
+                {bank.accountRequired ? 'Tak' : '✓ Nie'}
+                {bank.accountRequired && !!bank.accountFee && bank.accountFee > 0 && (
+                  <ParameterSubvalue> ({bank.accountFee} zł/msc)</ParameterSubvalue>
+                )}
               </ParameterValue>
             </ParameterCard>
             <ParameterCard>
@@ -936,8 +943,8 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue className="text-gray-600! text-xs">
-                {formatCurrencyNoCents(result.bank.minLoanAmount)} -{' '}
-                {formatCurrencyNoCents(result.bank.maxLoanAmount)}
+                {formatCurrencyNoCents(bank.minLoanAmount)} -{' '}
+                {formatCurrencyNoCents(bank.maxLoanAmount)}
               </ParameterValue>
             </ParameterCard>
           </ParametersGrid>
@@ -945,10 +952,10 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       )}
 
       {/* Dodatkowe szczegóły - zawsze widoczne */}
-      {result.bank && (
+      {bank && (
         <DetailsSectionWrapper>
           {/* Specjalne oferty */}
-          {result.bank.specialOffers && result.bank.specialOffers.length > 0 && (
+          {bank.specialOffers && bank.specialOffers.length > 0 && (
             <>
               <SectionDivider />
               <DetailsSectionSubtitle>
@@ -971,7 +978,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 SPECJALNE OFERTY
               </DetailsSectionSubtitle>
               <SpecialOffersGrid>
-                {result.bank.specialOffers.map((offer: string) => (
+                {bank.specialOffers.map((offer: string) => (
                   <SpecialOfferCard key={offer}>
                     <SpecialOfferIcon>
                       <svg
@@ -991,12 +998,12 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           )}
 
           {/* Zalety i wady */}
-          {((result.bank.advantages && result.bank.advantages.length > 0) ||
-            (result.bank.disadvantages && result.bank.disadvantages.length > 0)) && (
+          {((bank.advantages && bank.advantages.length > 0) ||
+            (bank.disadvantages && bank.disadvantages.length > 0)) && (
             <>
               <SectionDivider />
               <ComparisonGrid>
-                {result.bank.advantages && result.bank.advantages.length > 0 && (
+                {bank.advantages && bank.advantages.length > 0 && (
                   <AdvantagesSection>
                     <ComparisonHeader className="border-green-200 bg-linear-to-r from-green-50 to-emerald-50">
                       <ComparisonIcon className="bg-green-100 text-green-600">
@@ -1018,7 +1025,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                       <ComparisonTitle className="text-green-800">ZALETY</ComparisonTitle>
                     </ComparisonHeader>
                     <ComparisonList>
-                      {result.bank.advantages.map((advantage: string) => (
+                      {bank.advantages.map((advantage: string) => (
                         <ComparisonItem key={advantage}>
                           <ComparisonBullet className="bg-green-100 text-green-600">
                             +
@@ -1030,7 +1037,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                   </AdvantagesSection>
                 )}
 
-                {result.bank.disadvantages && result.bank.disadvantages.length > 0 && (
+                {bank.disadvantages && bank.disadvantages.length > 0 && (
                   <DisadvantagesSection>
                     <ComparisonHeader className="border-red-200 bg-linear-to-r from-red-50 to-orange-50">
                       <ComparisonIcon className="bg-red-100 text-red-600">
@@ -1052,7 +1059,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                       <ComparisonTitle className="text-red-800">WADY</ComparisonTitle>
                     </ComparisonHeader>
                     <ComparisonList>
-                      {result.bank.disadvantages.map((disadvantage: string) => (
+                      {bank.disadvantages.map((disadvantage: string) => (
                         <ComparisonItem key={disadvantage}>
                           <ComparisonBullet className="bg-red-100 text-red-600">−</ComparisonBullet>
                           <ComparisonText className="text-red-900">{disadvantage}</ComparisonText>
@@ -1066,7 +1073,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           )}
 
           {/* Informacja o LTV */}
-          {result.bank.ltv && (
+          {bank.ltv && (
             <>
               <SectionDivider />
               <LtvSection>
@@ -1132,10 +1139,10 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                     <LtvDivider />
                     <LtvRatio>LTV 80%</LtvRatio>
                     <LtvValue className="text-green-700">
-                      {result.bank.ltv.ratio80 === 0
+                      {bank.ltv?.ratio80 === 0
                         ? '✓ Bez dodatkowej marży'
-                        : result.bank.ltv.ratio80 !== undefined
-                          ? `+${formatPercent(result.bank.ltv.ratio80)}`
+                        : bank.ltv?.ratio80 !== undefined
+                          ? `+${formatPercent(bank.ltv.ratio80)}`
                           : 'Brak danych'}
                     </LtvValue>
                   </LtvCard>
@@ -1146,25 +1153,25 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                     <LtvDivider />
                     <LtvRatio>LTV 90%</LtvRatio>
                     <LtvValue className="text-orange-700">
-                      {result.bank.ltv.ratio90 === 0
+                      {bank.ltv?.ratio90 === 0
                         ? 'Bez dodatkowej marży'
-                        : result.bank.ltv.ratio90 !== undefined && result.bank.ltv.ratio90 > 0
-                          ? `+${formatPercent(result.bank.ltv.ratio90)}`
+                        : bank.ltv?.ratio90 !== undefined && (bank.ltv?.ratio90 ?? 0) > 0
+                          ? `+${formatPercent(bank.ltv?.ratio90 ?? 0)}`
                           : 'Oferta niedostępna'}
                     </LtvValue>
                   </LtvCard>
 
-                  {result.bank.ltv.ratio95 !== undefined && (
+                  {bank.ltv?.ratio95 !== undefined && (
                     <LtvCard className="border-red-200 bg-linear-to-br from-red-50 to-pink-50">
                       <LtvPercentage className="text-red-600">5%</LtvPercentage>
                       <LtvLabel>wkładu własnego</LtvLabel>
                       <LtvDivider />
                       <LtvRatio>LTV 95%</LtvRatio>
                       <LtvValue className="text-red-700">
-                        {result.bank.ltv.ratio95 === 0
+                        {bank.ltv?.ratio95 === 0
                           ? 'Bez dodatkowej marży'
-                          : result.bank.ltv.ratio95 > 0
-                            ? `+${formatPercent(result.bank.ltv.ratio95)}`
+                          : (bank.ltv?.ratio95 ?? 0) > 0
+                            ? `+${formatPercent(bank.ltv?.ratio95 ?? 0)}`
                             : 'Oferta niedostępna'}
                       </LtvValue>
                     </LtvCard>
@@ -1193,7 +1200,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           )}
 
           {/* Opis banku */}
-          {result.bank.description && (
+          {bank.description && (
             <>
               <SectionDivider />
               <BankDescription>
@@ -1215,7 +1222,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 </DescriptionIconWrapper>
                 <DescriptionContent>
                   <DescriptionTitle>O banku</DescriptionTitle>
-                  <DescriptionText>{result.bank.description}</DescriptionText>
+                  <DescriptionText>{bank.description}</DescriptionText>
                 </DescriptionContent>
               </BankDescription>
             </>
@@ -1237,6 +1244,19 @@ const DetailsSection = tw.div`
 const SimpleInfoTable = tw.div`
   w-full border border-gray-200 rounded-lg bg-white
   divide-y divide-gray-200
+`
+
+const MissingDetailsAlert = tw.div`
+  mt-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3
+  text-sm text-amber-800
+`
+
+const MissingDetailsIcon = tw.span`
+  text-base leading-none
+`
+
+const MissingDetailsText = tw.span`
+  flex-1 leading-snug
 `
 
 const SimpleInfoRow = tw.div`
