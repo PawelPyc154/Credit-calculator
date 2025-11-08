@@ -113,9 +113,15 @@ function calculateScore(
  * Sprawdza czy bank spełnia wymagania kredytowe
  */
 function isBankEligible(bank: BankOffer, formData: CalculatorFormData): boolean {
-  const { loanAmount, loanPeriod, downPayment, purpose } = formData
+  const { loanAmount, loanPeriod, downPayment, purpose, interestRateType } = formData
   const propertyValue = loanAmount + downPayment
   const downPaymentPercent = (downPayment / propertyValue) * 100
+
+  // Sprawdź czy bank obsługuje wybrany typ oprocentowania
+  const supportsInterestRateType =
+    !bank.supportedInterestRateTypes ||
+    bank.supportedInterestRateTypes.length === 0 ||
+    bank.supportedInterestRateTypes.includes(interestRateType)
 
   return (
     loanAmount >= bank.minLoanAmount &&
@@ -123,7 +129,8 @@ function isBankEligible(bank: BankOffer, formData: CalculatorFormData): boolean 
     loanPeriod >= bank.minLoanPeriod &&
     loanPeriod <= bank.maxLoanPeriod &&
     downPaymentPercent >= bank.minDownPaymentPercent &&
-    bank.supportedPurposes.includes(purpose)
+    bank.supportedPurposes.includes(purpose) &&
+    supportsInterestRateType
   )
 }
 
@@ -141,7 +148,13 @@ export function calculateBankOffers(
 
   // Oblicz wyniki dla każdego banku
   const results: CalculationResult[] = eligibleBanks.map((bank) => {
-    const monthlyPayment = calculateMonthlyPayment(loanAmount, bank.baseInterestRate, loanPeriod)
+    // Wybierz odpowiednie oprocentowanie w zależności od typu
+    const interestRate =
+      formData.interestRateType === 'fixed' && bank.fixedInterestRate
+        ? bank.fixedInterestRate
+        : bank.baseInterestRate
+
+    const monthlyPayment = calculateMonthlyPayment(loanAmount, interestRate, loanPeriod)
 
     const commission = calculateCommission(loanAmount, bank.commissionRate)
     const insurance = calculateInsurance(loanAmount, bank.insuranceRate, loanPeriod)
@@ -158,7 +171,7 @@ export function calculateBankOffers(
       bankLogo: bank.logo,
       monthlyPayment,
       totalCost,
-      interestRate: bank.baseInterestRate,
+      interestRate,
       totalInterest,
       commission,
       insurance,

@@ -5,6 +5,10 @@ import type { BankOffer } from './bank'
 export const loanPurposeSchema = z.enum(['purchase', 'refinancing', 'construction'])
 export type LoanPurpose = z.infer<typeof loanPurposeSchema>
 
+// Typ oprocentowania
+export const interestRateTypeSchema = z.enum(['fixed', 'variable'])
+export type InterestRateType = z.infer<typeof interestRateTypeSchema>
+
 // Schema formularza kalkulatora
 export const calculatorFormSchema = z.object({
   loanAmount: z
@@ -18,6 +22,7 @@ export const calculatorFormSchema = z.object({
   downPayment: z.number().min(0, 'Wkład własny nie może być ujemny'),
   monthlyIncome: z.number().min(3000, 'Minimalny dochód miesięczny to 3 000 zł'),
   purpose: loanPurposeSchema,
+  interestRateType: interestRateTypeSchema,
 })
 
 export type CalculatorFormData = z.infer<typeof calculatorFormSchema>

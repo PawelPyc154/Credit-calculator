@@ -20,6 +20,7 @@ const defaultFormData: CalculatorFormData = {
   downPayment: 100000,
   monthlyIncome: 8000,
   purpose: 'purchase',
+  interestRateType: 'variable',
 }
 
 export default function Home() {
@@ -80,7 +81,7 @@ export default function Home() {
 
       <ContentWrapper>
         <ResultsSection id="results">
-          <BankResults results={results} formData={formData} formRef={formRef} />
+          <BankResults results={results} formData={formData} />
         </ResultsSection>
         {results.length > 0 && (
           <DisclaimerSection>

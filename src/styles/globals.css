@@ -42,6 +42,43 @@
   padding: 0;
 }
 
+/* Style dla tooltipów z obramowaniem */
+.tippy-box[data-theme~="light-border"] {
+  background-color: white;
+  color: #1f2937;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 8px 12px;
+}
+
+.tippy-box[data-theme~="light-border"][data-placement^="top"] > .tippy-arrow::before {
+  border-top-color: white;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08));
+}
+
+.tippy-box[data-theme~="light-border"][data-placement^="bottom"] > .tippy-arrow::before {
+  border-bottom-color: white;
+  filter: drop-shadow(0 -1px 2px rgba(0, 0, 0, 0.08));
+}
+
+.tippy-box[data-theme~="light-border"][data-placement^="left"] > .tippy-arrow::before {
+  border-left-color: white;
+  filter: drop-shadow(1px 0 2px rgba(0, 0, 0, 0.08));
+}
+
+.tippy-box[data-theme~="light-border"][data-placement^="right"] > .tippy-arrow::before {
+  border-right-color: white;
+  filter: drop-shadow(-1px 0 2px rgba(0, 0, 0, 0.08));
+}
+
+.tippy-box[data-theme~="light-border"] > .tippy-content {
+  padding: 0;
+}
+
 /* Animacja dla przycisku CTA najlepszej oferty */
 @keyframes pulse-glow {
   0%,

@@ -18,6 +18,8 @@
       "refinancing",
       "construction"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 8.35,
     "description": "Dynamiczny bank z innowacyjnymi rozwiązaniami i bez prowizji",
     "earlyRepaymentFee": 0,
     "accountRequired": false,
@@ -71,6 +73,8 @@
       "refinancing",
       "construction"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 8.15,
     "description": "Bank oferujący kompleksową obsługę kredytową z dedykowanym doradcą",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -120,6 +124,8 @@
       "purchase",
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 8.05,
     "description": "Tradycyjny bank z bogatym doświadczeniem i stabilną pozycją na rynku",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -185,6 +191,8 @@
       "refinancing",
       "construction"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 7.99,
     "description": "Międzynarodowy bank z atrakcyjnymi warunkami kredytowymi",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -246,6 +254,8 @@
       "purchase",
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 8.2,
     "description": "Bank z europejskim doświadczeniem i indywidualnym podejściem do klienta",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -297,6 +307,8 @@
       "refinancing",
       "construction"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 7.75,
     "description": "Bank z najniższym oprocentowaniem i najwyższym limitem kredytowym",
     "earlyRepaymentFee": 0,
     "accountRequired": false,
@@ -346,6 +358,8 @@
       "purchase",
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 7.95,
     "description": "Nowoczesny bank online z najniższą marżą na rynku i prostym procesem aplikacji",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -396,6 +410,8 @@
       "refinancing",
       "construction"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 8.09,
     "description": "Najstarszy bank w Polsce z konkurencyjnymi ofertami i najszerszą siecią oddziałów",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -442,6 +458,8 @@
       "purchase",
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 8.25,
     "description": "Bank z najszybszym procesem decyzyjnym i elastycznymi warunkami",
     "earlyRepaymentFee": 3,
     "accountRequired": true,
@@ -491,6 +509,8 @@
       "purchase",
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 7.88,
     "description": "Nowoczesny bank z 0% prowizji i 100% zdalną obsługą",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -556,6 +576,8 @@
       "purchase",
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 7.78,
     "description": "Specjalna oferta kredytu hipotecznego dla wybranych zawodów - w uproszczonym trybie",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -622,6 +644,8 @@
     "supportedPurposes": [
       "refinancing"
     ],
+    "supportedInterestRateTypes": ["fixed", "variable"],
+    "fixedInterestRate": 7.88,
     "description": "Dedykowana oferta refinansowania kredytu hipotecznego z innymi bankami",
     "earlyRepaymentFee": 0,
     "accountRequired": true,

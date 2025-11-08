@@ -1,18 +1,174 @@
+'use client'
+
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Tooltip as ChartTooltip,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+} from 'chart.js'
 import { Tooltip } from 'components/common/tooltip'
+import { useEffect, useState } from 'react'
+import { Chart } from 'react-chartjs-2'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
+import type { CalculatorFormData } from 'types/calculator'
 import { formatCurrency, formatPercent } from 'utils/calculator'
+
+// Rejestrujemy komponenty Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler,
+)
 
 export type BankDetailsProps = {
   result: {
     totalInterest: number
     commission: number
     insurance: number
+    monthlyPayment: number
+    totalCost: number
+    loanAmount?: number
+    loanPeriod?: number
     bank?: BankOffer
   }
+  formData?: CalculatorFormData
 }
 
-export const BankDetails = ({ result }: BankDetailsProps) => {
+export const BankDetails = ({ result, formData }: BankDetailsProps) => {
+  const loanAmount = result.loanAmount ?? formData?.loanAmount ?? 0
+  const loanPeriod = result.loanPeriod ?? formData?.loanPeriod ?? 0
+  const totalPayments = loanPeriod * 12
+
+  // Oblicz wszystkie raty dla wykresu
+  const calculateAllPayments = () => {
+    if (!loanAmount || !loanPeriod || !result.monthlyPayment) return null
+
+    const monthlyRate = (result.bank?.baseInterestRate ?? 0) / 100 / 12
+    let remainingBalance = loanAmount
+    const allPayments: Array<{
+      month: number
+      payment: number
+      principal: number
+      interest: number
+      remaining: number
+    }> = []
+
+    // Zaokrąglij miesięczną ratę do 2 miejsc po przecinku
+    const roundedMonthlyPayment = Math.round(result.monthlyPayment * 100) / 100
+
+    for (let month = 1; month <= totalPayments; month++) {
+      const interest = Math.round(remainingBalance * monthlyRate * 100) / 100
+      let principal = roundedMonthlyPayment - interest
+
+      // Ostatnia rata - dostosuj kwotę do pozostałego salda
+      if (month === totalPayments) {
+        principal = Math.round(remainingBalance * 100) / 100
+      } else {
+        principal = Math.round(principal * 100) / 100
+      }
+
+      remainingBalance = Math.max(0, Math.round((remainingBalance - principal) * 100) / 100)
+
+      // Ostatnia rata - użyj rzeczywistej kwoty raty
+      const actualPayment =
+        month === totalPayments
+          ? Math.round((principal + interest) * 100) / 100
+          : roundedMonthlyPayment
+
+      allPayments.push({
+        month,
+        payment: Math.round(actualPayment * 100) / 100,
+        principal: Math.round(principal * 100) / 100,
+        interest: Math.round(interest * 100) / 100,
+        remaining: remainingBalance,
+      })
+    }
+
+    return allPayments
+  }
+
+  // Generuj harmonogram spłat z tym samym przeskokiem co wykres
+  const getPaymentSchedule = () => {
+    const allPayments = calculateAllPayments()
+    if (!allPayments) return null
+
+    // Użyj tego samego kroku co wykres
+    const step = totalPayments > 60 ? 6 : totalPayments > 24 ? 3 : 1
+    const schedule: typeof allPayments = []
+
+    // Dodaj raty z przeskokiem
+    for (let i = 0; i < allPayments.length; i += step) {
+      const payment = allPayments[i]
+      if (payment) {
+        schedule.push(payment)
+      }
+    }
+
+    // Dodaj ostatnią ratę jeśli nie została dodana
+    if (allPayments.length > 0) {
+      const lastPayment = allPayments[allPayments.length - 1]
+      if (lastPayment && schedule[schedule.length - 1]?.month !== lastPayment.month) {
+        schedule.push(lastPayment)
+      }
+    }
+
+    return { schedule, all: allPayments }
+  }
+
+  // Przygotuj dane do wykresu
+  const getChartData = () => {
+    const allPayments = calculateAllPayments()
+    if (!allPayments) return null
+
+    // Dla wykresu liniowego - pokazujemy co 6 miesiąc (lub częściej dla krótszych kredytów)
+    const step = totalPayments > 60 ? 6 : totalPayments > 24 ? 3 : 1
+    const labels: string[] = []
+    const remainingData: number[] = []
+    const principalData: number[] = []
+    const interestData: number[] = []
+
+    for (let i = 0; i < allPayments.length; i += step) {
+      const payment = allPayments[i]
+      if (payment) {
+        labels.push(`Miesiąc ${payment.month}`)
+        remainingData.push(payment.remaining)
+        principalData.push(payment.principal)
+        interestData.push(payment.interest)
+      }
+    }
+
+    // Dodaj ostatnią ratę jeśli nie została dodana
+    if (allPayments.length > 0) {
+      const lastPayment = allPayments[allPayments.length - 1]
+      if (lastPayment && labels[labels.length - 1] !== `Miesiąc ${lastPayment.month}`) {
+        labels.push(`Miesiąc ${lastPayment.month}`)
+        remainingData.push(lastPayment.remaining)
+        principalData.push(lastPayment.principal)
+        interestData.push(lastPayment.interest)
+      }
+    }
+
+    return {
+      labels,
+      remainingData,
+      principalData,
+      interestData,
+    }
+  }
+
   // Generuj rekomendację "Dla kogo ta oferta?"
   const getTargetAudience = () => {
     if (!result.bank) return null
@@ -30,7 +186,7 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
     if (result.bank.earlyRepaymentFee === 0) {
       features.push('osoby planujące wcześniejszą spłatę kredytu')
     }
-    if (result.bank.processingTime && result.bank.processingTime.includes('3-7')) {
+    if (result.bank.processingTime?.includes('3-7')) {
       features.push('osoby potrzebujące szybkiej decyzji')
     }
     if (result.bank.maxLoanAmount >= 2500000) {
@@ -54,161 +210,427 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
   }
 
   const targetAudience = getTargetAudience()
+  const paymentSchedule = getPaymentSchedule()
+  const chartData = getChartData()
+  const allPaymentsForChart = calculateAllPayments()
+
+  // Stan dla modalu z tabelą harmonogramu
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // Stan dla rozmiaru ekranu
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Funkcja do formatowania kwot w krótszej formie na mobile
+  const formatCurrencyShort = (amount: number): string => {
+    if (isMobile) {
+      if (amount >= 1000000) {
+        return `${(amount / 1000000).toFixed(1)}M zł`
+      }
+      if (amount >= 1000) {
+        return `${(amount / 1000).toFixed(0)}k zł`
+      }
+      return `${Math.round(amount)} zł`
+    }
+    return formatCurrency(amount)
+  }
+
+  // Konfiguracja wykresu
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top' as const,
+        align: 'center',
+        labels: {
+          font: {
+            size: isMobile ? 11 : 13,
+            weight: '600',
+            family: 'system-ui, -apple-system, sans-serif',
+          },
+          padding: isMobile ? 12 : 18,
+          boxWidth: isMobile ? 18 : 22,
+          boxHeight: isMobile ? 14 : 16,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          color: '#1f2937',
+        },
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
+        padding: isMobile ? 8 : 12,
+        titleFont: {
+          size: isMobile ? 11 : 13,
+          weight: '600',
+        },
+        bodyFont: {
+          size: isMobile ? 10 : 12,
+        },
+        callbacks: {
+          label: (context: any) => {
+            const value = context.parsed.y
+            if (value === null || value === undefined) return ''
+            return `${context.dataset.label}: ${formatCurrency(value)}`
+          },
+        },
+      },
+    },
+    scales: {
+      y: {
+        type: 'linear' as const,
+        display: true,
+        position: 'left' as const,
+        beginAtZero: true,
+        title: {
+          display: !isMobile,
+          text: 'Pozostała kwota do spłaty',
+          font: {
+            size: isMobile ? 10 : 12,
+            weight: '600',
+          },
+          color: '#3b82f6',
+          padding: isMobile ? 5 : 10,
+        },
+        ticks: {
+          callback: (value: any) => {
+            return formatCurrency(value as number)
+          },
+          font: {
+            size: isMobile ? 9 : 11,
+          },
+          maxTicksLimit: isMobile ? 5 : 8,
+        },
+        grid: {
+          color: 'rgba(99, 102, 241, 0.15)',
+          lineWidth: 1,
+        },
+      },
+      y1: {
+        type: 'linear' as const,
+        display: true,
+        position: 'right' as const,
+        beginAtZero: true,
+        title: {
+          display: !isMobile,
+          text: 'Kapitał i odsetki',
+          font: {
+            size: isMobile ? 10 : 12,
+            weight: '600',
+          },
+          color: '#10b981',
+          padding: isMobile ? 5 : 10,
+        },
+        ticks: {
+          callback: (value: any) => {
+            return formatCurrency(value as number)
+          },
+          font: {
+            size: isMobile ? 9 : 11,
+          },
+          maxTicksLimit: isMobile ? 5 : 8,
+        },
+        grid: {
+          drawOnChartArea: false,
+        },
+      },
+      x: {
+        ticks: {
+          maxRotation: isMobile ? 60 : 45,
+          minRotation: isMobile ? 60 : 45,
+          font: {
+            size: isMobile ? 8 : 10,
+          },
+          maxTicksLimit: isMobile ? 6 : 12,
+        },
+        grid: {
+          display: false,
+        },
+      },
+    },
+    interaction: {
+      mode: 'index' as const,
+      intersect: false,
+    },
+  }
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Blokuj scroll strony gdy modal jest otwarty, ale pozwól scrollować w modalu
+  useEffect(() => {
+    if (isModalOpen) {
+      // Funkcja blokująca scroll na body
+      const preventScroll = (e: WheelEvent) => {
+        // Sprawdź czy event pochodzi z modalu
+        const target = e.target as HTMLElement
+        const modalContent = target.closest('[data-modal-content]')
+
+        if (modalContent) {
+          // Sprawdź czy modal jest na początku/końcu scrolla
+          const modalBody = modalContent.querySelector('[data-modal-body]') as HTMLElement
+          if (modalBody) {
+            const isAtTop = modalBody.scrollTop === 0
+            const isAtBottom =
+              modalBody.scrollTop + modalBody.clientHeight >= modalBody.scrollHeight - 1
+            const isScrollingUp = e.deltaY < 0
+            const isScrollingDown = e.deltaY > 0
+
+            // Jeśli jesteśmy na górze modalu i scrollujemy w górę, zablokuj
+            if (isAtTop && isScrollingUp) {
+              e.preventDefault()
+              e.stopPropagation()
+              return
+            }
+
+            // Jeśli jesteśmy na końcu modalu i scrollujemy w dół, zablokuj
+            if (isAtBottom && isScrollingDown) {
+              e.preventDefault()
+              e.stopPropagation()
+              return
+            }
+          }
+          // Pozwól scrollować w modalu
+          return
+        }
+
+        // Jeśli event nie pochodzi z modalu, zablokuj scroll
+        e.preventDefault()
+        e.stopPropagation()
+      }
+
+      // Funkcja blokująca touch scroll
+      const preventTouchScroll = (e: TouchEvent) => {
+        const target = e.target as HTMLElement
+        const modalContent = target.closest('[data-modal-content]')
+
+        if (!modalContent) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      }
+
+      // Dodaj event listenery na window zamiast body
+      window.addEventListener('wheel', preventScroll, { passive: false, capture: true })
+      window.addEventListener('touchmove', preventTouchScroll, { passive: false, capture: true })
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('wheel', preventScroll, {
+          capture: true,
+        } as EventListenerOptions)
+        window.removeEventListener('touchmove', preventTouchScroll, {
+          capture: true,
+        } as EventListenerOptions)
+      }
+    }
+  }, [isModalOpen])
+
+  const openModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
 
   return (
     <DetailsSection>
-      <DetailsSectionTitle>
-        <TitleIcon>📊</TitleIcon>
-        Szczegółowa kalkulacja i informacje
-      </DetailsSectionTitle>
+      {/* Prosta tabela z podstawowymi informacjami */}
+      <SimpleInfoTable>
+        <SimpleInfoRow className="border-blue-200 border-b-2 bg-blue-50">
+          <SimpleInfoLabel className="text-blue-700">Miesięczna rata</SimpleInfoLabel>
+          <SimpleInfoValue className="text-blue-600">
+            {formatCurrency(result.monthlyPayment)}
+          </SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Całkowity koszt kredytu</SimpleInfoLabel>
+          <SimpleInfoValue>{formatCurrency(result.totalCost)}</SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Suma odsetek w okresie kredytowania</SimpleInfoLabel>
+          <SimpleInfoValue>{formatCurrency(result.totalInterest)}</SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Prowizja za udzielenie kredytu</SimpleInfoLabel>
+          <SimpleInfoValue>{formatCurrency(result.commission)}</SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Ubezpieczenie kredytu</SimpleInfoLabel>
+          <SimpleInfoValue>{formatCurrency(result.insurance)}</SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Liczba rat</SimpleInfoLabel>
+          <SimpleInfoValue>{totalPayments}</SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Okres kredytowania</SimpleInfoLabel>
+          <SimpleInfoValue>{loanPeriod} lat</SimpleInfoValue>
+        </SimpleInfoRow>
+      </SimpleInfoTable>
 
-      {/* Sekcja "Dla kogo ta oferta?" */}
-      {targetAudience && (targetAudience.features.length > 0 || targetAudience.warnings.length > 0) && (
-        <>
-          <TargetAudienceSection>
-            <TargetAudienceHeader>
-              <TargetAudienceIcon>👤</TargetAudienceIcon>
-              <TargetAudienceTitle>Dla kogo ta oferta?</TargetAudienceTitle>
-            </TargetAudienceHeader>
-            <TargetAudienceContent>
-              {targetAudience.features.length > 0 && (
-                <TargetAudienceList>
-                  <TargetAudienceListTitle>Idealna dla:</TargetAudienceListTitle>
-                  {targetAudience.features.map((feature, idx) => (
-                    <TargetAudienceItem key={idx} className="text-green-700">
-                      <TargetAudienceBullet className="bg-green-100 text-green-600">✓</TargetAudienceBullet>
-                      <span>{feature}</span>
-                    </TargetAudienceItem>
-                  ))}
-                </TargetAudienceList>
-              )}
-              {targetAudience.warnings.length > 0 && (
-                <TargetAudienceList>
-                  <TargetAudienceListTitle className="text-orange-700">Uwaga:</TargetAudienceListTitle>
-                  {targetAudience.warnings.map((warning, idx) => (
-                    <TargetAudienceItem key={idx} className="text-orange-700">
-                      <TargetAudienceBullet className="bg-orange-100 text-orange-600">!</TargetAudienceBullet>
-                      <span>{warning}</span>
-                    </TargetAudienceItem>
-                  ))}
-                </TargetAudienceList>
-              )}
-            </TargetAudienceContent>
-          </TargetAudienceSection>
-          <SectionDivider />
-        </>
+      {/* Harmonogram spłat - wykres w sekcji wyżej */}
+      {chartData && paymentSchedule && paymentSchedule.schedule.length > 0 && (
+        <PaymentChartCard>
+          <PaymentChartHeader>
+            <PaymentChartTitle>Harmonogram spłat</PaymentChartTitle>
+            <ModalButton onClick={openModal}>
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
+              </svg>
+              Pokaż tabelę
+            </ModalButton>
+          </PaymentChartHeader>
+          <PaymentChartContainer>
+            <Chart
+              type="bar"
+              data={{
+                labels: chartData.labels,
+                datasets: [
+                  // Linia - pozostała kwota do spłaty
+                  {
+                    type: 'line' as const,
+                    label: 'Pozostała kwota do spłaty',
+                    data: chartData.remainingData,
+                    borderColor: '#3b82f6', // Blue-500
+                    backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2.5,
+                    borderWidth: 3,
+                    yAxisID: 'y',
+                  },
+                  // Słupki - kapitał
+                  {
+                    type: 'bar' as const,
+                    label: 'Kapitał',
+                    data: chartData.labels.map((label) => {
+                      // Znajdź odpowiednią ratę dla tego miesiąca
+                      const monthMatch = label.match(/Miesiąc (\d+)/)
+                      if (!monthMatch || !monthMatch[1] || !allPaymentsForChart) return 0
+                      const month = parseInt(monthMatch[1], 10)
+                      const payment = allPaymentsForChart.find((p) => p.month === month)
+                      return payment ? payment.principal : 0
+                    }),
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)', // Emerald
+                    borderColor: '#10b981',
+                    borderWidth: 1.5,
+                    yAxisID: 'y1',
+                  },
+                  // Słupki - odsetki
+                  {
+                    type: 'bar' as const,
+                    label: 'Odsetki',
+                    data: chartData.labels.map((label) => {
+                      // Znajdź odpowiednią ratę dla tego miesiąca
+                      const monthMatch = label.match(/Miesiąc (\d+)/)
+                      if (!monthMatch || !monthMatch[1] || !allPaymentsForChart) return 0
+                      const month = parseInt(monthMatch[1], 10)
+                      const payment = allPaymentsForChart.find((p) => p.month === month)
+                      return payment ? payment.interest : 0
+                    }),
+                    backgroundColor: 'rgba(245, 101, 101, 0.7)', // Red/Coral
+                    borderColor: '#f56565',
+                    borderWidth: 1.5,
+                    yAxisID: 'y1',
+                  },
+                ],
+              }}
+              options={chartOptions}
+            />
+          </PaymentChartContainer>
+        </PaymentChartCard>
       )}
 
-      {/* Główne koszty */}
-      <CostCardsWrapper>
-        <CostCard>
-          <CostCardInner>
-            <CostIcon className="bg-linear-to-br from-amber-400 to-orange-500">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </CostIcon>
-            <CostContent>
-              <CostLabel>Całkowite odsetki</CostLabel>
-              <Tooltip
-                content={
-                  <span>
-                    To dodatkowa kwota, którą zapłacisz bankowi oprócz pożyczonej kwoty.{' '}
-                    <strong>Im niższe odsetki, tym mniej zapłacisz w sumie.</strong> To jeden z najważniejszych kosztów kredytu.
-                  </span>
-                }
-              >
-                <CostValue>{formatCurrency(result.totalInterest)}</CostValue>
-              </Tooltip>
-            </CostContent>
-          </CostCardInner>
-        </CostCard>
+      {/* Modal z tabelą harmonogramu */}
+      {isModalOpen && paymentSchedule && (
+        <ModalOverlay onClick={closeModal} style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
+          <ModalContent onClick={(e) => e.stopPropagation()} data-modal-content>
+            <ModalHeader>
+              <ModalTitle>Tabela harmonogramu spłat</ModalTitle>
+              <ModalCloseButton onClick={closeModal}>
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </ModalCloseButton>
+            </ModalHeader>
+            <ModalBody data-modal-body>
+              {paymentSchedule.schedule.length > 0 && (
+                <PaymentScheduleTableWrapper>
+                  <PaymentScheduleTable>
+                    <PaymentScheduleTableHead>
+                      <PaymentScheduleTableRow>
+                        <PaymentScheduleTableHeader>Rata</PaymentScheduleTableHeader>
+                        <PaymentScheduleTableHeader>Kwota raty</PaymentScheduleTableHeader>
+                        <PaymentScheduleTableHeader>Kapitał</PaymentScheduleTableHeader>
+                        <PaymentScheduleTableHeader>Odsetki</PaymentScheduleTableHeader>
+                        <PaymentScheduleTableHeader>Pozostało do spłaty</PaymentScheduleTableHeader>
+                      </PaymentScheduleTableRow>
+                    </PaymentScheduleTableHead>
+                    <PaymentScheduleTableBody>
+                      {paymentSchedule.schedule.map((payment) => (
+                        <PaymentScheduleTableRow key={payment.month}>
+                          <PaymentScheduleTableCell>{payment.month}</PaymentScheduleTableCell>
+                          <PaymentScheduleTableCell className="font-semibold">
+                            {formatCurrency(payment.payment)}
+                          </PaymentScheduleTableCell>
+                          <PaymentScheduleTableCell>
+                            {formatCurrency(payment.principal)}
+                          </PaymentScheduleTableCell>
+                          <PaymentScheduleTableCell className="text-orange-600">
+                            {formatCurrency(payment.interest)}
+                          </PaymentScheduleTableCell>
+                          <PaymentScheduleTableCell className="text-gray-600">
+                            {formatCurrency(payment.remaining)}
+                          </PaymentScheduleTableCell>
+                        </PaymentScheduleTableRow>
+                      ))}
+                    </PaymentScheduleTableBody>
+                  </PaymentScheduleTable>
+                </PaymentScheduleTableWrapper>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </ModalOverlay>
+      )}
 
-        <CostCard>
-          <CostCardInner>
-            <CostIcon className="bg-linear-to-br from-blue-400 to-indigo-500">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </CostIcon>
-            <CostContent>
-              <CostLabel>Prowizja banku</CostLabel>
-              <Tooltip
-                content={
-                  <span>
-                    Jednorazowa opłata, którą bank pobiera przy udzieleniu kredytu.{' '}
-                    <strong>Niektóre banki oferują 0% prowizji - to duża oszczędność!</strong> Prowizja jest płatna na początku.
-                  </span>
-                }
-              >
-                <CostValue>{formatCurrency(result.commission)}</CostValue>
-              </Tooltip>
-            </CostContent>
-          </CostCardInner>
-        </CostCard>
-
-        <CostCard>
-          <CostCardInner>
-            <CostIcon className="bg-linear-to-br from-emerald-400 to-teal-500">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-            </CostIcon>
-            <CostContent>
-              <CostLabel>Ubezpieczenie</CostLabel>
-              <Tooltip
-                content={
-                  <span>
-                    Koszt ubezpieczenia nieruchomości, które bank wymaga przy kredycie.{' '}
-                    <strong>To obowiązkowy koszt, ale różni się w zależności od banku.</strong> Płacisz przez cały okres kredytu.
-                  </span>
-                }
-              >
-                <CostValue>{formatCurrency(result.insurance)}</CostValue>
-              </Tooltip>
-            </CostContent>
-          </CostCardInner>
-        </CostCard>
-      </CostCardsWrapper>
-
-      {/* Nowe sekcje z dodatkowymi informacjami */}
+      {/* Parametry oferty - zawsze widoczne */}
       {result.bank && (
-        <>
-          {/* Parametry oferty */}
-          <SectionDivider />
+        <ParametersSection>
           <DetailsSectionSubtitle>
             <SubtitleIcon>
               <svg
@@ -226,44 +648,131 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                 />
               </svg>
             </SubtitleIcon>
-            Parametry oferty
+            PARAMETRY OFERTY
           </DetailsSectionSubtitle>
           <ParametersGrid>
-            <ParameterCard>
-              <ParameterLabel>
-                WIBOR
-                <Tooltip
-                  content={
-                    <span>
-                      WIBOR to referencyjna stopa procentowa, na podstawie której banki ustalają oprocentowanie kredytów.{' '}
-                      <strong>Jest to zmienna część oprocentowania.</strong>
-                    </span>
-                  }
-                >
-                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
-                </Tooltip>
-              </ParameterLabel>
-              <ParameterValue className="text-blue-600">
-                {formatPercent(result.bank.wibor ?? 0)}
-              </ParameterValue>
-            </ParameterCard>
-            <ParameterCard>
-              <ParameterLabel>
-                Marża banku
-                <Tooltip
-                  content={
-                    <span>
-                      Marża to stała część oprocentowania, którą bank dolicza do WIBOR. <strong>Im niższa marża, tym lepsza oferta.</strong>
-                    </span>
-                  }
-                >
-                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
-                </Tooltip>
-              </ParameterLabel>
-              <ParameterValue className="text-indigo-600">
-                {formatPercent(result.bank.margin ?? 0)}
-              </ParameterValue>
-            </ParameterCard>
+            {formData?.interestRateType === 'variable' && (
+              <ParameterCard>
+                <ParameterLabel>
+                  WIBOR
+                  <Tooltip
+                    content={
+                      <span>
+                        WIBOR to referencyjna stopa procentowa, na podstawie której banki ustalają
+                        oprocentowanie kredytów.{' '}
+                        <strong>Jest to zmienna część oprocentowania.</strong>
+                      </span>
+                    }
+                  >
+                    <ParameterTooltipIcon
+                      type="button"
+                      aria-label="Informacja"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <svg
+                        className="h-4.5 w-4.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </ParameterTooltipIcon>
+                  </Tooltip>
+                </ParameterLabel>
+                <ParameterValue className="text-blue-600">
+                  {formatPercent(result.bank.wibor ?? 0)}
+                </ParameterValue>
+              </ParameterCard>
+            )}
+            {formData?.interestRateType && (
+              <ParameterCard>
+                <ParameterLabel>
+                  Typ oprocentowania
+                  <Tooltip
+                    content={
+                      <span>
+                        {formData.interestRateType === 'fixed'
+                          ? 'Kredyt ze stałym oprocentowaniem - oprocentowanie nie zmienia się przez cały okres kredytowania.'
+                          : 'Kredyt ze zmiennym oprocentowaniem - oprocentowanie może się zmieniać w zależności od zmian stóp procentowych.'}
+                      </span>
+                    }
+                  >
+                    <ParameterTooltipIcon
+                      type="button"
+                      aria-label="Informacja"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <svg
+                        className="h-4.5 w-4.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </ParameterTooltipIcon>
+                  </Tooltip>
+                </ParameterLabel>
+                <ParameterValue className="text-green-600">
+                  {formData.interestRateType === 'fixed' ? 'Stałe' : 'Zmienne'}
+                </ParameterValue>
+              </ParameterCard>
+            )}
+            {formData?.interestRateType === 'variable' && (
+              <ParameterCard>
+                <ParameterLabel>
+                  Marża banku
+                  <Tooltip
+                    content={
+                      <span>
+                        Marża to stała część oprocentowania, którą bank dolicza do WIBOR.{' '}
+                        <strong>Im niższa marża, tym lepsza oferta.</strong>
+                      </span>
+                    }
+                  >
+                    <ParameterTooltipIcon
+                      type="button"
+                      aria-label="Informacja"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <svg
+                        className="h-4.5 w-4.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </ParameterTooltipIcon>
+                  </Tooltip>
+                </ParameterLabel>
+                <ParameterValue className="text-indigo-600">
+                  {formatPercent(result.bank.margin ?? 0)}
+                </ParameterValue>
+              </ParameterCard>
+            )}
             <ParameterCard>
               <ParameterLabel>
                 Czas rozpatrzenia
@@ -275,7 +784,27 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                     </span>
                   }
                 >
-                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                  <ParameterTooltipIcon
+                    type="button"
+                    aria-label="Informacja"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <title>Informacja</title>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                  </ParameterTooltipIcon>
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue className="text-purple-600">
@@ -288,11 +817,33 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                 <Tooltip
                   content={
                     <span>
-                      Opłata za wcześniejszą spłatę kredytu. <strong>Darmowa spłata to duża zaleta</strong> - możesz spłacić kredyt szybciej bez dodatkowych kosztów.
+                      Opłata za wcześniejszą spłatę kredytu.{' '}
+                      <strong>Darmowa spłata to duża zaleta</strong> - możesz spłacić kredyt
+                      szybciej bez dodatkowych kosztów.
                     </span>
                   }
                 >
-                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                  <ParameterTooltipIcon
+                    type="button"
+                    aria-label="Informacja"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <title>Informacja</title>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                  </ParameterTooltipIcon>
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue
@@ -316,7 +867,27 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                     </span>
                   }
                 >
-                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                  <ParameterTooltipIcon
+                    type="button"
+                    aria-label="Informacja"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <title>Informacja</title>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                  </ParameterTooltipIcon>
                 </Tooltip>
               </ParameterLabel>
               <ParameterValue
@@ -341,16 +912,41 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                     </span>
                   }
                 >
-                  <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                  <ParameterTooltipIcon
+                    type="button"
+                    aria-label="Informacja"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <title>Informacja</title>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                  </ParameterTooltipIcon>
                 </Tooltip>
               </ParameterLabel>
-              <ParameterValue className="text-gray-600 text-xs!">
+              <ParameterValue className="text-gray-600! text-xs">
                 {formatCurrency(result.bank.minLoanAmount)} -{' '}
                 {formatCurrency(result.bank.maxLoanAmount)}
               </ParameterValue>
             </ParameterCard>
           </ParametersGrid>
+        </ParametersSection>
+      )}
 
+      {/* Dodatkowe szczegóły - zawsze widoczne */}
+      {result.bank && (
+        <DetailsSectionWrapper>
           {/* Specjalne oferty */}
           {result.bank.specialOffers && result.bank.specialOffers.length > 0 && (
             <>
@@ -372,7 +968,7 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                     />
                   </svg>
                 </SubtitleIcon>
-                Specjalne oferty
+                SPECJALNE OFERTY
               </DetailsSectionSubtitle>
               <SpecialOffersGrid>
                 {result.bank.specialOffers.map((offer: string) => (
@@ -419,7 +1015,7 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                           />
                         </svg>
                       </ComparisonIcon>
-                      <ComparisonTitle className="text-green-800">Zalety</ComparisonTitle>
+                      <ComparisonTitle className="text-green-800">ZALETY</ComparisonTitle>
                     </ComparisonHeader>
                     <ComparisonList>
                       {result.bank.advantages.map((advantage: string) => (
@@ -453,7 +1049,7 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                           />
                         </svg>
                       </ComparisonIcon>
-                      <ComparisonTitle className="text-red-800">Wady</ComparisonTitle>
+                      <ComparisonTitle className="text-red-800">WADY</ComparisonTitle>
                     </ComparisonHeader>
                     <ComparisonList>
                       {result.bank.disadvantages.map((disadvantage: string) => (
@@ -492,18 +1088,40 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                     </svg>
                   </LtvIconWrapper>
                   <LtvTitleWrapper>
-                    <LtvTitle>
-                      Wpływ wkładu własnego na marżę (LTV)
-                    </LtvTitle>
+                    <LtvTitle>Wpływ wkładu własnego na marżę (LTV)</LtvTitle>
                     <Tooltip
                       content={
                         <span>
                           LTV (Loan-to-Value) to stosunek kwoty kredytu do wartości nieruchomości.{' '}
-                          <strong>Im wyższy wkład własny (więcej własnych pieniędzy), tym lepsze warunki kredytu.</strong> Banki oferują niższe marże przy wyższym wkładzie własnym.
+                          <strong>
+                            Im wyższy wkład własny (więcej własnych pieniędzy), tym lepsze warunki
+                            kredytu.
+                          </strong>{' '}
+                          Banki oferują niższe marże przy wyższym wkładzie własnym.
                         </span>
                       }
                     >
-                      <ParameterTooltipIcon>ℹ️</ParameterTooltipIcon>
+                      <ParameterTooltipIcon
+                        type="button"
+                        aria-label="Informacja"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <svg
+                          className="h-4.5 w-4.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <title>Informacja</title>
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 16v-4" />
+                          <path d="M12 8h.01" />
+                        </svg>
+                      </ParameterTooltipIcon>
                     </Tooltip>
                   </LtvTitleWrapper>
                 </LtvHeader>
@@ -555,15 +1173,18 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
                 <LtvExplanation>
                   <svg
                     className="h-4 w-4 shrink-0 text-blue-600"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     aria-hidden="true"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    />
+                    <title>Informacja</title>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4" />
+                    <path d="M12 8h.01" />
                   </svg>
                   <span>Im wyższy wkład własny, tym niższa marża i lepsze warunki kredytu</span>
                 </LtvExplanation>
@@ -599,30 +1220,7 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
               </BankDescription>
             </>
           )}
-
-          {/* Data aktualizacji */}
-          {result.bank.updated && (
-            <UpdateInfo>
-              <svg
-                className="h-4 w-4 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>
-                Dane zaktualizowane: {new Date(result.bank.updated).toLocaleDateString('pl-PL')}
-              </span>
-            </UpdateInfo>
-          )}
-        </>
+        </DetailsSectionWrapper>
       )}
     </DetailsSection>
   )
@@ -630,101 +1228,186 @@ export const BankDetails = ({ result }: BankDetailsProps) => {
 
 // Main section
 const DetailsSection = tw.div`
-  px-4 pb-6 md:px-8 md:pb-8 pt-6
-  border-t border-gray-100
-  bg-linear-to-b from-gray-50 to-white
+  px-4 pb-4 md:px-8 md:pb-6 pt-6 md:pt-8
+  border-t border-gray-200/60
+  bg-white
 `
 
-const DetailsSectionTitle = tw.h3`
-  font-bold text-gray-900 mb-8 text-center text-xl md:text-2xl
-  flex items-center justify-center gap-3
+// Simple info table
+const SimpleInfoTable = tw.div`
+  w-full border border-gray-200 rounded-lg bg-white
+  divide-y divide-gray-200
 `
 
-const TitleIcon = tw.span`text-2xl md:text-3xl`
+const SimpleInfoRow = tw.div`
+  grid grid-cols-[auto_1fr] items-center
+  py-3 px-4 sm:px-6
+  gap-x-3
+`
+
+const SimpleInfoLabel = tw.div`
+  text-sm text-gray-600 font-medium
+`
+
+const SimpleInfoValue = tw.div`
+  text-sm text-gray-900 font-semibold
+  text-right
+`
+
+// Main costs section - uproszczone
+const MainCostsSection = tw.div`
+  mb-6
+`
+
+const MainCostsGrid = tw.div`
+  grid grid-cols-1 sm:grid-cols-3 gap-4
+`
+
+const MainCostCard = tw.div`
+  bg-white rounded-xl border border-gray-200 p-5
+  transition-all duration-200
+  hover:shadow-md hover:border-gray-300
+  [&.highlight]:border-2 [&.highlight]:border-blue-300 [&.highlight]:bg-blue-50/50
+`
+
+const MainCostLabel = tw.div`
+  text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2
+`
+
+const MainCostValue = tw.div`
+  text-2xl md:text-3xl font-black text-gray-900
+`
+
+// Accordion components
+const AccordionSection = tw.div`
+  mb-4 border border-gray-200 rounded bg-white
+  overflow-hidden
+`
+
+const AccordionHeader = tw.button`
+  w-full flex items-center justify-between p-3
+  text-left
+  hover:bg-gray-50
+  focus:outline-none
+`
+
+const AccordionTitle = tw.h4`
+  font-medium text-sm text-gray-900
+`
+
+const AccordionIcon = tw.span`
+  shrink-0 text-gray-400 transition-transform duration-200
+  [&.expanded]:rotate-180
+`
+
+const AccordionContent = tw.div`
+  border-t border-gray-200 p-3
+`
 
 // Cost cards (główne koszty)
 const CostCardsWrapper = tw.div`
-  grid grid-cols-1 md:grid-cols-3 gap-4 mb-8
+  grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10
 `
 
 const CostCard = tw.div`
-  bg-white rounded-2xl
-  shadow-sm hover:shadow-lg
-  transition-all duration-300 ease-out
-  hover:-translate-y-1
-  border border-gray-100
+  bg-white/80 backdrop-blur-md
+  rounded-3xl
+  shadow-[0_4px_20px_rgba(0,0,0,0.08)] 
+  hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]
+  transition-all duration-500 ease-out
+  hover:-translate-y-2
+  border border-white/50
   overflow-hidden
   group
+  relative
+  before:absolute before:inset-0 before:bg-linear-to-br before:from-white/50 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500
 `
 
 const CostCardInner = tw.div`
-  p-5 flex items-center gap-4
+  p-5 md:p-6 flex items-center gap-4 md:gap-5
 `
 
 const CostIcon = tw.div`
-  w-12 h-12 rounded-xl
+  w-14 h-14 md:w-16 md:h-16 rounded-2xl
   flex items-center justify-center
-  shadow-md
-  transition-transform duration-300
-  group-hover:scale-110 group-hover:rotate-3
+  shadow-[0_4px_12px_rgba(0,0,0,0.15)]
+  transition-all duration-500 ease-out
+  group-hover:scale-110 group-hover:rotate-6
+  group-hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)]
+  shrink-0
+  relative
+  overflow-hidden
+  before:absolute before:inset-0 before:bg-linear-to-br before:from-white/30 before:to-transparent
 `
 
 const CostContent = tw.div`flex flex-col flex-1 min-w-0`
 
 const CostLabel = tw.span`
-  text-xs text-gray-600 font-semibold uppercase tracking-wider mb-1.5
+  text-xs md:text-sm text-gray-500 font-extrabold uppercase tracking-widest mb-2.5
 `
 
 const CostValue = tw.span`
-  text-lg md:text-xl font-bold text-gray-900
+  text-2xl md:text-3xl font-black
   cursor-help
-  transition-colors duration-200
-  hover:text-blue-600
+  transition-all duration-300
+  hover:scale-105
+  inline-block
+  bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent
+  group-hover:from-blue-600 group-hover:to-indigo-600
 `
 
 // Section dividers
 const SectionDivider = tw.div`
-  my-8 h-px bg-linear-to-r from-transparent via-gray-200 to-transparent
+  my-4 h-px bg-gray-200
 `
 
 // Subsection titles
 const DetailsSectionSubtitle = tw.h4`
-  mb-4 flex items-center gap-2
-  text-base font-bold text-gray-800 md:text-lg
+  mb-3 flex items-center gap-2
+  text-xs font-semibold text-gray-700 uppercase tracking-wide
 `
 
 const SubtitleIcon = tw.span`
-  flex h-8 w-8 items-center justify-center rounded-lg
-  bg-linear-to-br from-blue-100 to-indigo-100 text-blue-600
+  flex h-5 w-5 items-center justify-center
+  text-gray-500
+  shrink-0
+`
+
+// Parameters section
+const ParametersSection = tw.div`
+  mb-6
 `
 
 // Parameters grid
 const ParametersGrid = tw.div`
-  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6
+  grid grid-cols-1 sm:grid-cols-2 gap-3
+`
+
+// Details section wrapper
+const DetailsSectionWrapper = tw.div`
+  space-y-4
 `
 
 const ParameterCard = tw.div`
-  bg-white p-4 rounded-xl border border-gray-200
-  hover:border-blue-300 hover:shadow-md
-  transition-all duration-300
-  group
+  bg-white p-3 rounded border border-gray-200
 `
 
 const ParameterLabel = tw.div`
-  text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide
-  transition-colors duration-300
-  flex items-center gap-1.5
+  text-xs text-gray-600 font-medium mb-1
+  flex items-center gap-1
 `
 
-const ParameterTooltipIcon = tw.span`
-  text-xs cursor-help opacity-60 hover:opacity-100 transition-opacity
+const ParameterTooltipIcon = tw.button`
+  inline-flex items-center justify-center
+  w-4.5 h-4.5 ml-1
+  text-gray-400 hover:text-gray-600
+  cursor-help
+  transition-colors
+  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded
 `
 
 const ParameterValue = tw.span`
-  inline-block
-  text-sm md:text-base font-bold
-  transition-all duration-300 ease-out
-  group-hover:scale-105
+  text-sm font-semibold text-gray-900
 `
 
 const ParameterSubvalue = tw.span`
@@ -733,145 +1416,130 @@ const ParameterSubvalue = tw.span`
 
 // Special offers
 const SpecialOffersGrid = tw.div`
-  mb-6 grid grid-cols-1 gap-3 md:grid-cols-2
+  grid grid-cols-1 gap-2
 `
 
 const SpecialOfferCard = tw.div`
-  group
-  flex items-start gap-3 rounded-xl border-2 border-amber-200 p-4
-  bg-linear-to-br from-amber-50 to-yellow-50
-  transition-all duration-200 hover:border-amber-300 hover:shadow-md
+  flex items-start gap-2 rounded border border-gray-200 p-3 bg-white
 `
 
 const SpecialOfferIcon = tw.span`
-  flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
-  bg-linear-to-br from-amber-400 to-yellow-500 text-white shadow-sm
-  transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12
+  flex h-4 w-4 shrink-0 items-center justify-center text-gray-500
 `
 
 const SpecialOfferText = tw.span`
-  text-sm text-gray-800 font-medium leading-relaxed
+  text-xs text-gray-700
   flex-1
 `
 
 // Comparison (zalety i wady)
 const ComparisonGrid = tw.div`
-  grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6
+  grid grid-cols-1 lg:grid-cols-2 gap-4
 `
 
 const AdvantagesSection = tw.div`
-  bg-white rounded-2xl overflow-hidden
-  border-2 border-green-100
-  shadow-sm hover:shadow-md transition-shadow duration-300
+  bg-white rounded border border-gray-200
 `
 
 const DisadvantagesSection = tw.div`
-  bg-white rounded-2xl overflow-hidden
-  border-2 border-red-100
-  shadow-sm hover:shadow-md transition-shadow duration-300
+  bg-white rounded border border-gray-200
 `
 
 const ComparisonHeader = tw.div`
-  px-5 py-4 border-b-2
-  flex items-center gap-3
+  px-3 py-2 border-b border-gray-200
+  flex items-center gap-2
+  bg-gray-50
 `
 
 const ComparisonIcon = tw.div`
-  w-10 h-10 rounded-xl
+  w-5 h-5
   flex items-center justify-center
 `
 
 const ComparisonTitle = tw.h5`
-  font-bold text-base uppercase tracking-wide
+  font-medium text-xs uppercase tracking-wide
 `
 
 const ComparisonList = tw.ul`
-  p-5 space-y-3
+  p-3 space-y-2
 `
 
 const ComparisonItem = tw.li`
-  flex items-start gap-3
-  animate-in fade-in slide-in-from-left duration-300
+  flex items-start gap-2
 `
 
 const ComparisonBullet = tw.span`
-  w-6 h-6 rounded-lg
+  w-4 h-4 rounded
   flex items-center justify-center
-  font-bold text-sm shrink-0
+  text-xs shrink-0
 `
 
 const ComparisonText = tw.span`
-  text-sm leading-relaxed flex-1
+  text-xs leading-relaxed flex-1
 `
 
 // LTV section
 const LtvSection = tw.div`
-  rounded-2xl border-2 border-blue-200 p-6 shadow-sm
-  bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50
+  rounded border border-gray-200 p-3 bg-white
 `
 
 const LtvHeader = tw.div`
-  mb-6 flex items-center gap-3
+  mb-3 flex items-center gap-2
 `
 
 const LtvIconWrapper = tw.div`
-  flex h-12 w-12 items-center justify-center rounded-xl shadow-md
-  bg-linear-to-br from-blue-500 to-indigo-600
+  flex h-5 w-5 items-center justify-center text-gray-500
 `
 
 const LtvTitleWrapper = tw.div`
-  flex items-center gap-2
+  flex items-center gap-1
 `
 
 const LtvTitle = tw.h5`
-  font-bold text-base md:text-lg text-gray-900
+  font-medium text-xs uppercase tracking-wide text-gray-900
 `
 
 const LtvGrid = tw.div`
-  grid grid-cols-1 md:grid-cols-3 gap-4 mb-4
+  grid grid-cols-1 md:grid-cols-3 gap-3 mb-3
 `
 
 const LtvCard = tw.div`
-  bg-white rounded-xl p-5 border-2
+  bg-white rounded border border-gray-200 p-3
   text-center
-  hover:shadow-lg transition-all duration-300
-  hover:-translate-y-1
 `
 
 const LtvPercentage = tw.div`
-  text-3xl md:text-4xl font-bold mb-1
+  text-lg font-semibold mb-1
 `
 
 const LtvLabel = tw.div`
-  text-xs text-gray-600 font-medium mb-3
+  text-xs text-gray-600 mb-2
 `
 
 const LtvDivider = tw.div`
-  my-3 h-px bg-linear-to-r from-transparent via-gray-300 to-transparent
+  my-2 h-px bg-gray-200
 `
 
 const LtvRatio = tw.div`
-  text-sm font-semibold text-gray-700 mb-2
+  text-xs font-medium text-gray-700 mb-1
 `
 
 const LtvValue = tw.div`
-  text-sm md:text-base font-bold
+  text-xs font-semibold
 `
 
 const LtvExplanation = tw.div`
-  flex items-center justify-center gap-2 rounded-lg bg-white/50 p-3 text-center
-  text-xs text-gray-700 backdrop-blur-sm md:text-sm
+  flex items-center justify-center gap-2 p-2 text-center
+  text-xs text-gray-600 bg-gray-50 rounded
 `
 
 // Bank description
 const BankDescription = tw.div`
-  flex items-start gap-4 rounded-2xl border-2 border-blue-200 p-6 shadow-sm
-  bg-linear-to-r from-blue-50 to-indigo-50
+  flex items-start gap-3 rounded border border-gray-200 p-3 bg-white
 `
 
 const DescriptionIconWrapper = tw.div`
-  flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-md
-  bg-linear-to-br from-blue-500 to-indigo-600
+  flex h-5 w-5 shrink-0 items-center justify-center text-gray-500
 `
 
 const DescriptionContent = tw.div`
@@ -879,56 +1547,264 @@ const DescriptionContent = tw.div`
 `
 
 const DescriptionTitle = tw.h5`
-  font-bold text-gray-900 mb-2 text-sm uppercase tracking-wide
+  font-medium text-gray-900 mb-1 text-xs uppercase tracking-wide
 `
 
 const DescriptionText = tw.p`
-  text-sm text-gray-700 leading-relaxed
+  text-xs text-gray-700 leading-relaxed
 `
 
 // Target audience section
 const TargetAudienceSection = tw.div`
-  rounded-2xl border-2 border-blue-200 p-6 shadow-sm
-  bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50
-  mb-8
+  rounded-3xl border border-blue-200/60 p-6 md:p-8 
+  shadow-[0_8px_30px_rgba(59,130,246,0.12)]
+  bg-linear-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/80
+  backdrop-blur-md
+  mb-8 md:mb-10
+  relative
+  overflow-hidden
+  before:absolute before:inset-0 before:bg-linear-to-br before:from-white/40 before:via-transparent before:to-transparent
+  after:absolute after:top-0 after:right-0 after:w-32 after:h-32 after:bg-linear-to-br after:from-blue-200/20 after:to-transparent after:rounded-full after:blur-3xl
 `
 
 const TargetAudienceHeader = tw.div`
-  flex items-center gap-3 mb-4
+  flex items-center gap-4 mb-5 md:mb-6
 `
 
-const TargetAudienceIcon = tw.span`text-3xl`
+const TargetAudienceIcon = tw.span`
+  text-3xl md:text-4xl
+  filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)]
+  transition-transform duration-300
+  hover:scale-110 hover:rotate-12
+`
 
 const TargetAudienceTitle = tw.h4`
-  font-bold text-lg md:text-xl text-gray-900
+  font-black text-lg md:text-xl lg:text-2xl text-gray-900
+  tracking-tight
 `
 
 const TargetAudienceContent = tw.div`
-  flex flex-col gap-4
+  flex flex-col gap-4 md:gap-5
 `
 
 const TargetAudienceList = tw.div`
-  flex flex-col gap-2
+  flex flex-col gap-2.5 md:gap-3
 `
 
 const TargetAudienceListTitle = tw.h5`
-  font-semibold text-sm uppercase tracking-wide text-gray-700 mb-2
+  font-black text-xs md:text-sm uppercase tracking-widest text-gray-800 mb-4
 `
 
 const TargetAudienceItem = tw.div`
-  flex items-start gap-3 text-sm leading-relaxed
+  flex items-start gap-3.5 md:gap-4 text-sm md:text-base leading-relaxed
+  p-2 rounded-lg
+  transition-all duration-300
+  hover:bg-white/50
+  hover:translate-x-1
 `
 
 const TargetAudienceBullet = tw.span`
-  w-6 h-6 rounded-lg
+  w-7 h-7 md:w-8 md:h-8 rounded-xl
   flex items-center justify-center
-  font-bold text-xs shrink-0
+  font-black text-base shrink-0
+  shadow-[0_2px_8px_rgba(0,0,0,0.1)]
+  transition-all duration-300
+  hover:scale-110 hover:rotate-6
 `
 
-// Update info
-const UpdateInfo = tw.div`
-  text-xs text-gray-500 text-center
-  flex items-center justify-center gap-2
-  mt-6 pt-6 border-t border-gray-200
-  italic
+const TargetAudienceText = tw.span`
+  flex-1 leading-relaxed font-medium
+`
+
+// Cost Summary Section
+const CostSummarySection = tw.div`
+  rounded-3xl border-2 border-blue-200/60 p-6 md:p-8
+  shadow-[0_8px_30px_rgba(59,130,246,0.12)]
+  bg-linear-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/80
+  backdrop-blur-md
+  mb-8 md:mb-10
+  relative
+  overflow-hidden
+  before:absolute before:inset-0 before:bg-linear-to-br before:from-white/40 before:via-transparent before:to-transparent
+  after:absolute after:top-0 after:right-0 after:w-32 after:h-32 after:bg-linear-to-br after:from-blue-200/20 after:to-transparent after:rounded-full after:blur-3xl
+`
+
+const CostSummaryHeader = tw.div`
+  flex items-center gap-4 mb-6
+`
+
+const CostSummaryIcon = tw.div`
+  flex h-12 w-12 items-center justify-center rounded-xl shadow-md
+  bg-linear-to-br from-blue-500 to-indigo-600 text-white
+`
+
+const CostSummaryTitle = tw.h4`
+  font-black text-lg md:text-xl lg:text-2xl text-gray-900
+  tracking-tight
+`
+
+const CostSummaryGrid = tw.div`
+  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mb-6
+`
+
+const CostSummaryCard = tw.div`
+  bg-white/80 backdrop-blur-sm p-5 md:p-6 rounded-2xl
+  border border-gray-200/60
+  hover:border-blue-400/60
+  hover:shadow-[0_8px_25px_rgba(59,130,246,0.15)]
+  hover:bg-white/90
+  transition-all duration-400 ease-out
+`
+
+const CostSummaryCardLabel = tw.div`
+  text-xs md:text-sm text-gray-500 font-extrabold mb-2 uppercase tracking-widest
+`
+
+const CostSummaryCardValue = tw.div`
+  text-xl md:text-2xl font-black
+  bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent
+`
+
+// Cost Breakdown Section
+const CostBreakdownSection = tw.div`
+  mt-6 pt-6 border-t border-gray-200/60
+`
+
+const CostBreakdownTitle = tw.h5`
+  font-black text-sm md:text-base uppercase tracking-widest text-gray-800 mb-4
+`
+
+const CostBreakdownBars = tw.div`
+  space-y-4
+`
+
+const CostBreakdownBar = tw.div`
+  space-y-2
+`
+
+const CostBreakdownBarLabel = tw.div`
+  text-xs md:text-sm text-gray-600 font-semibold
+  flex items-center justify-between
+`
+
+const CostBreakdownBarContainer = tw.div`
+  relative h-8 bg-gray-100 rounded-lg overflow-hidden
+  flex items-center
+`
+
+const CostBreakdownBarFill = tw.div`
+  absolute left-0 top-0 h-full rounded-lg
+  transition-all duration-500 ease-out
+  shadow-sm
+`
+
+const CostBreakdownBarValue = tw.span`
+  absolute right-3 text-xs md:text-sm font-bold text-gray-700
+  z-10
+`
+
+// Payment Schedule Section
+const PaymentScheduleSection = tw.div`
+  space-y-4
+`
+
+const PaymentScheduleHeader = tw.div`
+  flex items-center gap-2 mb-3
+`
+
+const PaymentScheduleIcon = tw.div`
+  flex h-5 w-5 items-center justify-center text-gray-500
+`
+
+const PaymentScheduleTitle = tw.h4`
+  font-medium text-sm text-gray-900
+  flex-1
+`
+
+const PaymentScheduleTableWrapper = tw.div`
+  overflow-x-auto
+  border border-gray-200 rounded
+`
+
+const PaymentScheduleTable = tw.table`
+  w-full
+  border-collapse
+`
+
+const PaymentScheduleTableHead = tw.thead`
+  bg-gray-50
+`
+
+const PaymentScheduleTableBody = tw.tbody`
+  divide-y divide-gray-200
+`
+
+const PaymentScheduleTableRow = tw.tr`
+  hover:bg-gray-50
+`
+
+const PaymentScheduleTableHeader = tw.th`
+  px-4 py-3 text-left text-sm font-medium text-gray-700
+  border-b border-gray-200
+  sm:px-6
+`
+
+const PaymentScheduleTableCell = tw.td`
+  px-4 py-3 text-sm text-gray-900
+  border-b border-gray-100
+  sm:px-6
+`
+
+// Payment Charts
+const PaymentChartsWrapper = tw.div`
+  mt-8 space-y-6
+`
+
+const PaymentChartCard = tw.div`
+  bg-white rounded border border-gray-200 p-3 mb-6
+`
+
+const PaymentChartHeader = tw.div`
+  flex items-center justify-between mb-3
+`
+
+const PaymentChartTitle = tw.h5`
+  font-medium text-xs text-gray-700
+`
+
+const ModalButton = tw.button`
+  flex items-center gap-2 px-3 py-1.5 text-xs font-medium
+  text-gray-700 bg-gray-100 rounded border border-gray-300
+  hover:bg-gray-200 transition-colors
+`
+
+const PaymentChartContainer = tw.div`
+  relative h-64 md:h-80 w-full
+`
+
+// Modal components
+const ModalOverlay = tw.div`
+  fixed inset-0 z-50 flex items-center justify-center
+  p-4
+`
+
+const ModalContent = tw.div`
+  bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh]
+  flex flex-col
+`
+
+const ModalHeader = tw.div`
+  flex items-center justify-between p-4 border-b border-gray-200
+`
+
+const ModalTitle = tw.h3`
+  font-semibold text-sm text-gray-900
+`
+
+const ModalCloseButton = tw.button`
+  p-1 text-gray-400 hover:text-gray-600 transition-colors
+`
+
+const ModalBody = tw.div`
+  overflow-y-auto p-4
 `

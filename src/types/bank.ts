@@ -29,6 +29,8 @@ export const bankOfferSchema = z.object({
   maxLoanPeriod: z.number(),
   minDownPaymentPercent: z.number(), // Minimalny wkład własny w %
   supportedPurposes: z.array(z.enum(['purchase', 'refinancing', 'construction'])),
+  supportedInterestRateTypes: z.array(z.enum(['fixed', 'variable'])).optional(), // Typy oprocentowania: stałe, zmienne, lub oba
+  fixedInterestRate: z.number().optional(), // Oprocentowanie dla kredytu stałoprocentowego (jeśli dostępne)
   description: z.string().optional(),
   // Dodatkowe parametry
   earlyRepaymentFee: z.number().optional(), // Opłata za wcześniejszą spłatę w %

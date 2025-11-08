@@ -1,8 +1,7 @@
 'use client'
 
-import { BankLogo } from 'components/common/BankLogo'
 import clsx from 'clsx'
-import type { RefObject } from 'react'
+import { BankLogo } from 'components/common/BankLogo'
 import { useRef, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
@@ -12,12 +11,11 @@ import { BankDetails } from './molecules/BankDetails'
 type BankResultsProps = {
   results: CalculationResult[]
   formData: CalculatorFormData
-  formRef: RefObject<HTMLFormElement | null>
 }
 
-export const BankResults = ({ results, formData, formRef }: BankResultsProps) => {
+export const BankResults = ({ results, formData }: BankResultsProps) => {
   const offerListRef = useRef<HTMLDivElement>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
   if (results.length === 0) {
     return (
@@ -31,7 +29,15 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
   }
 
   const toggleExpanded = (id: string) => {
-    setExpandedId(expandedId === id ? null : id)
+    setExpandedIds((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
   }
 
   const handleAffiliateClick = (result: CalculationResult) => {
@@ -46,6 +52,16 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
     }
   }
 
+  // Zbierz wszystkie daty aktualizacji
+  const updateDates = results
+    .map((result) => result.bank?.updated)
+    .filter((date): date is string => !!date)
+    .map((date) => new Date(date).getTime())
+    .filter((time) => !Number.isNaN(time))
+
+  const latestUpdateDate =
+    updateDates.length > 0 ? new Date(Math.max(...updateDates)).toLocaleDateString('pl-PL') : null
+
   return (
     <ResultsContainer>
       <ResultsHeader>
@@ -53,30 +69,33 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
       </ResultsHeader>
       <OfferList ref={offerListRef}>
         {results.map((offer, index) => {
-          const isExpanded = expandedId === offer.bankId
+          const isExpanded = expandedIds.has(offer.bankId)
           const hasAffiliate = offer.bank?.affiliate?.enabled && offer.bank?.affiliate?.url
           const isTopThree = index < 3 && offer.isRecommended
 
           return (
-            <OfferCard key={offer.bankId} className={clsx(
-              isTopThree && index === 0 && 'is-best',
-              isTopThree && index === 1 && 'is-second',
-              isTopThree && index === 2 && 'is-third'
-            )}>
+            <OfferCard
+              key={offer.bankId}
+              className={clsx(
+                isTopThree && index === 0 && 'is-best',
+                isTopThree && index === 1 && 'is-second',
+                isTopThree && index === 2 && 'is-third',
+              )}
+            >
               {isTopThree ? (
-                <TopBadge className={clsx(
-                  index === 0 && 'badge-best',
-                  index === 1 && 'badge-second',
-                  index === 2 && 'badge-third'
-                )}>
+                <TopBadge
+                  className={clsx(
+                    index === 0 && 'badge-best',
+                    index === 1 && 'badge-second',
+                    index === 2 && 'badge-third',
+                  )}
+                >
                   {index === 0 && 'Najlepsza oferta'}
                   {index === 1 && 'Druga najlepsza'}
                   {index === 2 && 'Trzecia najlepsza'}
                 </TopBadge>
               ) : (
-                <TopBadge className="badge-default">
-                  #{index + 1}
-                </TopBadge>
+                <TopBadge className="badge-default">#{index + 1}</TopBadge>
               )}
               <OfferRow>
                 <OfferContentWrapper>
@@ -95,17 +114,24 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
                   </OfferHeader>
 
                   <OfferMetrics>
-                    <MetricItem className="text-left sm:text-left">
-                      <MetricLabel>RRSO</MetricLabel>
+                    <MetricItem className="text-left sm:text-left lg:text-left">
+                      <MetricLabel>
+                        RRSO
+                        {formData.interestRateType && (
+                          <InterestRateTypeBadge>
+                            {formData.interestRateType === 'fixed' ? 'Stałe' : 'Zmienne'}
+                          </InterestRateTypeBadge>
+                        )}
+                      </MetricLabel>
                       <MetricValue>{formatPercent(offer.rrso)}</MetricValue>
                     </MetricItem>
-                    <MetricItem className="text-left sm:text-center">
+                    <MetricItem className="text-left sm:text-center lg:text-left">
                       <MetricLabel>Całkowity koszt</MetricLabel>
                       <MetricValue>{formatCurrency(offer.totalCost)}</MetricValue>
                     </MetricItem>
                     <MetricItemHighlight
                       className={clsx(
-                        'text-left sm:text-right',
+                        'text-left sm:text-right lg:text-left',
                         isTopThree && index === 0 && 'highlight-best',
                         isTopThree && index === 1 && 'highlight-second',
                         isTopThree && index === 2 && 'highlight-third',
@@ -139,7 +165,7 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
                     >
                       <AffiliateIconWrapper>
                         <svg
-                          className="w-full h-full"
+                          className="h-full w-full"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -157,7 +183,6 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
                       <AffiliateContent>
                         <AffiliateText>Złóż wniosek online</AffiliateText>
                       </AffiliateContent>
-                      <AffiliateArrow>→</AffiliateArrow>
                     </AffiliateButton>
                   )}
                   <DetailsButton
@@ -165,7 +190,9 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
                     aria-expanded={isExpanded}
                     aria-label={isExpanded ? 'Ukryj szczegóły oferty' : 'Zobacz szczegóły oferty'}
                   >
-                    <DetailsButtonText>{isExpanded ? 'Ukryj szczegóły' : 'Zobacz szczegóły'}</DetailsButtonText>
+                    <DetailsButtonText>
+                      {isExpanded ? 'Ukryj szczegóły' : 'Zobacz szczegóły'}
+                    </DetailsButtonText>
                   </DetailsButton>
                 </OfferActions>
               </OfferRow>
@@ -173,10 +200,33 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
               {/* Rozwinięte szczegóły */}
               {isExpanded && (
                 <ExpandedSection>
-                  <BankDetails result={offer} />
+                  <BankDetails
+                    result={{
+                      ...offer,
+                      loanAmount: formData.loanAmount,
+                      loanPeriod: formData.loanPeriod,
+                    }}
+                    formData={formData}
+                  />
                   {hasAffiliate && offer.bank?.affiliate?.notes && (
                     <AffiliateInfo>
-                      <InfoIcon>ℹ️</InfoIcon>
+                      <InfoIcon>
+                        <svg
+                          className="h-4 w-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <title>Informacja</title>
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 16v-4" />
+                          <path d="M12 8h.01" />
+                        </svg>
+                      </InfoIcon>
                       <InfoText>
                         Ten link jest linkiem partnerskim. Otrzymujemy prowizję od banku, jeśli
                         zdecydujesz się złożyć wniosek. Dla Ciebie nie ma żadnych dodatkowych
@@ -190,6 +240,25 @@ export const BankResults = ({ results, formData, formRef }: BankResultsProps) =>
           )
         })}
       </OfferList>
+      {latestUpdateDate && (
+        <UpdateInfo>
+          <svg
+            className="h-4 w-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>Dane zaktualizowane: {latestUpdateDate}</span>
+        </UpdateInfo>
+      )}
     </ResultsContainer>
   )
 }
@@ -355,7 +424,8 @@ const OfferActions = tw.div`
 const AffiliateButton = tw.a`
   group/cta
   relative
-  flex flex-1 items-center justify-center sm:justify-start gap-2 sm:gap-2.5
+  flex items-center justify-center sm:justify-start gap-2 sm:gap-2.5
+  w-full lg:w-[200px]
   rounded-lg
   bg-linear-to-r from-emerald-600 to-green-600
   px-4 py-2
@@ -383,17 +453,10 @@ const AffiliateText = tw.span`text-sm font-semibold leading-tight`
 
 const AffiliateSubtext = tw.span`text-xs font-normal text-emerald-50 opacity-90 leading-tight mt-0.5 hidden sm:block`
 
-const AffiliateArrow = tw.span`
-  text-base font-semibold shrink-0
-  transition-transform duration-200
-  group-hover/cta:translate-x-0.5
-  hidden sm:block
-`
-
 const DetailsButton = tw.button`
   group/button
   flex items-center justify-center gap-2
-  w-full sm:w-auto sm:min-w-[140px]
+  w-full lg:w-[200px]
   rounded-lg
   border border-gray-300
   bg-white
@@ -419,7 +482,7 @@ const DetailsIcon = tw.span`
 
 const ExpandedSection = tw.div`
   border-t border-gray-200 bg-gray-50
-  animate-in fade-in slide-in-from-top-2 duration-300
+  animate-in fade-in duration-200
 `
 
 const AffiliateInfo = tw.div`
@@ -429,6 +492,31 @@ const AffiliateInfo = tw.div`
   text-xs text-blue-700
 `
 
-const InfoIcon = tw.span`text-sm shrink-0`
+const InfoIcon = tw.span`
+  flex items-center justify-center
+  text-blue-600 shrink-0
+`
 
 const InfoText = tw.span`leading-relaxed`
+
+const UpdateInfo = tw.div`
+  text-xs text-gray-500 text-center
+  flex items-center justify-center gap-2
+  mt-4 pt-4 border-t border-gray-200
+  italic
+`
+
+const InterestRateTypeBadge = tw.span`
+  ml-2
+  inline-flex
+  items-center
+  rounded
+  border
+  border-blue-200
+  bg-blue-100
+  px-1.5
+  py-0.5
+  text-xs
+  font-medium
+  text-blue-700
+`

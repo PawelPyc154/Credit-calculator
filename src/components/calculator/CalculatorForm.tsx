@@ -880,23 +880,45 @@ export const CalculatorForm = ({
           </Field>
         </FieldList>
 
-        <PurposeSection>
-          <PurposeLabel>Cel kredytu</PurposeLabel>
-          <PurposeList>
-            {purposes.map((option) => (
-              <PurposeItem key={option.id}>
-                <PurposeRadio
-                  type="radio"
-                  id={`purpose-${option.id}`}
-                  value={option.id}
-                  {...register('purpose')}
-                />
-                <PurposeTile htmlFor={`purpose-${option.id}`}>{option.label}</PurposeTile>
-              </PurposeItem>
-            ))}
-          </PurposeList>
-          {errors.purpose && <ErrorMessage>{errors.purpose.message}</ErrorMessage>}
-        </PurposeSection>
+        <SelectionSection>
+          <InterestRateSection>
+            <InterestRateLabel>Typ oprocentowania</InterestRateLabel>
+            <InterestRateList>
+              {interestRateTypes.map((option) => (
+                <InterestRateItem key={option.id}>
+                  <InterestRateRadio
+                    type="radio"
+                    id={`interestRate-${option.id}`}
+                    value={option.id}
+                    {...register('interestRateType')}
+                  />
+                  <InterestRateTile htmlFor={`interestRate-${option.id}`}>
+                    {option.label}
+                  </InterestRateTile>
+                </InterestRateItem>
+              ))}
+            </InterestRateList>
+            {errors.interestRateType && <ErrorMessage>{errors.interestRateType.message}</ErrorMessage>}
+          </InterestRateSection>
+
+          <PurposeSection>
+            <PurposeLabel>Cel kredytu</PurposeLabel>
+            <PurposeList>
+              {purposes.map((option) => (
+                <PurposeItem key={option.id}>
+                  <PurposeRadio
+                    type="radio"
+                    id={`purpose-${option.id}`}
+                    value={option.id}
+                    {...register('purpose')}
+                  />
+                  <PurposeTile htmlFor={`purpose-${option.id}`}>{option.label}</PurposeTile>
+                </PurposeItem>
+              ))}
+            </PurposeList>
+            {errors.purpose && <ErrorMessage>{errors.purpose.message}</ErrorMessage>}
+          </PurposeSection>
+        </SelectionSection>
 
         <SubmitBar>
           <SubmitButton type="submit" disabled={!isValid && !hasResults}>
@@ -912,6 +934,11 @@ const purposes = [
   { id: 'purchase', label: 'Zakup' },
   { id: 'refinancing', label: 'Refinansowanie' },
   { id: 'construction', label: 'Budowa' },
+] as const
+
+const interestRateTypes = [
+  { id: 'fixed', label: 'Stałe' },
+  { id: 'variable', label: 'Zmienne' },
 ] as const
 
 const Card = tw.div`
@@ -1105,7 +1132,12 @@ const SliderLabel = tw.span``
 
 const ErrorMessage = tw.p`text-xs text-red-200`
 
-const PurposeSection = tw.section`flex flex-col gap-2`
+const SelectionSection = tw.section`
+  flex flex-col md:flex-row
+  gap-4 md:gap-6
+`
+
+const PurposeSection = tw.section`flex flex-col gap-2 flex-1`
 
 const PurposeLabel = tw.span`text-xs font-bold text-green-50/90 uppercase tracking-wide`
 
@@ -1118,6 +1150,34 @@ const PurposeRadio = tw.input`
 `
 
 const PurposeTile = tw.label`
+  inline-flex items-center justify-center
+  rounded-lg
+  border-2 border-white/20
+  bg-white/10
+  backdrop-blur-sm
+  px-4 py-2
+  text-xs font-medium text-white
+  cursor-pointer
+  transition-colors
+  peer-checked:border-white
+  peer-checked:bg-white/20
+  hover:border-white/40
+  hover:bg-white/15
+`
+
+const InterestRateSection = tw.section`flex flex-col gap-2 flex-1`
+
+const InterestRateLabel = tw.span`text-xs font-bold text-green-50/90 uppercase tracking-wide`
+
+const InterestRateList = tw.div`flex flex-wrap gap-2`
+
+const InterestRateItem = tw.div`relative`
+
+const InterestRateRadio = tw.input`
+  peer absolute inset-0 opacity-0
+`
+
+const InterestRateTile = tw.label`
   inline-flex items-center justify-center
   rounded-lg
   border-2 border-white/20
