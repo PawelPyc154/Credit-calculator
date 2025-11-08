@@ -7,6 +7,7 @@ import { COOKIE_CONSENT_KEY, COOKIE_POLICY_VERSION, DEFAULT_COOKIE_CONSENT } fro
 export function useCookieConsent() {
   const [consent, setConsent] = useState<CookieConsent | null>(null)
   const [showBanner, setShowBanner] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   // Zastosowanie zgód (włączenie/wyłączenie skryptów)
   const applyConsent = useCallback((newConsent: CookieConsent) => {
@@ -59,6 +60,7 @@ export function useCookieConsent() {
       localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(preferences))
       setConsent(newConsent)
       setShowBanner(false)
+      setShowSettings(false)
       applyConsent(newConsent)
     },
     [applyConsent],
@@ -90,11 +92,20 @@ export function useCookieConsent() {
     [saveConsent],
   )
 
+  const openSettings = useCallback(() => {
+    setShowSettings(true)
+  }, [])
+
+  const closeSettings = useCallback(() => {
+    setShowSettings(false)
+  }, [])
+
   // Resetowanie zgód (do testowania lub zmiany preferencji)
   const resetConsent = useCallback(() => {
     localStorage.removeItem(COOKIE_CONSENT_KEY)
     setConsent(null)
     setShowBanner(true)
+    setShowSettings(false)
     disableGoogleAnalytics()
     disableGoogleAdSense()
   }, [])
@@ -102,10 +113,13 @@ export function useCookieConsent() {
   return {
     consent,
     showBanner,
+    showSettings,
     acceptAll,
     rejectAll,
     acceptSelected,
     resetConsent,
+    openSettings,
+    closeSettings,
   }
 }
 

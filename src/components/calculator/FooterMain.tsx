@@ -1,5 +1,6 @@
 'use client'
 
+import { CookieSettingsTrigger } from 'components/common/CookieSettingsTrigger'
 import Link from 'next/link'
 import tw from 'tw-tailwind'
 
@@ -15,6 +16,8 @@ export const FooterMain = () => {
           <FooterLink href="/regulamin">Regulamin</FooterLink>
           <Separator>•</Separator>
           <FooterLink href="/polityka-prywatnosci">Polityka prywatności</FooterLink>
+          <Separator>•</Separator>
+          <CookieSettingsTrigger>Preferencje cookies</CookieSettingsTrigger>
           <Separator>•</Separator>
           <FooterLink href="/zagrozenia-kredytowe">Zagrożenia kredytowe</FooterLink>
           <Separator>•</Separator>
