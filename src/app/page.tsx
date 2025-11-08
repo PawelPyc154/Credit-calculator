@@ -6,12 +6,13 @@ import { Disclaimer } from 'components/calculator/Disclaimer'
 import { FooterMain } from 'components/calculator/FooterMain'
 import { NavigationTabs, type TabType } from 'components/calculator/NavigationTabs'
 import { StickySummaryBar } from 'components/calculator/StickySummaryBar'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
 import { parseBankOffers } from 'types/bank'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { calculateBankOffers } from 'utils/calculator'
+import { pageView, trackCalculation, trackTimeOnPage } from 'utils/analytics'
 import banksData from '../data/banks.json'
 
 const defaultFormData: CalculatorFormData = {
@@ -44,12 +45,42 @@ export default function Home() {
         const calculatedResults = calculateBankOffers(formData, banks)
         setResults(calculatedResults)
         setFormData(formData)
+        
+        // Śledź obliczenie kredytu
+        trackCalculation({
+          loanAmount: formData.loanAmount,
+          loanPeriod: formData.loanPeriod,
+          downPayment: formData.downPayment,
+          monthlyIncome: formData.monthlyIncome,
+          purpose: formData.purpose,
+          interestRateType: formData.interestRateType || 'variable',
+          resultsCount: calculatedResults.length,
+        })
       } catch (error) {
         console.error('Błąd podczas kalkulacji:', error)
       }
     },
     [banks],
   )
+
+  // Śledź page view przy załadowaniu
+  useEffect(() => {
+    pageView(window.location.pathname)
+  }, [])
+
+  // Śledź czas spędzony na stronie
+  useEffect(() => {
+    const startTime = Date.now()
+    const interval = setInterval(() => {
+      const seconds = Math.floor((Date.now() - startTime) / 1000)
+      if (seconds > 0 && seconds % 30 === 0) {
+        // Co 30 sekund
+        trackTimeOnPage(seconds)
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <MainContainer>

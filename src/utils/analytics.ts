@@ -62,3 +62,172 @@ export const logEvent = (action: string, category: string, label: string, value?
     })
   }
 }
+
+// ============================================
+// Rozszerzone eventy dla kalkulatora kredytów
+// ============================================
+
+/**
+ * Śledzi obliczenie kredytu w kalkulatorze
+ */
+export const trackCalculation = (params: {
+  loanAmount: number
+  loanPeriod: number
+  downPayment: number
+  monthlyIncome: number
+  purpose: string
+  interestRateType: string
+  resultsCount: number
+}) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'calculate_loan', {
+      event_category: 'calculator',
+      event_label: 'Obliczenie kredytu',
+      loan_amount: params.loanAmount,
+      loan_period: params.loanPeriod,
+      down_payment: params.downPayment,
+      monthly_income: params.monthlyIncome,
+      purpose: params.purpose,
+      interest_rate_type: params.interestRateType,
+      results_count: params.resultsCount,
+      value: params.resultsCount,
+    })
+  }
+}
+
+/**
+ * Śledzi zmianę parametru w formularzu
+ */
+export const trackParameterChange = (params: {
+  field: string
+  oldValue: number | string
+  newValue: number | string
+}) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'parameter_change', {
+      event_category: 'calculator',
+      event_label: `Zmiana: ${params.field}`,
+      parameter_name: params.field,
+      old_value: String(params.oldValue),
+      new_value: String(params.newValue),
+    })
+  }
+}
+
+/**
+ * Śledzi kliknięcie w link partnerski (affiliate)
+ */
+export const trackAffiliateClick = (params: {
+  bankName: string
+  bankId: string
+  campaignId?: string
+  position: number
+  loanAmount?: number
+  monthlyPayment?: number
+}) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    // Event dla GA4
+    window.gtag('event', 'affiliate_click', {
+      event_category: 'conversion',
+      event_label: `Kliknięcie: ${params.bankName}`,
+      bank_name: params.bankName,
+      bank_id: params.bankId,
+      campaign_id: params.campaignId || '',
+      position: params.position,
+      loan_amount: params.loanAmount,
+      monthly_payment: params.monthlyPayment,
+      value: params.position === 1 ? 100 : params.position === 2 ? 50 : 25, // Wartość konwersji zależna od pozycji
+    })
+
+    // Conversion event dla lepszego śledzenia (GA4)
+    window.gtag('event', 'conversion', {
+      event_category: 'conversion',
+      event_label: `Konwersja: ${params.bankName}`,
+      bank_name: params.bankName,
+      value: params.position === 1 ? 100 : params.position === 2 ? 50 : 25,
+    })
+  }
+}
+
+/**
+ * Śledzi rozwinięcie szczegółów oferty banku
+ */
+export const trackBankDetailsExpand = (params: {
+  bankName: string
+  bankId: string
+  position: number
+}) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'view_bank_details', {
+      event_category: 'engagement',
+      event_label: `Szczegóły: ${params.bankName}`,
+      bank_name: params.bankName,
+      bank_id: params.bankId,
+      position: params.position,
+    })
+  }
+}
+
+/**
+ * Śledzi scroll do sekcji wyników
+ */
+export const trackScrollToResults = () => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'scroll_to_results', {
+      event_category: 'engagement',
+      event_label: 'Scroll do wyników',
+    })
+  }
+}
+
+/**
+ * Śledzi użycie slidera vs input
+ */
+export const trackInputModeToggle = (mode: 'slider' | 'input') => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'toggle_input_mode', {
+      event_category: 'ui',
+      event_label: `Tryb: ${mode}`,
+      input_mode: mode,
+    })
+  }
+}
+
+/**
+ * Śledzi zmianę typu oprocentowania
+ */
+export const trackInterestRateTypeChange = (type: 'fixed' | 'variable') => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'interest_rate_type_change', {
+      event_category: 'calculator',
+      event_label: `Typ: ${type === 'fixed' ? 'Stałe' : 'Zmienne'}`,
+      interest_rate_type: type,
+    })
+  }
+}
+
+/**
+ * Śledzi zmianę celu kredytu
+ */
+export const trackPurposeChange = (purpose: string) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'purpose_change', {
+      event_category: 'calculator',
+      event_label: `Cel: ${purpose}`,
+      purpose: purpose,
+    })
+  }
+}
+
+/**
+ * Śledzi czas spędzony na stronie (engagement)
+ */
+export const trackTimeOnPage = (seconds: number) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'time_on_page', {
+      event_category: 'engagement',
+      event_label: 'Czas na stronie',
+      value: seconds,
+    })
+  }
+}

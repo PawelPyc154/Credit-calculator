@@ -66,6 +66,9 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    // Google Analytics API (opcjonalne)
+    GA4_PROPERTY_ID: z.string().optional(),
+    GOOGLE_APPLICATION_CREDENTIALS_JSON: z.string().optional(),
   },
 
   /**
@@ -82,6 +85,8 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    GA4_PROPERTY_ID: process.env.GA4_PROPERTY_ID,
+    GOOGLE_APPLICATION_CREDENTIALS_JSON: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
 

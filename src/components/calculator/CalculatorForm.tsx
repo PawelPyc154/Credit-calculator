@@ -4,11 +4,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Tooltip } from 'components/common/tooltip'
 import { useDebounce } from 'hooks/useDebounce'
 import type { RefObject } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BsInputCursor } from 'react-icons/bs'
 import tw from 'tw-tailwind'
 import { type CalculatorFormData, calculatorFormSchema } from 'types/calculator'
+import {
+  trackInputModeToggle,
+  trackInterestRateTypeChange,
+  trackParameterChange,
+  trackPurposeChange,
+  trackScrollToResults,
+} from 'utils/analytics'
 import { formatCurrency } from 'utils/calculator'
 
 type CalculatorFormProps = {
@@ -25,6 +32,7 @@ export const CalculatorForm = ({
   defaultValues,
 }: CalculatorFormProps) => {
   const [useSlider, setUseSlider] = useState(false)
+  const previousValuesRef = useRef<CalculatorFormData>(defaultValues)
 
   const {
     register,
@@ -51,6 +59,7 @@ export const CalculatorForm = ({
   useEffect(() => {
     if (isValid) {
       onCalculate(debouncedValues)
+      previousValuesRef.current = debouncedValues
     }
   }, [debouncedValues, isValid, onCalculate])
 
@@ -69,13 +78,24 @@ export const CalculatorForm = ({
 
   const updateValue = useCallback(
     (field: keyof CalculatorFormData, value: number) => {
+      const oldValue = previousValuesRef.current[field]
       setValue(field, value, { shouldDirty: true, shouldValidate: true })
+
+      // Śledź zmianę parametru
+      if (oldValue !== value) {
+        trackParameterChange({
+          field,
+          oldValue,
+          newValue: value,
+        })
+      }
     },
     [setValue],
   )
 
   const scrollToResults = () => {
     document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    trackScrollToResults()
   }
 
   const handleDecrease = useCallback(
@@ -105,7 +125,11 @@ export const CalculatorForm = ({
       <Form ref={formRef} onSubmit={handleSubmit(scrollToResults)}>
         <SliderToggleButton
           type="button"
-          onClick={() => setUseSlider(!useSlider)}
+          onClick={() => {
+            const newMode = !useSlider
+            setUseSlider(newMode)
+            trackInputModeToggle(newMode ? 'slider' : 'input')
+          }}
           aria-label={useSlider ? 'Przełącz na inputy' : 'Przełącz na slidery'}
           title={useSlider ? 'Przełącz na inputy' : 'Przełącz na slidery'}
         >
@@ -890,7 +914,14 @@ export const CalculatorForm = ({
                     type="radio"
                     id={`interestRate-${option.id}`}
                     value={option.id}
-                    {...register('interestRateType')}
+                    {...register('interestRateType', {
+                      onChange: () => {
+                        const currentValue = watch('interestRateType')
+                        if (currentValue) {
+                          trackInterestRateTypeChange(currentValue as 'fixed' | 'variable')
+                        }
+                      },
+                    })}
                   />
                   <InterestRateTile htmlFor={`interestRate-${option.id}`}>
                     {option.label}
@@ -898,7 +929,9 @@ export const CalculatorForm = ({
                 </InterestRateItem>
               ))}
             </InterestRateList>
-            {errors.interestRateType && <ErrorMessage>{errors.interestRateType.message}</ErrorMessage>}
+            {errors.interestRateType && (
+              <ErrorMessage>{errors.interestRateType.message}</ErrorMessage>
+            )}
           </InterestRateSection>
 
           <PurposeSection>
@@ -910,7 +943,14 @@ export const CalculatorForm = ({
                     type="radio"
                     id={`purpose-${option.id}`}
                     value={option.id}
-                    {...register('purpose')}
+                    {...register('purpose', {
+                      onChange: () => {
+                        const currentValue = watch('purpose')
+                        if (currentValue) {
+                          trackPurposeChange(currentValue)
+                        }
+                      },
+                    })}
                   />
                   <PurposeTile htmlFor={`purpose-${option.id}`}>{option.label}</PurposeTile>
                 </PurposeItem>

@@ -6,6 +6,7 @@ import { useRef, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { formatCurrency, formatPercent } from 'utils/calculator'
+import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
 import { BankDetails } from './molecules/BankDetails'
 
 type BankResultsProps = {
@@ -31,25 +32,34 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
       const newSet = new Set(prev)
+      const isExpanding = !newSet.has(id)
       if (newSet.has(id)) {
         newSet.delete(id)
       } else {
         newSet.add(id)
+        // Śledź rozwinięcie szczegółów
+        const result = results.find((r) => r.bankId === id)
+        if (result) {
+          trackBankDetailsExpand({
+            bankName: result.bankName,
+            bankId: result.bankId,
+            position: results.indexOf(result) + 1,
+          })
+        }
       }
       return newSet
     })
   }
 
   const handleAffiliateClick = (result: CalculationResult) => {
-    // Track affiliate click for analytics
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'affiliate_click', {
-        bank_name: result.bankName,
-        bank_id: result.bankId,
-        campaign_id: result.bank?.affiliate?.campaignId,
-        position: results.indexOf(result) + 1,
-      })
-    }
+    trackAffiliateClick({
+      bankName: result.bankName,
+      bankId: result.bankId,
+      campaignId: result.bank?.affiliate?.campaignId,
+      position: results.indexOf(result) + 1,
+      loanAmount: formData.loanAmount,
+      monthlyPayment: result.monthlyPayment,
+    })
   }
 
   // Zbierz wszystkie daty aktualizacji
