@@ -183,22 +183,66 @@ export default function PolitykaPrywatnosciPage() {
             </SectionSubtitle>
           </SectionHeader>
           <PolicyGrid role="list">
-            {policySections.map(({ title, paragraphs, bulletIntro, bullets }) => (
-              <PolicyCard key={title} role="listitem">
-                <CardTitle>{title}</CardTitle>
-                {paragraphs?.map((paragraph) => (
-                  <Paragraph key={paragraph}>{paragraph}</Paragraph>
-                ))}
-                {bulletIntro ? <Paragraph>{bulletIntro}</Paragraph> : null}
-                {bullets ? (
-                  <BulletList>
-                    {bullets.map((item) => (
-                      <li key={item}>{item}</li>
+            {policySections.map(({ title, paragraphs, bulletIntro, bullets }) => {
+              const isCookiesSection = title.includes('Pliki cookies')
+
+              if (isCookiesSection) {
+                const cookiesParagraphs = paragraphs ?? []
+                const [cookiesIntro, ...cookiesRest] = cookiesParagraphs
+                const cookiesBullets = bullets ?? []
+                const cookiesItems = cookiesBullets.slice(0, -1)
+                const cookiesFootnote = cookiesBullets.at(-1)
+
+                return (
+                  <CookiesCard key={title} role="listitem">
+                    <CookiesHeader>
+                      <CookiesIcon aria-hidden="true">
+                        <HiOutlineSparkles size={18} />
+                      </CookiesIcon>
+                      <CookiesTitle>{title}</CookiesTitle>
+                    </CookiesHeader>
+                    {cookiesIntro ? <CookiesIntro>{cookiesIntro}</CookiesIntro> : null}
+                    {cookiesRest.map((paragraph) => (
+                      <Paragraph key={paragraph}>{paragraph}</Paragraph>
                     ))}
-                  </BulletList>
-                ) : null}
-              </PolicyCard>
-            ))}
+                    {bulletIntro ? <Paragraph>{bulletIntro}</Paragraph> : null}
+                    {cookiesItems.length ? (
+                      <CookiesBulletList>
+                        {cookiesItems.map((item) => {
+                          const [label, description] = item.split(' – ')
+                          return (
+                            <li key={item}>
+                              <CookiesBulletLabel>{label}</CookiesBulletLabel>
+                              {description ? (
+                                <CookiesBulletDescription>{description}</CookiesBulletDescription>
+                              ) : null}
+                            </li>
+                          )
+                        })}
+                      </CookiesBulletList>
+                    ) : null}
+                    {cookiesFootnote ? <CookiesNote>{cookiesFootnote}</CookiesNote> : null}
+                  </CookiesCard>
+                )
+              }
+
+              return (
+                <PolicyCard key={title} role="listitem">
+                  <CardTitle>{title}</CardTitle>
+                  {paragraphs?.map((paragraph) => (
+                    <Paragraph key={paragraph}>{paragraph}</Paragraph>
+                  ))}
+                  {bulletIntro ? <Paragraph>{bulletIntro}</Paragraph> : null}
+                  {bullets ? (
+                    <BulletList>
+                      {bullets.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </BulletList>
+                  ) : null}
+                </PolicyCard>
+              )
+            })}
           </PolicyGrid>
           <LastUpdated>Ostatnia aktualizacja: {policyLastUpdated}</LastUpdated>
         </Section>
@@ -246,11 +290,24 @@ const SectionTitle = tw.h2`text-3xl font-bold text-gray-900 sm:text-4xl`
 const SectionSubtitle = tw.p`mt-3 text-sm leading-relaxed text-gray-600 sm:text-base`
 
 const PolicyGrid = tw.ul`grid grid-cols-1 gap-5`
-const PolicyCard = tw.li`rounded-2xl border border-gray-200 bg-white/90 p-6 text-left shadow-sm backdrop-blur-sm`
+const PolicyCardBase = tw.li`rounded-2xl border border-gray-200 bg-white/90 p-6 text-left shadow-sm backdrop-blur-sm`
+const PolicyCard = PolicyCardBase
+const CookiesCard = tw(
+  PolicyCardBase,
+)`border-amber-200 bg-linear-to-br from-amber-50/80 via-white to-amber-100/80 shadow-md`
 const CardTitle = tw.h3`mb-3 text-xl font-semibold text-gray-900`
 const Paragraph = tw.p`mb-3 text-sm leading-relaxed text-gray-600 last:mb-0`
 const BulletList = tw.ul`mb-3 grid gap-2 text-sm text-gray-600 [&_li]:relative [&_li]:pl-4 [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:text-emerald-500 [&_li]:before:content-['•']`
 const LastUpdated = tw.p`mt-8 text-sm text-gray-500`
+
+const CookiesHeader = tw.div`mb-4 flex items-center gap-3`
+const CookiesIcon = tw.span`inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 shadow-sm`
+const CookiesTitle = tw(CardTitle)`mb-0 text-2xl font-semibold text-amber-900`
+const CookiesIntro = tw.p`mb-4 rounded-xl bg-white/80 px-4 py-3 text-sm leading-relaxed text-amber-800 shadow-inner`
+const CookiesBulletList = tw.ul`mb-4 space-y-3 [&_li]:rounded-2xl [&_li]:border [&_li]:border-amber-200 [&_li]:bg-white/80 [&_li]:px-4 [&_li]:py-3 [&_li]:shadow-inner`
+const CookiesBulletLabel = tw.span`block text-sm font-semibold text-amber-800`
+const CookiesBulletDescription = tw.span`mt-0.5 block text-sm leading-relaxed text-amber-700`
+const CookiesNote = tw.p`mt-4 rounded-xl border border-amber-200 bg-white/70 px-4 py-3 text-sm leading-relaxed text-amber-700`
 
 const FinalSection = tw.section`mt-20 rounded-3xl border border-emerald-200 bg-linear-to-r from-emerald-600 to-teal-600 p-8 shadow-xl sm:p-10`
 const FinalContent = tw.div`mx-auto flex max-w-3xl flex-col items-center text-center text-white`
