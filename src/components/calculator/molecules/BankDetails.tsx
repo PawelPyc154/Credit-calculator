@@ -24,6 +24,7 @@ import {
 } from 'components/calculator/narration/OfferNarration'
 import { OfferNarrationStickyBar } from 'components/calculator/narration/OfferNarrationStickyBar'
 import { Tooltip } from 'components/common/tooltip'
+import { useNarrationSpeech } from 'hooks/useNarrationSpeech'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Chart } from 'react-chartjs-2'
 import tw from 'tw-tailwind'
@@ -93,7 +94,6 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const [activeTab, setActiveTab] = useState<'details' | 'narration'>('details')
   const [activeWordIndex, setActiveWordIndex] = useState(0)
   const [isNarrationPlaying, setIsNarrationPlaying] = useState(false)
-  const playbackTimeoutRef = useRef<number | null>(null)
   const detailsRef = useRef<HTMLDivElement>(null)
 
   const hasNarrationData = loanAmount > 0 && loanPeriod > 0 && result.monthlyPayment > 0
@@ -156,13 +156,41 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const activeWordEntry = narrationWordEntries[activeWordIndex] ?? null
   const activeSectionId = activeWordEntry?.sectionId ?? narrationSections[0]?.id ?? null
 
+  const handleSpeechPlaybackStarted = useCallback(() => {
+    setIsNarrationPlaying(true)
+  }, [])
+
+  const handleSpeechPlaybackFinished = useCallback(() => {
+    setIsNarrationPlaying(false)
+  }, [])
+
+  const {
+    isSupported: isSpeechSupported,
+    playFrom: playNarrationFrom,
+    stop: stopNarrationSpeech,
+  } = useNarrationSpeech({
+    wordEntries: narrationWordEntries,
+    voicePreference: 'Zosia',
+    locale: 'pl-PL',
+    onWordBoundary: setActiveWordIndex,
+    onPlaybackFinished: handleSpeechPlaybackFinished,
+    onPlaybackStarted: handleSpeechPlaybackStarted,
+  })
+
+  const stopNarrationPlayback = useCallback(() => {
+    if (isSpeechSupported) {
+      stopNarrationSpeech()
+    }
+    setIsNarrationPlaying(false)
+  }, [isSpeechSupported, stopNarrationSpeech])
+
   const targetSelector = useMemo(() => {
     return bankId ? `#offer-details-${bankId}` : undefined
   }, [bankId])
 
   const handleNarrationSectionChange = useCallback(
     (sectionId: string) => {
-      setIsNarrationPlaying(false)
+      stopNarrationPlayback()
       setActiveWordIndex((prev) => {
         if (narrationWordEntries[prev]?.sectionId === sectionId) {
           return prev
@@ -171,34 +199,49 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
         return targetIndex >= 0 ? targetIndex : prev
       })
     },
-    [narrationWordEntries],
+    [narrationWordEntries, stopNarrationPlayback],
   )
 
   const handleWordIndexChange = useCallback(
     (index: number) => {
-      setIsNarrationPlaying(false)
+      stopNarrationPlayback()
       const maxIndex = Math.max(narrationWordEntries.length - 1, 0)
       const nextIndex = narrationWordEntries.length ? Math.min(Math.max(index, 0), maxIndex) : 0
 
       setActiveWordIndex(nextIndex)
     },
-    [narrationWordEntries],
+    [narrationWordEntries, stopNarrationPlayback],
   )
 
   const handlePlaybackToggle = useCallback(
     (shouldPlay: boolean) => {
       if (!shouldPlay) {
-        setIsNarrationPlaying(false)
+        stopNarrationPlayback()
         return
       }
 
       if (!narrationWordEntries.length) {
+        stopNarrationPlayback()
+        return
+      }
+
+      if (isSpeechSupported) {
+        const started = playNarrationFrom(activeWordIndex)
+        if (!started) {
+          stopNarrationPlayback()
+        }
         return
       }
 
       setIsNarrationPlaying(true)
     },
-    [narrationWordEntries],
+    [
+      activeWordIndex,
+      isSpeechSupported,
+      narrationWordEntries,
+      playNarrationFrom,
+      stopNarrationPlayback,
+    ],
   )
 
   useEffect(() => {
@@ -233,7 +276,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       wordEntries: narrationWordEntries,
       isPlaying: isNarrationPlaying,
       onPlaybackToggle: handlePlaybackToggle,
-      onWordSelect: setActiveWordIndex,
+      onWordSelect: handleWordIndexChange,
     }
   }, [
     activeTab,
@@ -281,41 +324,19 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   }, [activeSectionId, activeTab, narrationSections])
 
   useEffect(() => {
-    if (playbackTimeoutRef.current !== null) {
-      window.clearTimeout(playbackTimeoutRef.current)
-      playbackTimeoutRef.current = null
+    if (activeTab !== 'narration') {
+      stopNarrationPlayback()
     }
-
-    if (!isNarrationPlaying) return
-    if (!narrationWordEntries.length) {
-      setIsNarrationPlaying(false)
-      return
-    }
-
-    const lastIndex = narrationWordEntries.length - 1
-
-    if (activeWordIndex >= lastIndex) {
-      setIsNarrationPlaying(false)
-      return
-    }
-
-    playbackTimeoutRef.current = window.setTimeout(() => {
-      setActiveWordIndex((prev) => Math.min(prev + 1, lastIndex))
-    }, PLAYBACK_INTERVAL_MS)
-
-    return () => {
-      if (playbackTimeoutRef.current !== null) {
-        window.clearTimeout(playbackTimeoutRef.current)
-        playbackTimeoutRef.current = null
-      }
-    }
-  }, [activeWordIndex, isNarrationPlaying, narrationWordEntries.length])
+  }, [activeTab, stopNarrationPlayback])
 
   useEffect(() => {
-    if (activeTab !== 'narration') {
-      setIsNarrationPlaying(false)
+    if (!narrationOffer) {
+      stopNarrationPlayback()
+      return
     }
-  }, [activeTab])
+
+    stopNarrationPlayback()
+  }, [narrationOffer, stopNarrationPlayback])
 
   // Oblicz wszystkie raty dla wykresu
   const calculateAllPayments = () => {
