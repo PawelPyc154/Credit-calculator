@@ -97,3 +97,25 @@
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+@keyframes narrationPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(56, 189, 248, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+}
+
+.narration-highlight {
+  position: relative;
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  background-color: rgba(56, 189, 248, 0.08) !important;
+  animation: narrationPulse 1.6s ease-out 2;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  outline: 1px solid rgba(56, 189, 248, 0.35);
+  scroll-margin-top: 128px;
+}

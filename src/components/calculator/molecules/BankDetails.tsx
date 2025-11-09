@@ -14,8 +14,15 @@ import {
   PointElement,
   Title,
 } from 'chart.js'
+import clsx from 'clsx'
+import {
+  type NarrationOffer,
+  OfferNarration,
+  createNarrationSections,
+} from 'components/calculator/narration/OfferNarration'
+import { OfferNarrationStickyBar } from 'components/calculator/narration/OfferNarrationStickyBar'
 import { Tooltip } from 'components/common/tooltip'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Chart } from 'react-chartjs-2'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
@@ -44,6 +51,8 @@ export type BankDetailsProps = {
     insurance: number
     monthlyPayment: number
     totalCost: number
+    interestRate: number
+    rrso: number
     loanAmount?: number
     loanPeriod?: number
     bank?: BankOffer
@@ -51,11 +60,133 @@ export type BankDetailsProps = {
   formData?: CalculatorFormData
 }
 
+type BankNarrationState = {
+  offer: NarrationOffer
+  activeSectionId: string | null
+  initialSectionId?: string | null
+  requestedSectionId?: string | null
+  isActive: boolean
+  targetSelector?: string
+  onSelectSection: (sectionId: string) => void
+  onSectionChange?: (sectionId: string) => void
+}
+
 export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const loanAmount = result.loanAmount ?? formData?.loanAmount ?? 0
   const loanPeriod = result.loanPeriod ?? formData?.loanPeriod ?? 0
   const totalPayments = loanPeriod * 12
   const bank = result.bank
+
+  const [activeTab, setActiveTab] = useState<'details' | 'narration'>('details')
+  const [activeNarrationSection, setActiveNarrationSection] = useState<string | null>(null)
+  const detailsRef = useRef<HTMLDivElement>(null)
+
+  const hasNarrationData = loanAmount > 0 && loanPeriod > 0 && result.monthlyPayment > 0
+
+  const narrationOffer: NarrationOffer | null = useMemo(() => {
+    if (!hasNarrationData) return null
+
+    const benefits: string[] = []
+
+    if (bank?.specialOffers?.length) {
+      benefits.push(...bank.specialOffers.filter((value): value is string => Boolean(value)))
+    }
+
+    if (bank?.advantages?.length) {
+      benefits.push(...bank.advantages.filter((value): value is string => Boolean(value)))
+    }
+
+    return {
+      bankId: result.bankId,
+      bankName: result.bankName,
+      loanAmount,
+      loanPeriodYears: loanPeriod,
+      loanTermMonths: totalPayments,
+      monthlyPayment: result.monthlyPayment,
+      interestRate: result.interestRate,
+      apr: result.rrso,
+      commission: result.commission,
+      totalCost: result.totalCost,
+      totalInterest: result.totalInterest,
+      insurance: result.insurance,
+      benefits,
+    }
+  }, [
+    bank,
+    hasNarrationData,
+    loanAmount,
+    loanPeriod,
+    result.bankId,
+    result.bankName,
+    result.commission,
+    result.insurance,
+    result.interestRate,
+    result.monthlyPayment,
+    result.rrso,
+    result.totalCost,
+    result.totalInterest,
+    totalPayments,
+  ])
+
+  const targetSelector = useMemo(() => {
+    return result.bankId ? `#offer-details-${result.bankId}` : undefined
+  }, [result.bankId])
+
+  const handleNarrationSectionChange = useCallback((sectionId: string) => {
+    setActiveNarrationSection(sectionId)
+  }, [])
+
+  const narration: BankNarrationState | null = useMemo(() => {
+    if (!narrationOffer) return null
+
+    return {
+      offer: narrationOffer,
+      activeSectionId: activeNarrationSection,
+      initialSectionId: 'basics',
+      requestedSectionId: activeNarrationSection,
+      isActive: activeTab === 'narration',
+      targetSelector,
+      onSelectSection: handleNarrationSectionChange,
+      onSectionChange: handleNarrationSectionChange,
+    }
+  }, [
+    activeNarrationSection,
+    activeTab,
+    handleNarrationSectionChange,
+    narrationOffer,
+    targetSelector,
+  ])
+
+  useEffect(() => {
+    const container = detailsRef.current
+    if (!container) return
+
+    const highlightableElements = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-narration-key]'),
+    )
+
+    if (!narrationOffer || activeTab !== 'narration') {
+      highlightableElements.forEach((element) => element.classList.remove('narration-highlight'))
+      return
+    }
+
+    const sections = createNarrationSections(narrationOffer, true, false)
+    const activeHighlights =
+      sections.find((section) => section.id === activeNarrationSection)?.highlights ?? []
+
+    highlightableElements.forEach((element) => {
+      const key = element.getAttribute('data-narration-key')
+      if (key && activeHighlights.includes(key)) {
+        element.classList.add('narration-highlight')
+      } else {
+        element.classList.remove('narration-highlight')
+      }
+    })
+
+    return () => {
+      highlightableElements.forEach((element) => element.classList.remove('narration-highlight'))
+    }
+  }, [activeNarrationSection, activeTab, narrationOffer])
 
   // Oblicz wszystkie raty dla wykresu
   const calculateAllPayments = () => {
@@ -446,31 +577,114 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     setIsModalOpen(false)
   }
 
+  const handleNarrationSectionSelect = (sectionId: string) => {
+    if (!narration) return
+    setActiveTab('narration')
+    narration.onSelectSection(sectionId)
+    if (narration.onSectionChange && narration.onSectionChange !== narration.onSelectSection) {
+      narration.onSectionChange(sectionId)
+    }
+  }
+
+  const tabsHeader = (
+    <TabsWrapper>
+      <TabButton
+        type="button"
+        className={clsx(activeTab === 'details' && 'is-active')}
+        onClick={() => setActiveTab('details')}
+      >
+        Szczegóły
+      </TabButton>
+      <TabButton
+        type="button"
+        className={clsx(activeTab === 'narration' && 'is-active')}
+        onClick={() => narration && setActiveTab('narration')}
+        disabled={!narration}
+      >
+        Analiza
+      </TabButton>
+    </TabsWrapper>
+  )
+
+  if (activeTab === 'narration' && narration) {
+    return (
+      <DetailsSection ref={detailsRef} className="relative pb-4 md:pb-6">
+        {tabsHeader}
+        <OfferNarration
+          offer={narration.offer}
+          className="mt-4"
+          variant="list"
+          activeSectionId={narration.activeSectionId}
+          onSectionSelect={handleNarrationSectionSelect}
+        />
+        {narration.isActive && (
+          <NarrationStickyContainer>
+            <NarrationStickyInner>
+              <OfferNarrationStickyBar
+                offer={narration.offer}
+                targetSelector={narration.targetSelector}
+                initialSectionId={narration.initialSectionId}
+                requestedSectionId={narration.requestedSectionId}
+                onSectionChange={narration.onSectionChange ?? narration.onSelectSection}
+                className="w-full"
+              />
+            </NarrationStickyInner>
+          </NarrationStickyContainer>
+        )}
+      </DetailsSection>
+    )
+  }
+
   return (
-    <DetailsSection>
+    <DetailsSection ref={detailsRef}>
+      {tabsHeader}
       {/* Prosta tabela z podstawowymi informacjami */}
       <SimpleInfoTable>
         <SimpleInfoRow className="border-blue-200 border-b-2 bg-blue-50">
           <SimpleInfoLabel className="text-blue-700">Miesięczna rata</SimpleInfoLabel>
-          <SimpleInfoValue className="text-blue-600">
+          <SimpleInfoValue className="text-blue-600" data-narration-key="monthlyPayment">
             {formatCurrencyNoCents(result.monthlyPayment)}
           </SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
+          <SimpleInfoLabel>Kwota kredytu</SimpleInfoLabel>
+          <SimpleInfoValue data-narration-key="loanAmount">
+            {formatCurrencyNoCents(result.loanAmount ?? formData?.loanAmount ?? 0)}
+          </SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>Oprocentowanie nominalne</SimpleInfoLabel>
+          <SimpleInfoValue data-narration-key="interestRate">
+            {formatPercent(result.interestRate)}
+          </SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
+          <SimpleInfoLabel>RRSO</SimpleInfoLabel>
+          <SimpleInfoValue data-narration-key="apr">{formatPercent(result.rrso)}</SimpleInfoValue>
+        </SimpleInfoRow>
+        <SimpleInfoRow>
           <SimpleInfoLabel>Całkowity koszt kredytu</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrencyNoCents(result.totalCost)}</SimpleInfoValue>
+          <SimpleInfoValue data-narration-key="totalCost">
+            {formatCurrencyNoCents(result.totalCost)}
+          </SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Suma odsetek w okresie kredytowania</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrencyNoCents(result.totalInterest)}</SimpleInfoValue>
+          <SimpleInfoValue data-narration-key="totalInterest">
+            {formatCurrencyNoCents(result.totalInterest)}
+          </SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Prowizja za udzielenie kredytu</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrencyNoCents(result.commission)}</SimpleInfoValue>
+          <SimpleInfoValue data-narration-key="commission">
+            {formatCurrencyNoCents(result.commission)}
+          </SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Ubezpieczenie kredytu</SimpleInfoLabel>
-          <SimpleInfoValue>{formatCurrencyNoCents(result.insurance)}</SimpleInfoValue>
+          <SimpleInfoValue data-narration-key="insurance">
+            {formatCurrencyNoCents(result.insurance)}
+          </SimpleInfoValue>
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Liczba rat</SimpleInfoLabel>
@@ -478,7 +692,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
         </SimpleInfoRow>
         <SimpleInfoRow>
           <SimpleInfoLabel>Okres kredytowania</SimpleInfoLabel>
-          <SimpleInfoValue>{loanPeriod} lat</SimpleInfoValue>
+          <SimpleInfoValue data-narration-key="loanPeriod">{loanPeriod} lat</SimpleInfoValue>
         </SimpleInfoRow>
       </SimpleInfoTable>
 
@@ -1235,7 +1449,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
 
 // Main section
 const DetailsSection = tw.div`
-  px-4 pb-4 md:px-8 md:pb-6 pt-6 md:pt-8
+  px-4 pb-4 md:px-8 md:pb-6 pt-4 md:pt-4
   border-t border-gray-200/60
   bg-white
 `
@@ -1274,6 +1488,20 @@ const SimpleInfoValue = tw.div`
   text-right
 `
 
+const TabsWrapper = tw.div`mb-4 flex justify-end gap-2`
+const TabButton = tw.button`
+  inline-flex items-center justify-center gap-2
+  rounded-lg border border-slate-300 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-semibold text-slate-700
+  shadow-sm transition-all duration-200 ease-out
+  hover:border-slate-400 hover:bg-slate-100 hover:text-slate-900 hover:shadow-md
+  focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
+  [&.is-active]:border-slate-500 [&.is-active]:bg-slate-100 [&.is-active]:text-slate-900 [&.is-active]:shadow-inner
+  disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:bg-white
+`
+const NarrationStickyContainer = tw.div`
+  pointer-events-none sticky bottom-0 inset-x-0 z-30 mt-4 flex justify-center -mx-4 sm:bottom-4 sm:mx-0
+`
+const NarrationStickyInner = tw.div`pointer-events-auto w-full max-w-none sm:max-w-6xl`
 // Main costs section - uproszczone
 const MainCostsSection = tw.div`
   mb-6

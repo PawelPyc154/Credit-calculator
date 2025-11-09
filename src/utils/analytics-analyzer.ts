@@ -8,6 +8,66 @@
 import { createCaller } from 'server/api/root'
 import { createTRPCContext } from 'server/api/trpc'
 
+type AnalysisSuccess<TData, TSummary, TExtras extends Record<string, unknown> = {}> = {
+  status: 'success'
+  data: TData
+  summary: TSummary
+} & TExtras
+
+type AnalysisError = {
+  status: 'error'
+  error: string
+  summary: string
+}
+
+const DEFAULT_MESSAGES = {
+  overview: 'Nie można pobrać danych - sprawdź konfigurację Google Analytics API',
+  conversions: 'Nie można pobrać danych konwersji',
+  events: 'Nie można pobrać danych eventów',
+  engagement: 'Nie można pobrać danych engagement',
+}
+
+const numberOrZero = (value: unknown): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const percentageString = (value: number, fractionDigits = 1) => {
+  const safeValue = Number.isFinite(value) ? value : 0
+  return `${safeValue.toFixed(fractionDigits)}%`
+}
+
+const ratioToPercentage = (value: number, total: number, fractionDigits = 1) => {
+  if (!total) return '0%'
+  return percentageString((value / total) * 100, fractionDigits)
+}
+
+const secondsToReadable = (valueInSeconds: number) => {
+  const safeSeconds = Math.max(0, Math.round(numberOrZero(valueInSeconds)))
+  const minutes = Math.floor(safeSeconds / 60)
+  const seconds = safeSeconds % 60
+  return `${minutes} min ${seconds} sek`
+}
+
+const createErrorResult = (error: string, summary: string): AnalysisError => ({
+  status: 'error',
+  error,
+  summary,
+})
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error && error.message) {
+    return error.message
+  }
+  if (typeof error === 'string' && error.trim().length > 0) {
+    return error
+  }
+  return fallback
+}
+
 /**
  * Tworzy caller tRPC do użycia w analizie
  */
@@ -53,61 +113,32 @@ type OverviewSummary = {
   topPages: Array<{ path: string; views: number }>
 }
 
-type OverviewResult =
-  | {
-      data: OverviewData
-      summary: OverviewSummary
-      insights: string[]
-    }
-  | {
-      error: string
-      summary: string
-    }
+type OverviewResult = AnalysisSuccess<OverviewData, OverviewSummary, { insights: string[] }> | AnalysisError
 
 /**
  * Analizuje podstawowe metryki i zwraca podsumowanie
  */
 export async function analyzeOverview(days = 30): Promise<OverviewResult> {
-  const caller = await getAnalyticsCaller()
-  const data = await caller.analytics.getOverview({ days })
+  try {
+    const caller = await getAnalyticsCaller()
+    const rawData = await caller.analytics.getOverview({ days })
 
-  if (data.error) {
-    return {
-      error: data.error,
-      summary: 'Nie można pobrać danych - sprawdź konfigurację Google Analytics API',
+    if (!rawData || rawData.error) {
+      return createErrorResult(rawData?.error ?? DEFAULT_MESSAGES.overview, DEFAULT_MESSAGES.overview)
     }
-  }
 
-  const summary = {
-    period: data.period,
-    users: {
-      total: data.users.total,
-      new: data.users.new,
-      returning: data.users.returning,
-      newUserRate:
-        data.users.total > 0 ? ((data.users.new / data.users.total) * 100).toFixed(1) + '%' : '0%',
-    },
-    engagement: {
-      sessions: data.sessions,
-      pageViews: data.pageViews,
-      pagesPerSession: data.sessions > 0 ? (data.pageViews / data.sessions).toFixed(2) : '0',
-    },
-    events: {
-      calculations: data.events.calculate_loan,
-      affiliateClicks: data.events.affiliate_click,
-      bankDetailsViews: data.events.view_bank_details,
-    },
-    conversions: {
-      total: data.conversions.total,
-      rate: data.conversions.rate.toFixed(2) + '%',
-    },
-    topPages: data.topPages.slice(0, 5),
-  }
+    const data = normalizeOverviewData(rawData)
+    const summary = buildOverviewSummary(data)
 
-  return {
-    data,
-    summary,
-    insights: generateInsights(summary),
+    return {
+      status: 'success',
+      data,
+      summary,
+      insights: generateOverviewInsights(summary),
+    }
+  } catch (error) {
+    const message = extractErrorMessage(error, DEFAULT_MESSAGES.overview)
+    return createErrorResult(message, DEFAULT_MESSAGES.overview)
   }
 }
 
@@ -132,59 +163,32 @@ type ConversionsSummary = {
   firstPositionRate: string
 }
 
-type ConversionsResult =
-  | {
-      data: ConversionsData
-      summary: ConversionsSummary
-      recommendations: string[]
-    }
-  | {
-      error: string
-      summary: string
-    }
+type ConversionsResult = AnalysisSuccess<ConversionsData, ConversionsSummary, { recommendations: string[] }> | AnalysisError
 
 /**
  * Analizuje konwersje i zwraca rekomendacje
  */
 export async function analyzeConversions(days = 30): Promise<ConversionsResult> {
-  const caller = await getAnalyticsCaller()
-  const data = await caller.analytics.getConversions({ days })
+  try {
+    const caller = await getAnalyticsCaller()
+    const rawData = await caller.analytics.getConversions({ days })
 
-  if (data.error) {
-    return {
-      error: data.error,
-      summary: 'Nie można pobrać danych konwersji',
+    if (!rawData || rawData.error) {
+      return createErrorResult(rawData?.error ?? DEFAULT_MESSAGES.conversions, DEFAULT_MESSAGES.conversions)
     }
-  }
 
-  const topBank = data.byBank[0]
-  const positionDistribution = {
-    first: data.byPosition.first,
-    second: data.byPosition.second,
-    third: data.byPosition.third,
-    other: data.byPosition.other,
-  }
+    const data = normalizeConversionsData(rawData)
+    const summary = buildConversionsSummary(data)
 
-  const firstPositionRate =
-    data.total > 0 ? ((data.byPosition.first / data.total) * 100).toFixed(1) + '%' : '0%'
-
-  return {
-    data,
-    summary: {
-      period: data.period,
-      totalConversions: data.total,
-      topBank: topBank
-        ? {
-            name: topBank.bankName,
-            clicks: topBank.clicks,
-            position: topBank.position,
-            value: topBank.conversionValue,
-          }
-        : null,
-      positionDistribution,
-      firstPositionRate,
-    },
-    recommendations: generateConversionRecommendations(data),
+    return {
+      status: 'success',
+      data,
+      summary,
+      recommendations: generateConversionRecommendations(data),
+    }
+  } catch (error) {
+    const message = extractErrorMessage(error, DEFAULT_MESSAGES.conversions)
+    return createErrorResult(message, DEFAULT_MESSAGES.conversions)
   }
 }
 
@@ -212,49 +216,32 @@ type CalculatorEventsSummary = {
   mostCommonInterestType: string
 }
 
-type CalculatorEventsResult =
-  | {
-      data: CalculatorEventsData
-      summary: CalculatorEventsSummary
-      insights: string[]
-    }
-  | {
-      error: string
-      summary: string
-    }
+type CalculatorEventsResult = AnalysisSuccess<CalculatorEventsData, CalculatorEventsSummary, { insights: string[] }> | AnalysisError
 
 /**
  * Analizuje eventy kalkulatora
  */
 export async function analyzeCalculatorEvents(days = 30): Promise<CalculatorEventsResult> {
-  const caller = await getAnalyticsCaller()
-  const data = await caller.analytics.getCalculatorEvents({ days })
+  try {
+    const caller = await getAnalyticsCaller()
+    const rawData = await caller.analytics.getCalculatorEvents({ days })
 
-  if (data.error) {
-    return {
-      error: data.error,
-      summary: 'Nie można pobrać danych eventów',
+    if (!rawData || rawData.error) {
+      return createErrorResult(rawData?.error ?? DEFAULT_MESSAGES.events, DEFAULT_MESSAGES.events)
     }
-  }
 
-  const calculationRate =
-    data.calculations > 0 && data.affiliateClicks > 0
-      ? ((data.affiliateClicks / data.calculations) * 100).toFixed(2) + '%'
-      : '0%'
+    const data = normalizeCalculatorEventsData(rawData)
+    const summary = buildCalculatorEventsSummary(data)
 
-  return {
-    data,
-    summary: {
-      period: data.period,
-      calculations: data.calculations,
-      parameterChanges: data.parameterChanges,
-      affiliateClicks: data.affiliateClicks,
-      bankDetailsViews: data.bankDetailsViews,
-      calculationToConversionRate: calculationRate,
-      mostCommonPurpose: data.mostCommonPurpose || 'brak danych',
-      mostCommonInterestType: data.mostCommonInterestType || 'brak danych',
-    },
-    insights: generateCalculatorInsights(data),
+    return {
+      status: 'success',
+      data,
+      summary,
+      insights: generateCalculatorInsights(data),
+    }
+  } catch (error) {
+    const message = extractErrorMessage(error, DEFAULT_MESSAGES.events)
+    return createErrorResult(message, DEFAULT_MESSAGES.events)
   }
 }
 
@@ -275,41 +262,32 @@ type EngagementSummary = {
   pagesPerSession: string
 }
 
-type EngagementResult =
-  | {
-      data: EngagementData
-      summary: EngagementSummary
-      recommendations: string[]
-    }
-  | {
-      error: string
-      summary: string
-    }
+type EngagementResult = AnalysisSuccess<EngagementData, EngagementSummary, { recommendations: string[] }> | AnalysisError
 
 /**
  * Analizuje engagement
  */
 export async function analyzeEngagement(days = 30): Promise<EngagementResult> {
-  const caller = await getAnalyticsCaller()
-  const data = await caller.analytics.getEngagement({ days })
+  try {
+    const caller = await getAnalyticsCaller()
+    const rawData = await caller.analytics.getEngagement({ days })
 
-  if (data.error) {
-    return {
-      error: data.error,
-      summary: 'Nie można pobrać danych engagement',
+    if (!rawData || rawData.error) {
+      return createErrorResult(rawData?.error ?? DEFAULT_MESSAGES.engagement, DEFAULT_MESSAGES.engagement)
     }
-  }
 
-  return {
-    data,
-    summary: {
-      period: data.period,
-      averageTimeOnPage: `${Math.round(data.averageTimeOnPage / 60)} min ${data.averageTimeOnPage % 60} sek`,
-      averageSessionDuration: `${Math.round(data.averageSessionDuration / 60)} min ${Math.round(data.averageSessionDuration % 60)} sek`,
-      bounceRate: data.bounceRate.toFixed(1) + '%',
-      pagesPerSession: data.pagesPerSession.toFixed(2),
-    },
-    recommendations: generateEngagementRecommendations(data),
+    const data = normalizeEngagementData(rawData)
+    const summary = buildEngagementSummary(data)
+
+    return {
+      status: 'success',
+      data,
+      summary,
+      recommendations: generateEngagementRecommendations(data),
+    }
+  } catch (error) {
+    const message = extractErrorMessage(error, DEFAULT_MESSAGES.engagement)
+    return createErrorResult(message, DEFAULT_MESSAGES.engagement)
   }
 }
 
@@ -343,16 +321,82 @@ export async function fullAnalysis(options: { days?: number } = {}): Promise<str
   return formatAnalysisReport(analysis)
 }
 
-// Helper functions do generowania insights
+// Helper functions do analizy i generowania insightów
 
-function generateInsights(summary: OverviewSummary) {
+const normalizeOverviewData = (raw: OverviewData): OverviewData => {
+  const normalizedTopPages = Array.isArray(raw.topPages)
+    ? raw.topPages
+        .filter((item): item is { path: string; views: number } => typeof item?.path === 'string')
+        .map((item) => ({
+          path: item.path,
+          views: numberOrZero(item.views),
+        }))
+    : []
+
+  return {
+    ...raw,
+    users: {
+      total: numberOrZero(raw.users?.total),
+      new: numberOrZero(raw.users?.new),
+      returning: numberOrZero(raw.users?.returning),
+    },
+    sessions: numberOrZero(raw.sessions),
+    pageViews: numberOrZero(raw.pageViews),
+    events: {
+      ...raw.events,
+      calculate_loan: numberOrZero(raw.events?.calculate_loan),
+      affiliate_click: numberOrZero(raw.events?.affiliate_click),
+      view_bank_details: numberOrZero(raw.events?.view_bank_details),
+    },
+    conversions: {
+      total: numberOrZero(raw.conversions?.total),
+      rate: numberOrZero(raw.conversions?.rate),
+    },
+    topBanks: Array.isArray(raw.topBanks) ? raw.topBanks : [],
+    topPages: normalizedTopPages,
+  }
+}
+
+const buildOverviewSummary = (data: OverviewData): OverviewSummary => {
+  const pagesPerSession =
+    data.sessions > 0 ? (data.pageViews / data.sessions).toFixed(2) : '0.00'
+
+  return {
+    period: data.period,
+    users: {
+      total: data.users.total,
+      new: data.users.new,
+      returning: data.users.returning,
+      newUserRate: ratioToPercentage(data.users.new, data.users.total),
+    },
+    engagement: {
+      sessions: data.sessions,
+      pageViews: data.pageViews,
+      pagesPerSession,
+    },
+    events: {
+      calculations: data.events.calculate_loan ?? 0,
+      affiliateClicks: data.events.affiliate_click ?? 0,
+      bankDetailsViews: data.events.view_bank_details ?? 0,
+    },
+    conversions: {
+      total: data.conversions.total,
+      rate: percentageString(data.conversions.rate, 2),
+    },
+    topPages: data.topPages.slice(0, 5),
+  }
+}
+
+const generateOverviewInsights = (summary: OverviewSummary) => {
   const insights: string[] = []
 
-  if (summary.users.newUserRate && parseFloat(summary.users.newUserRate) > 70) {
+  const newUserShare = parseFloat(summary.users.newUserRate)
+  if (Number.isFinite(newUserShare) && newUserShare > 70) {
     insights.push('⚠️ Wysoki odsetek nowych użytkowników - rozważ strategię retencji')
   }
 
-  if (summary.conversions.rate && parseFloat(summary.conversions.rate) < 2) {
+  const conversionRate = parseFloat(summary.conversions.rate)
+  if (Number.isFinite(conversionRate) && conversionRate < 2) {
     insights.push('⚠️ Niska konwersja - sprawdź UX formularza i ranking banków')
   }
 
@@ -360,14 +404,52 @@ function generateInsights(summary: OverviewSummary) {
     insights.push('⚠️ Użytkownicy obliczają, ale nie klikają - sprawdź widoczność linków')
   }
 
-  if (summary.engagement.pagesPerSession && parseFloat(summary.engagement.pagesPerSession) < 2) {
+  const pagesPerSession = parseFloat(summary.engagement.pagesPerSession)
+  if (Number.isFinite(pagesPerSession) && pagesPerSession < 2) {
     insights.push('⚠️ Niski engagement - użytkownicy szybko opuszczają stronę')
   }
 
   return insights
 }
 
-function generateConversionRecommendations(data: ConversionsData) {
+const normalizeConversionsData = (raw: ConversionsData): ConversionsData => ({
+  ...raw,
+  total: numberOrZero(raw.total),
+  byBank: Array.isArray(raw.byBank)
+    ? raw.byBank.map((item) => ({
+        bankName: String(item.bankName ?? 'Nieznany bank'),
+        clicks: numberOrZero(item.clicks),
+        position: numberOrZero(item.position),
+        conversionValue: numberOrZero(item.conversionValue),
+      }))
+    : [],
+  byPosition: {
+    first: numberOrZero(raw.byPosition?.first),
+    second: numberOrZero(raw.byPosition?.second),
+    third: numberOrZero(raw.byPosition?.third),
+    other: numberOrZero(raw.byPosition?.other),
+  },
+})
+
+const buildConversionsSummary = (data: ConversionsData): ConversionsSummary => {
+  const [topBank] = data.byBank
+  return {
+    period: data.period,
+    totalConversions: data.total,
+    topBank: topBank
+      ? {
+          name: topBank.bankName,
+          clicks: topBank.clicks,
+          position: topBank.position,
+          value: topBank.conversionValue,
+        }
+      : null,
+    positionDistribution: data.byPosition,
+    firstPositionRate: ratioToPercentage(data.byPosition.first, data.total),
+  }
+}
+
+const generateConversionRecommendations = (data: ConversionsData) => {
   const recommendations: string[] = []
 
   if (data.byPosition.first > data.byPosition.second * 3) {
@@ -375,10 +457,10 @@ function generateConversionRecommendations(data: ConversionsData) {
   }
 
   if (data.byBank.length > 0) {
-    const topBank = data.byBank[0]
-    if (topBank && topBank.clicks > data.total * 0.5) {
+    const [topBank] = data.byBank
+    if (topBank && data.total > 0 && topBank.clicks > data.total * 0.5) {
       recommendations.push(
-        `✅ ${topBank.bankName} ma ${((topBank.clicks / data.total) * 100).toFixed(0)}% kliknięć - rozważ negocjacje lepszych warunków`,
+        `✅ ${topBank.bankName} ma ${ratioToPercentage(topBank.clicks, data.total)} kliknięć - rozważ negocjacje lepszych warunków`,
       )
     }
   }
@@ -392,7 +474,34 @@ function generateConversionRecommendations(data: ConversionsData) {
   return recommendations
 }
 
-function generateCalculatorInsights(data: CalculatorEventsData) {
+const normalizeCalculatorEventsData = (
+  raw: CalculatorEventsData,
+): CalculatorEventsData => ({
+  ...raw,
+  calculations: numberOrZero(raw.calculations),
+  parameterChanges: numberOrZero(raw.parameterChanges),
+  affiliateClicks: numberOrZero(raw.affiliateClicks),
+  bankDetailsViews: numberOrZero(raw.bankDetailsViews),
+  averageLoanAmount: numberOrZero(raw.averageLoanAmount),
+  averageLoanPeriod: numberOrZero(raw.averageLoanPeriod),
+  mostCommonPurpose: raw.mostCommonPurpose || 'brak danych',
+  mostCommonInterestType: raw.mostCommonInterestType || 'brak danych',
+})
+
+const buildCalculatorEventsSummary = (
+  data: CalculatorEventsData,
+): CalculatorEventsSummary => ({
+  period: data.period,
+  calculations: data.calculations,
+  parameterChanges: data.parameterChanges,
+  affiliateClicks: data.affiliateClicks,
+  bankDetailsViews: data.bankDetailsViews,
+  calculationToConversionRate: ratioToPercentage(data.affiliateClicks, data.calculations, 2),
+  mostCommonPurpose: data.mostCommonPurpose || 'brak danych',
+  mostCommonInterestType: data.mostCommonInterestType || 'brak danych',
+})
+
+const generateCalculatorInsights = (data: CalculatorEventsData) => {
   const insights: string[] = []
 
   if (data.calculations > 0) {
@@ -417,7 +526,25 @@ function generateCalculatorInsights(data: CalculatorEventsData) {
   return insights
 }
 
-function generateEngagementRecommendations(data: EngagementData) {
+const normalizeEngagementData = (raw: EngagementData): EngagementData => ({
+  ...raw,
+  averageTimeOnPage: numberOrZero(raw.averageTimeOnPage),
+  averageSessionDuration: numberOrZero(raw.averageSessionDuration),
+  bounceRate: numberOrZero(raw.bounceRate),
+  pagesPerSession: Number.isFinite(raw.pagesPerSession)
+    ? raw.pagesPerSession
+    : numberOrZero(raw.pagesPerSession),
+})
+
+const buildEngagementSummary = (data: EngagementData): EngagementSummary => ({
+  period: data.period,
+  averageTimeOnPage: secondsToReadable(data.averageTimeOnPage),
+  averageSessionDuration: secondsToReadable(data.averageSessionDuration),
+  bounceRate: percentageString(data.bounceRate, 1),
+  pagesPerSession: data.pagesPerSession.toFixed(2),
+})
+
+const generateEngagementRecommendations = (data: EngagementData) => {
   const recommendations: string[] = []
 
   if (data.bounceRate > 60) {
@@ -444,22 +571,14 @@ function generateOverallRecommendations(analysis: {
   const recommendations: string[] = []
 
   // Priorytetowe rekomendacje na podstawie wszystkich danych
-  if (
-    'summary' in analysis.overview &&
-    typeof analysis.overview.summary !== 'string' &&
-    !('error' in analysis.overview)
-  ) {
+  if (analysis.overview.status === 'success') {
     const convRate = parseFloat(analysis.overview.summary.conversions.rate)
     if (convRate < 2) {
       recommendations.push('🔴 PRIORYTET: Niska konwersja - optymalizuj ranking i UX formularza')
     }
   }
 
-  if (
-    'summary' in analysis.engagement &&
-    typeof analysis.engagement.summary !== 'string' &&
-    !('error' in analysis.engagement)
-  ) {
+  if (analysis.engagement.status === 'success') {
     const bounceRate = parseFloat(analysis.engagement.summary.bounceRate)
     if (bounceRate > 60) {
       recommendations.push(
@@ -468,11 +587,7 @@ function generateOverallRecommendations(analysis: {
     }
   }
 
-  if (
-    'summary' in analysis.conversions &&
-    typeof analysis.conversions.summary !== 'string' &&
-    !('error' in analysis.conversions)
-  ) {
+  if (analysis.conversions.status === 'success') {
     if (analysis.conversions.summary.topBank) {
       recommendations.push(
         `💡 Oportunność: ${analysis.conversions.summary.topBank.name} generuje najwięcej kliknięć - rozważ partnerstwo`,
@@ -496,9 +611,9 @@ function formatAnalysisReport(analysis: {
   const lines: string[] = []
 
   // Overview
-  if ('error' in analysis.overview) {
+  if (analysis.overview.status === 'error') {
     lines.push('❌ Błąd pobierania danych overview')
-  } else if ('summary' in analysis.overview && typeof analysis.overview.summary !== 'string') {
+  } else {
     lines.push('📊 PODSUMOWANIE')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.overview.summary.period}`)
@@ -514,7 +629,7 @@ function formatAnalysisReport(analysis: {
     lines.push(
       `Konwersje: ${analysis.overview.summary.conversions.total} (${analysis.overview.summary.conversions.rate})`,
     )
-    if ('insights' in analysis.overview && analysis.overview.insights.length > 0) {
+    if (analysis.overview.insights.length > 0) {
       lines.push('\n💡 Insights:')
       analysis.overview.insights.forEach((insight: string) => lines.push(`   ${insight}`))
     }
@@ -522,12 +637,9 @@ function formatAnalysisReport(analysis: {
   }
 
   // Conversions
-  if ('error' in analysis.conversions) {
+  if (analysis.conversions.status === 'error') {
     lines.push('❌ Błąd pobierania danych konwersji')
-  } else if (
-    'summary' in analysis.conversions &&
-    typeof analysis.conversions.summary !== 'string'
-  ) {
+  } else {
     lines.push('💰 KONWERSJE')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.conversions.summary.period}`)
@@ -541,10 +653,7 @@ function formatAnalysisReport(analysis: {
       `Rozkład pozycji: 1. ${analysis.conversions.summary.positionDistribution.first}, 2. ${analysis.conversions.summary.positionDistribution.second}, 3. ${analysis.conversions.summary.positionDistribution.third}, inne: ${analysis.conversions.summary.positionDistribution.other}`,
     )
     lines.push(`Pozycja 1: ${analysis.conversions.summary.firstPositionRate} wszystkich kliknięć`)
-    if (
-      'recommendations' in analysis.conversions &&
-      analysis.conversions.recommendations.length > 0
-    ) {
+    if (analysis.conversions.recommendations.length > 0) {
       lines.push('\n💡 Rekomendacje:')
       analysis.conversions.recommendations.forEach((rec: string) => lines.push(`   ${rec}`))
     }
@@ -552,9 +661,9 @@ function formatAnalysisReport(analysis: {
   }
 
   // Events
-  if ('error' in analysis.events) {
+  if (analysis.events.status === 'error') {
     lines.push('❌ Błąd pobierania danych eventów')
-  } else if ('summary' in analysis.events && typeof analysis.events.summary !== 'string') {
+  } else {
     lines.push('🎯 EVENTY KALKULATORA')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.events.summary.period}`)
@@ -567,7 +676,7 @@ function formatAnalysisReport(analysis: {
     )
     lines.push(`Najczęstszy cel: ${analysis.events.summary.mostCommonPurpose}`)
     lines.push(`Najczęstszy typ oprocentowania: ${analysis.events.summary.mostCommonInterestType}`)
-    if ('insights' in analysis.events && analysis.events.insights.length > 0) {
+    if (analysis.events.insights.length > 0) {
       lines.push('\n💡 Insights:')
       analysis.events.insights.forEach((insight: string) => lines.push(`   ${insight}`))
     }
@@ -575,9 +684,9 @@ function formatAnalysisReport(analysis: {
   }
 
   // Engagement
-  if ('error' in analysis.engagement) {
+  if (analysis.engagement.status === 'error') {
     lines.push('❌ Błąd pobierania danych engagement')
-  } else if ('summary' in analysis.engagement && typeof analysis.engagement.summary !== 'string') {
+  } else {
     lines.push('⏱️  ENGAGEMENT')
     lines.push('─'.repeat(60))
     lines.push(`Okres: ${analysis.engagement.summary.period}`)
@@ -585,10 +694,7 @@ function formatAnalysisReport(analysis: {
     lines.push(`Średni czas sesji: ${analysis.engagement.summary.averageSessionDuration}`)
     lines.push(`Bounce rate: ${analysis.engagement.summary.bounceRate}`)
     lines.push(`Strony na sesję: ${analysis.engagement.summary.pagesPerSession}`)
-    if (
-      'recommendations' in analysis.engagement &&
-      analysis.engagement.recommendations.length > 0
-    ) {
+    if (analysis.engagement.recommendations.length > 0) {
       lines.push('\n💡 Rekomendacje:')
       analysis.engagement.recommendations.forEach((rec: string) => lines.push(`   ${rec}`))
     }

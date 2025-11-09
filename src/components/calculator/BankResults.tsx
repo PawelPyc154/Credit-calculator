@@ -2,7 +2,7 @@
 
 import clsx from 'clsx'
 import { BankLogo } from 'components/common/BankLogo'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
@@ -15,29 +15,15 @@ type BankResultsProps = {
 }
 
 export const BankResults = ({ results, formData }: BankResultsProps) => {
-  const offerListRef = useRef<HTMLDivElement>(null)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
-
-  if (results.length === 0) {
-    return (
-      <EmptyState>
-        <EmptyTitle>Brak wyników</EmptyTitle>
-        <EmptySubtitle>
-          Uzupełnij parametry, aby zobaczyć minimalistyczne porównanie banków.
-        </EmptySubtitle>
-      </EmptyState>
-    )
-  }
 
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
       const newSet = new Set(prev)
-      const isExpanding = !newSet.has(id)
       if (newSet.has(id)) {
         newSet.delete(id)
       } else {
         newSet.add(id)
-        // Śledź rozwinięcie szczegółów
         const result = results.find((r) => r.bankId === id)
         if (result) {
           trackBankDetailsExpand({
@@ -62,26 +48,40 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
     })
   }
 
-  // Zbierz wszystkie daty aktualizacji
   const updateDates = results
     .map((result) => result.bank?.updated)
-    .filter((date): date is string => !!date)
+    .filter((date): date is string => Boolean(date))
     .map((date) => new Date(date).getTime())
     .filter((time) => !Number.isNaN(time))
 
   const latestUpdateDate =
     updateDates.length > 0 ? new Date(Math.max(...updateDates)).toLocaleDateString('pl-PL') : null
 
+  const hasResults = results.length > 0
+
+  if (!hasResults) {
+    return (
+      <EmptyState>
+        <EmptyTitle>Brak wyników</EmptyTitle>
+        <EmptySubtitle>
+          Uzupełnij parametry, aby zobaczyć minimalistyczne porównanie banków.
+        </EmptySubtitle>
+      </EmptyState>
+    )
+  }
+
   return (
     <ResultsContainer>
       <ResultsHeader>
         <ResultsTitle>Porównanie ofert ({results.length})</ResultsTitle>
       </ResultsHeader>
-      <OfferList ref={offerListRef}>
+      <OfferList>
         {results.map((offer, index) => {
           const isExpanded = expandedIds.has(offer.bankId)
           const hasAffiliate = offer.bank?.affiliate?.enabled && offer.bank?.affiliate?.url
           const isTopThree = index < 3 && offer.isRecommended
+          const expandedSectionId = `offer-details-${offer.bankId}`
+          const targetSelector = `#${expandedSectionId}`
 
           return (
             <OfferCard
@@ -209,7 +209,7 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
 
               {/* Rozwinięte szczegóły */}
               {isExpanded && (
-                <ExpandedSection>
+                <ExpandedSection id={expandedSectionId}>
                   <BankDetails
                     result={{
                       ...offer,
@@ -218,32 +218,6 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
                     }}
                     formData={formData}
                   />
-                  {hasAffiliate && offer.bank?.affiliate?.notes && (
-                    <AffiliateInfo>
-                      <InfoIcon>
-                        <svg
-                          className="h-4 w-4"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <title>Informacja</title>
-                          <circle cx="12" cy="12" r="10" />
-                          <path d="M12 16v-4" />
-                          <path d="M12 8h.01" />
-                        </svg>
-                      </InfoIcon>
-                      <InfoText>
-                        Ten link jest linkiem partnerskim. Otrzymujemy prowizję od banku, jeśli
-                        zdecydujesz się złożyć wniosek. Dla Ciebie nie ma żadnych dodatkowych
-                        kosztów.
-                      </InfoText>
-                    </AffiliateInfo>
-                  )}
                 </ExpandedSection>
               )}
             </OfferCard>
@@ -493,21 +467,9 @@ const DetailsIcon = tw.span`
 const ExpandedSection = tw.div`
   border-t border-gray-200 bg-gray-50
   animate-in fade-in duration-200
+  flex flex-col gap-4
+  md:gap-6
 `
-
-const AffiliateInfo = tw.div`
-  flex gap-2
-  mx-4 mb-4 p-3
-  bg-blue-50 border border-blue-100 rounded-lg
-  text-xs text-blue-700
-`
-
-const InfoIcon = tw.span`
-  flex items-center justify-center
-  text-blue-600 shrink-0
-`
-
-const InfoText = tw.span`leading-relaxed`
 
 const UpdateInfo = tw.div`
   text-xs text-gray-500 text-center

@@ -193,6 +193,38 @@ export const trackInputModeToggle = (mode: 'slider' | 'input') => {
   }
 }
 
+type NarrationEventAction =
+  | 'start'
+  | 'resume'
+  | 'pause'
+  | 'next'
+  | 'prev'
+  | 'auto_next'
+  | 'section_jump'
+  | 'cta'
+  | 'close'
+  | 'script_open'
+  | 'script_close'
+
+export const trackNarrationEvent = (params: {
+  action: NarrationEventAction
+  bankId: string
+  bankName: string
+  sectionId?: string
+  source: 'sticky' | 'modal'
+}) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', `narration_${params.action}`, {
+      event_category: 'narration',
+      event_label: `${params.source}: ${params.bankName}`,
+      bank_id: params.bankId,
+      bank_name: params.bankName,
+      section_id: params.sectionId ?? '',
+      narration_source: params.source,
+    })
+  }
+}
+
 /**
  * Śledzi zmianę typu oprocentowania
  */

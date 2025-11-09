@@ -1,4 +1,5 @@
 import { FooterMain } from 'components/calculator/FooterMain'
+import { OfferNarrationDemo } from 'components/demo/OfferNarrationDemo'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -345,6 +346,19 @@ export default function LandingPage() {
             </StepItem>
           ))}
         </StepList>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Zobacz narrację oferty w wersji demonstracyjnej</SectionTitle>
+          <SectionSubtitle>
+            Przetestuj interaktywny podgląd, który prowadzi użytkownika krok po kroku przez
+            najważniejsze parametry kredytu i na bieżąco podświetla omawiane elementy.
+          </SectionSubtitle>
+        </SectionHeader>
+        <div className="mx-auto mt-8 max-w-6xl">
+          <OfferNarrationDemo />
+        </div>
       </Section>
 
       <Section id="faq">
