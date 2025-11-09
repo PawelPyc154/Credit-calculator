@@ -2,7 +2,7 @@
 
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
-import { useCallback, useEffect, useMemo } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react'
 import { MdPause, MdPlayArrow } from 'react-icons/md'
 import tw from 'tw-tailwind'
 
@@ -34,6 +34,10 @@ type OfferNarrationProps = {
   className?: string
   activeSectionId?: string | null
   onSectionSelect?: (sectionId: string) => void
+  activeWordEntry?: NarrationWordEntry | null
+  isPlaying?: boolean
+  onPlaybackToggle?: (shouldPlay: boolean) => void
+  onWordSelect?: (globalIndex: number) => void
 }
 
 export type NarrationSection = {
@@ -41,6 +45,15 @@ export type NarrationSection = {
   title: string
   script: string
   highlights: string[]
+}
+
+export type NarrationWordEntry = {
+  sectionId: string
+  sectionIndex: number
+  wordIndex: number
+  word: string
+  displayWord: string
+  globalIndex: number
 }
 
 type DetailCardProps = {
@@ -128,6 +141,30 @@ export const createNarrationSections = (
   })
 
   return sections
+}
+
+export const createNarrationWordEntries = (sections: NarrationSection[]): NarrationWordEntry[] => {
+  const entries: NarrationWordEntry[] = []
+
+  sections.forEach((section, sectionIndex) => {
+    const words = section.script
+      .split(/\s+/)
+      .map((word) => word.trim())
+      .filter(Boolean)
+
+    words.forEach((word, wordIndex) => {
+      entries.push({
+        sectionId: section.id,
+        sectionIndex,
+        wordIndex,
+        word,
+        displayWord: word.replace(/[.,!?;:]+$/g, ''),
+        globalIndex: entries.length,
+      })
+    })
+  })
+
+  return entries
 }
 
 export type NarrationDisplayStep = {
@@ -349,10 +386,28 @@ export function OfferNarration({
   className,
   activeSectionId,
   onSectionSelect,
+  activeWordEntry,
+  isPlaying = false,
+  onPlaybackToggle,
+  onWordSelect,
 }: OfferNarrationProps) {
   const sections = useMemo(() => createNarrationSections(offer, true, Boolean(cta)), [offer, cta])
   const detailCards = useMemo(() => detailCardsConfig(offer), [offer])
   const displaySteps = useMemo(() => createNarrationDisplaySteps(offer), [offer])
+  const wordEntries = useMemo(() => createNarrationWordEntries(sections), [sections])
+
+  const sectionWordEntriesMap = useMemo(() => {
+    const map = new Map<string, NarrationWordEntry[]>()
+    wordEntries.forEach((entry) => {
+      const existing = map.get(entry.sectionId)
+      if (existing) {
+        existing.push(entry)
+      } else {
+        map.set(entry.sectionId, [entry])
+      }
+    })
+    return map
+  }, [wordEntries])
 
   const isCompact = variant === 'compact'
   const isListVariant = variant === 'list'
@@ -369,16 +424,82 @@ export function OfferNarration({
     () => new Set(currentSection?.highlights ?? []),
     [currentSection],
   )
-  const listDescriptions = useMemo(
-    () => displaySteps.map((step) => step.description),
-    [displaySteps],
+  const createHighlightedNodes = useCallback(
+    (sectionId: string, script: string) => {
+      const entries = sectionWordEntriesMap.get(sectionId) ?? []
+      const tokens = script.match(/\S+|\s+/g) ?? []
+      let wordCounter = 0
+      let whitespaceCounter = 0
+
+      return tokens.map((token) => {
+        if (/^\s+$/.test(token)) {
+          const whitespaceKey = `${sectionId}-space-${whitespaceCounter}`
+          whitespaceCounter += 1
+          return <Fragment key={whitespaceKey}>{token}</Fragment>
+        }
+
+        const entry = entries[wordCounter]
+        const isActive =
+          entry &&
+          activeWordEntry?.sectionId === entry.sectionId &&
+          activeWordEntry.wordIndex === entry.wordIndex
+
+        const key = entry
+          ? `${entry.sectionId}-${entry.wordIndex}`
+          : `${sectionId}-word-${wordCounter}`
+        const node = (
+          <ScriptWord
+            key={key}
+            data-word-index={entry?.wordIndex ?? wordCounter}
+            data-section-id={entry?.sectionId ?? sectionId}
+            data-active={isActive ? 'true' : 'false'}
+            tabIndex={0}
+            role="button"
+            onClick={() => {
+              if (entry) {
+                onWordSelect?.(entry.globalIndex)
+              }
+            }}
+            onKeyDown={(event) => {
+              if (!entry) return
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onWordSelect?.(entry.globalIndex)
+              }
+            }}
+          >
+            {token}
+          </ScriptWord>
+        )
+
+        wordCounter += 1
+        return node
+      })
+    },
+    [activeWordEntry, onWordSelect, sectionWordEntriesMap],
   )
+
+  const listDescriptionNodes = useMemo(
+    () => displaySteps.map((step) => createHighlightedNodes(step.id, step.description)),
+    [createHighlightedNodes, displaySteps],
+  )
+
+  const highlightedScriptNodes = useMemo(() => {
+    if (!currentSection) return null
+    return createHighlightedNodes(currentSection.id, currentSection.script)
+  }, [createHighlightedNodes, currentSection])
+
+  const latestOnSectionSelectRef = useRef(onSectionSelect)
+
+  useEffect(() => {
+    latestOnSectionSelectRef.current = onSectionSelect
+  }, [onSectionSelect])
 
   useEffect(() => {
     if (currentSection?.id) {
-      onSectionSelect?.(currentSection.id)
+      latestOnSectionSelectRef.current?.(currentSection.id)
     }
-  }, [currentSection?.id, onSectionSelect])
+  }, [currentSection?.id])
 
   const handleCta = useCallback(() => {
     cta?.onActivate()
@@ -389,7 +510,17 @@ export function OfferNarration({
       <ListVariantList className={clsx(className)} data-offer-id={offer.bankId}>
         {displaySteps.map((step, index) => {
           const isActive = index === currentSectionIndex
-          const isCompleted = index < currentSectionIndex
+          const sectionEntries = sectionWordEntriesMap.get(step.id) ?? []
+          const lastEntry =
+            sectionEntries.length > 0 ? sectionEntries[sectionEntries.length - 1] : null
+          const lastGlobalIndex = lastEntry ? lastEntry.globalIndex : null
+          const isCompleted =
+            index < currentSectionIndex ||
+            (lastGlobalIndex !== null &&
+              activeWordEntry?.globalIndex !== undefined &&
+              activeWordEntry.globalIndex >= lastGlobalIndex)
+          const canPlaySection = sectionEntries.length > 0
+          const isSectionPlaying = isActive && isPlaying
           return (
             <ListVariantItem key={step.id}>
               <ListVariantInteractive aria-pressed={isActive} role="presentation">
@@ -425,20 +556,30 @@ export function OfferNarration({
                             'text-slate-600': !isActive && !isCompleted,
                           })}
                         >
-                          {listDescriptions[index]}
+                          {listDescriptionNodes[index]}
                         </ListVariantDescription>
                       </ListVariantTitleWrapper>
                     </ListVariantHeaderContent>
                     <ListVariantPlayButton
                       type="button"
                       aria-label={`Narracja sekcji ${step.title}`}
-                      disabled
+                      disabled={!isActive || !canPlaySection}
+                      onClick={() => {
+                        if (!canPlaySection || !isActive) return
+                        if (!isPlaying && sectionEntries.length > 0) {
+                          const firstEntry = sectionEntries[0]
+                          if (firstEntry) {
+                            onWordSelect?.(firstEntry.globalIndex)
+                          }
+                        }
+                        onPlaybackToggle?.(!isPlaying)
+                      }}
                       data-active={isActive ? 'true' : 'false'}
-                      data-playing="false"
+                      data-playing={isSectionPlaying ? 'true' : 'false'}
                       data-completed={isCompleted ? 'true' : 'false'}
                     >
                       <ListVariantPlayIcon aria-hidden="true">
-                        {isActive ? <MdPause size={14} /> : <MdPlayArrow size={16} />}
+                        {isSectionPlaying ? <MdPause size={14} /> : <MdPlayArrow size={16} />}
                       </ListVariantPlayIcon>
                     </ListVariantPlayButton>
                   </ListVariantHeader>
@@ -453,6 +594,25 @@ export function OfferNarration({
                           'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-100':
                             isCompleted,
                         })}
+                        onClick={() => {
+                          if (!canPlaySection || sectionEntries.length === 0) return
+                          const firstEntry = sectionEntries[0]
+                          if (firstEntry) {
+                            onWordSelect?.(firstEntry.globalIndex)
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(event) => {
+                          if (!canPlaySection || sectionEntries.length === 0) return
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            const firstEntry = sectionEntries[0]
+                            if (firstEntry) {
+                              onWordSelect?.(firstEntry.globalIndex)
+                            }
+                          }
+                        }}
                       >
                         <ListVariantPropertyLabel>{item.label}</ListVariantPropertyLabel>
                         <ListVariantPropertyValue>{item.value}</ListVariantPropertyValue>
@@ -531,8 +691,16 @@ export function OfferNarration({
           <PrevButton type="button" disabled={isFirst}>
             Poprzedni
           </PrevButton>
-          <PlayButton type="button" disabled>
-            {currentSection ? 'Odtwórz' : 'Pauza'}
+          <PlayButton
+            type="button"
+            disabled={wordEntries.length === 0}
+            data-playing={isPlaying ? 'true' : 'false'}
+            onClick={() => {
+              if (!wordEntries.length) return
+              onPlaybackToggle?.(!isPlaying)
+            }}
+          >
+            {isPlaying ? 'Pauza' : 'Odtwórz'}
           </PlayButton>
           <NextButton type="button" disabled={isLast || sections.length === 0}>
             Następny
@@ -540,7 +708,7 @@ export function OfferNarration({
         </Controls>
 
         <ScriptPanel aria-live="polite">
-          <span>{currentSection?.script ?? 'Brak narracji do wyświetlenia.'}</span>
+          {currentSection ? highlightedScriptNodes : 'Brak narracji do wyświetlenia.'}
         </ScriptPanel>
 
         {cta && (
@@ -605,6 +773,7 @@ const PrevButton = tw.button`rounded-full bg-white/10 px-3 py-2 text-sm font-sem
 const PlayButton = tw.button`rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:text-slate-400`
 const NextButton = tw.button`rounded-full bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40`
 const ScriptPanel = tw.div`mt-6 rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-relaxed text-white/80 whitespace-pre-wrap`
+const ScriptWord = tw.span`relative whitespace-normal wrap-break-word rounded-sm px-0 transition-colors duration-150 data-[active='true']:bg-emerald-500/35`
 const CTAWrapper = tw.div`mt-6`
 const CTAButton = tw.button`flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40`
 const NarrationDetails = tw.main`grid gap-4 sm:grid-cols-2 xl:grid-cols-3`
@@ -633,6 +802,6 @@ const ListVariantPropertyLabel = tw.span`text-sm font-medium text-slate-600`
 const ListVariantPropertyValue = tw.span`text-sm font-semibold text-slate-900`
 const ListVariantPlayButton = tw.button`
   inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 transition
-  cursor-default
+  cursor-pointer hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60
 `
 const ListVariantPlayIcon = tw.span`flex items-center justify-center`

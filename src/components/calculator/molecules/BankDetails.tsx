@@ -16,9 +16,11 @@ import {
 } from 'chart.js'
 import clsx from 'clsx'
 import {
-  type NarrationOffer,
-  OfferNarration,
   createNarrationSections,
+  createNarrationWordEntries,
+  type NarrationOffer,
+  type NarrationWordEntry,
+  OfferNarration,
 } from 'components/calculator/narration/OfferNarration'
 import { OfferNarrationStickyBar } from 'components/calculator/narration/OfferNarrationStickyBar'
 import { Tooltip } from 'components/common/tooltip'
@@ -69,16 +71,29 @@ type BankNarrationState = {
   targetSelector?: string
   onSelectSection: (sectionId: string) => void
   onSectionChange?: (sectionId: string) => void
+  activeWordIndex: number
+  activeWordEntry: NarrationWordEntry | null
+  onWordIndexChange: (index: number) => void
+  wordEntries: NarrationWordEntry[]
+  isPlaying: boolean
+  onPlaybackToggle: (shouldPlay: boolean) => void
+  onWordSelect: (globalIndex: number) => void
 }
+
+const PLAYBACK_INTERVAL_MS = 200
 
 export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const loanAmount = result.loanAmount ?? formData?.loanAmount ?? 0
   const loanPeriod = result.loanPeriod ?? formData?.loanPeriod ?? 0
   const totalPayments = loanPeriod * 12
   const bank = result.bank
+  const bankId = bank?.id ?? null
+  const bankName = bank?.name ?? bankId ?? 'Niezidentyfikowany bank'
 
   const [activeTab, setActiveTab] = useState<'details' | 'narration'>('details')
-  const [activeNarrationSection, setActiveNarrationSection] = useState<string | null>(null)
+  const [activeWordIndex, setActiveWordIndex] = useState(0)
+  const [isNarrationPlaying, setIsNarrationPlaying] = useState(false)
+  const playbackTimeoutRef = useRef<number | null>(null)
   const detailsRef = useRef<HTMLDivElement>(null)
 
   const hasNarrationData = loanAmount > 0 && loanPeriod > 0 && result.monthlyPayment > 0
@@ -97,8 +112,8 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     }
 
     return {
-      bankId: result.bankId,
-      bankName: result.bankName,
+      bankId: bankId ?? 'unknown-bank',
+      bankName,
       loanAmount,
       loanPeriodYears: loanPeriod,
       loanTermMonths: totalPayments,
@@ -113,11 +128,11 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     }
   }, [
     bank,
+    bankId,
+    bankName,
     hasNarrationData,
     loanAmount,
     loanPeriod,
-    result.bankId,
-    result.bankName,
     result.commission,
     result.insurance,
     result.interestRate,
@@ -128,32 +143,110 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     totalPayments,
   ])
 
-  const targetSelector = useMemo(() => {
-    return result.bankId ? `#offer-details-${result.bankId}` : undefined
-  }, [result.bankId])
+  const narrationSections = useMemo(() => {
+    if (!narrationOffer) return []
+    return createNarrationSections(narrationOffer, true, false)
+  }, [narrationOffer])
 
-  const handleNarrationSectionChange = useCallback((sectionId: string) => {
-    setActiveNarrationSection(sectionId)
-  }, [])
+  const narrationWordEntries = useMemo(
+    () => createNarrationWordEntries(narrationSections),
+    [narrationSections],
+  )
+
+  const activeWordEntry = narrationWordEntries[activeWordIndex] ?? null
+  const activeSectionId = activeWordEntry?.sectionId ?? narrationSections[0]?.id ?? null
+
+  const targetSelector = useMemo(() => {
+    return bankId ? `#offer-details-${bankId}` : undefined
+  }, [bankId])
+
+  const handleNarrationSectionChange = useCallback(
+    (sectionId: string) => {
+      setIsNarrationPlaying(false)
+      setActiveWordIndex((prev) => {
+        if (narrationWordEntries[prev]?.sectionId === sectionId) {
+          return prev
+        }
+        const targetIndex = narrationWordEntries.findIndex((entry) => entry.sectionId === sectionId)
+        return targetIndex >= 0 ? targetIndex : prev
+      })
+    },
+    [narrationWordEntries],
+  )
+
+  const handleWordIndexChange = useCallback(
+    (index: number) => {
+      setIsNarrationPlaying(false)
+      const maxIndex = Math.max(narrationWordEntries.length - 1, 0)
+      const nextIndex = narrationWordEntries.length ? Math.min(Math.max(index, 0), maxIndex) : 0
+
+      setActiveWordIndex(nextIndex)
+    },
+    [narrationWordEntries],
+  )
+
+  const handlePlaybackToggle = useCallback(
+    (shouldPlay: boolean) => {
+      if (!shouldPlay) {
+        setIsNarrationPlaying(false)
+        return
+      }
+
+      if (!narrationWordEntries.length) {
+        return
+      }
+
+      setIsNarrationPlaying(true)
+    },
+    [narrationWordEntries],
+  )
+
+  useEffect(() => {
+    if (!narrationWordEntries.length) {
+      if (activeWordIndex !== 0) {
+        setActiveWordIndex(0)
+      }
+      return
+    }
+
+    const maxIndex = narrationWordEntries.length - 1
+    if (activeWordIndex > maxIndex) {
+      setActiveWordIndex(maxIndex)
+    }
+  }, [activeWordIndex, narrationWordEntries])
 
   const narration: BankNarrationState | null = useMemo(() => {
     if (!narrationOffer) return null
 
     return {
       offer: narrationOffer,
-      activeSectionId: activeNarrationSection,
-      initialSectionId: 'basics',
-      requestedSectionId: activeNarrationSection,
+      activeSectionId,
+      initialSectionId: narrationSections[0]?.id ?? null,
+      requestedSectionId: activeSectionId ?? undefined,
       isActive: activeTab === 'narration',
       targetSelector,
       onSelectSection: handleNarrationSectionChange,
       onSectionChange: handleNarrationSectionChange,
+      activeWordIndex,
+      activeWordEntry,
+      onWordIndexChange: handleWordIndexChange,
+      wordEntries: narrationWordEntries,
+      isPlaying: isNarrationPlaying,
+      onPlaybackToggle: handlePlaybackToggle,
+      onWordSelect: setActiveWordIndex,
     }
   }, [
-    activeNarrationSection,
     activeTab,
+    activeWordEntry,
+    activeWordIndex,
     handleNarrationSectionChange,
+    handleWordIndexChange,
+    activeSectionId,
+    handlePlaybackToggle,
+    isNarrationPlaying,
     narrationOffer,
+    narrationWordEntries,
+    narrationSections,
     targetSelector,
   ])
 
@@ -165,14 +258,13 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       container.querySelectorAll<HTMLElement>('[data-narration-key]'),
     )
 
-    if (!narrationOffer || activeTab !== 'narration') {
+    if (!narrationSections.length || activeTab !== 'narration') {
       highlightableElements.forEach((element) => element.classList.remove('narration-highlight'))
       return
     }
 
-    const sections = createNarrationSections(narrationOffer, true, false)
     const activeHighlights =
-      sections.find((section) => section.id === activeNarrationSection)?.highlights ?? []
+      narrationSections.find((section) => section.id === activeSectionId)?.highlights ?? []
 
     highlightableElements.forEach((element) => {
       const key = element.getAttribute('data-narration-key')
@@ -186,7 +278,44 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     return () => {
       highlightableElements.forEach((element) => element.classList.remove('narration-highlight'))
     }
-  }, [activeNarrationSection, activeTab, narrationOffer])
+  }, [activeSectionId, activeTab, narrationSections])
+
+  useEffect(() => {
+    if (playbackTimeoutRef.current !== null) {
+      window.clearTimeout(playbackTimeoutRef.current)
+      playbackTimeoutRef.current = null
+    }
+
+    if (!isNarrationPlaying) return
+    if (!narrationWordEntries.length) {
+      setIsNarrationPlaying(false)
+      return
+    }
+
+    const lastIndex = narrationWordEntries.length - 1
+
+    if (activeWordIndex >= lastIndex) {
+      setIsNarrationPlaying(false)
+      return
+    }
+
+    playbackTimeoutRef.current = window.setTimeout(() => {
+      setActiveWordIndex((prev) => Math.min(prev + 1, lastIndex))
+    }, PLAYBACK_INTERVAL_MS)
+
+    return () => {
+      if (playbackTimeoutRef.current !== null) {
+        window.clearTimeout(playbackTimeoutRef.current)
+        playbackTimeoutRef.current = null
+      }
+    }
+  }, [activeWordIndex, isNarrationPlaying, narrationWordEntries.length])
+
+  useEffect(() => {
+    if (activeTab !== 'narration') {
+      setIsNarrationPlaying(false)
+    }
+  }, [activeTab])
 
   // Oblicz wszystkie raty dla wykresu
   const calculateAllPayments = () => {
@@ -616,6 +745,10 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           variant="list"
           activeSectionId={narration.activeSectionId}
           onSectionSelect={handleNarrationSectionSelect}
+          activeWordEntry={narration.activeWordEntry}
+          isPlaying={narration.isPlaying}
+          onPlaybackToggle={narration.onPlaybackToggle}
+          onWordSelect={narration.onWordSelect}
         />
         {narration.isActive && (
           <NarrationStickyContainer>
@@ -626,6 +759,11 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 initialSectionId={narration.initialSectionId}
                 requestedSectionId={narration.requestedSectionId}
                 onSectionChange={narration.onSectionChange ?? narration.onSelectSection}
+                activeWordIndex={narration.activeWordIndex}
+                onWordIndexChange={narration.onWordIndexChange}
+                isPlaying={narration.isPlaying}
+                onPlaybackToggle={narration.onPlaybackToggle}
+                onWordSelect={narration.onWordSelect}
                 className="w-full"
               />
             </NarrationStickyInner>
