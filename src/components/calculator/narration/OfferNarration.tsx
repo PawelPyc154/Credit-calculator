@@ -3,7 +3,7 @@
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react'
-import { MdPause, MdPlayArrow } from 'react-icons/md'
+import { MdPause, MdPlayArrow, MdReplay } from 'react-icons/md'
 import tw from 'tw-tailwind'
 
 export type NarrationOffer = {
@@ -33,11 +33,11 @@ type OfferNarrationProps = {
   variant?: 'default' | 'compact' | 'list'
   className?: string
   activeSectionId?: string | null
-  onSectionSelect?: (sectionId: string) => void
+  onSectionSelect?: (sectionId: string, options?: NarrationWordSelectionOptions) => void
   activeWordEntry?: NarrationWordEntry | null
   isPlaying?: boolean
   onPlaybackToggle?: (shouldPlay: boolean) => void
-  onWordSelect?: (globalIndex: number) => void
+  onWordSelect?: (globalIndex: number, options?: NarrationWordSelectionOptions) => void
 }
 
 export type NarrationSection = {
@@ -54,6 +54,10 @@ export type NarrationWordEntry = {
   word: string
   displayWord: string
   globalIndex: number
+}
+
+export type NarrationWordSelectionOptions = {
+  autoPlay?: boolean
 }
 
 type DetailCardProps = {
@@ -419,6 +423,106 @@ export function OfferNarration({
     return idx >= 0 ? idx : 0
   }, [currentSectionId, sections])
 
+  const sectionElementsRef = useRef<Record<string, HTMLElement | null>>({})
+  const scriptPanelRef = useRef<HTMLDivElement | null>(null)
+  const prevIsPlayingRef = useRef(isPlaying)
+  const prevSectionIdRef = useRef<string | null>(currentSectionId ?? null)
+  const scrollTimeoutRef = useRef<number | null>(null)
+  const isPlayingRef = useRef(isPlaying)
+
+  const registerSectionElement = useCallback(
+    (sectionId: string) => (node: HTMLElement | null) => {
+      if (node) {
+        sectionElementsRef.current[sectionId] = node
+      } else {
+        delete sectionElementsRef.current[sectionId]
+      }
+    },
+    [],
+  )
+
+  const clearScheduledScroll = useCallback(() => {
+    if (scrollTimeoutRef.current !== null) {
+      window.clearTimeout(scrollTimeoutRef.current)
+      scrollTimeoutRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying
+    if (!isPlaying) {
+      clearScheduledScroll()
+    }
+  }, [clearScheduledScroll, isPlaying])
+
+  const scrollToCurrentSection = useCallback(
+    (sectionId: string | null) => {
+      if (!sectionId) return
+      if (typeof window === 'undefined') return
+
+      const targetElement: HTMLElement | null = isListVariant
+        ? (sectionElementsRef.current[sectionId] ?? null)
+        : scriptPanelRef.current
+
+      if (!targetElement) return
+
+      window.requestAnimationFrame(() => {
+        const rect = targetElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+        const headerOffset = isListVariant ? 140 : 96
+        const topBoundary = headerOffset
+        const bottomBoundary = viewportHeight - headerOffset
+
+        const isWithinView =
+          rect.top >= topBoundary &&
+          rect.bottom <= bottomBoundary &&
+          rect.top >= 0 &&
+          rect.bottom <= viewportHeight
+
+        if (isWithinView) return
+
+        const targetY = rect.top + window.scrollY - headerOffset
+        window.scrollTo({
+          top: Math.max(targetY, 0),
+          behavior: 'smooth',
+        })
+      })
+    },
+    [isListVariant],
+  )
+
+  const scheduleScrollToSection = useCallback(
+    (sectionId: string | null, delay: number) => {
+      if (!sectionId) return
+      clearScheduledScroll()
+      if (!isPlayingRef.current) return
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        scrollToCurrentSection(sectionId)
+        scrollTimeoutRef.current = null
+      }, delay)
+    },
+    [clearScheduledScroll, scrollToCurrentSection],
+  )
+
+  useEffect(() => {
+    const prevIsPlaying = prevIsPlayingRef.current
+    const prevSectionId = prevSectionIdRef.current
+    const startedPlaying = isPlaying && !prevIsPlaying
+    const sectionChangedWhilePlaying =
+      isPlaying && currentSectionId && prevSectionId !== currentSectionId
+
+    if ((startedPlaying || sectionChangedWhilePlaying) && currentSectionId) {
+      if (startedPlaying) {
+        scrollToCurrentSection(currentSectionId)
+      } else {
+        scheduleScrollToSection(currentSectionId, 1200)
+      }
+    }
+
+    prevIsPlayingRef.current = isPlaying
+    prevSectionIdRef.current = currentSectionId ?? null
+  }, [currentSectionId, isPlaying, scheduleScrollToSection, scrollToCurrentSection])
+
   const currentSection = sections[currentSectionIndex] ?? null
   const activeHighlights = useMemo(
     () => new Set(currentSection?.highlights ?? []),
@@ -520,9 +624,22 @@ export function OfferNarration({
               activeWordEntry?.globalIndex !== undefined &&
               activeWordEntry.globalIndex >= lastGlobalIndex)
           const canPlaySection = sectionEntries.length > 0
-          const isSectionPlaying = isActive && isPlaying
+          const isSectionPlaying = isPlaying && activeWordEntry?.sectionId === step.id && isActive
+          const shouldShowReplay = isCompleted && !isSectionPlaying
+          const playButtonLabel = isSectionPlaying
+            ? 'Wstrzymaj narrację sekcji'
+            : shouldShowReplay
+              ? 'Odtwórz ponownie narrację sekcji'
+              : 'Odtwórz narrację sekcji'
+          const playButtonIcon = isSectionPlaying ? (
+            <MdPause size={16} />
+          ) : shouldShowReplay ? (
+            <MdReplay size={18} />
+          ) : (
+            <MdPlayArrow size={16} />
+          )
           return (
-            <ListVariantItem key={step.id}>
+            <ListVariantItem key={step.id} ref={registerSectionElement(step.id)}>
               <ListVariantInteractive aria-pressed={isActive} role="presentation">
                 <ListVariantCard
                   className={clsx({
@@ -562,15 +679,23 @@ export function OfferNarration({
                     </ListVariantHeaderContent>
                     <ListVariantPlayButton
                       type="button"
-                      aria-label={`Narracja sekcji ${step.title}`}
-                      disabled={!isActive || !canPlaySection}
+                      aria-label={`${playButtonLabel}: ${step.title}`}
+                      disabled={!canPlaySection}
                       onClick={() => {
-                        if (!canPlaySection || !isActive) return
-                        if (!isPlaying && sectionEntries.length > 0) {
-                          const firstEntry = sectionEntries[0]
-                          if (firstEntry) {
-                            onWordSelect?.(firstEntry.globalIndex)
-                          }
+                        if (!canPlaySection || sectionEntries.length === 0) return
+                        const firstEntry = sectionEntries[0]
+                        if (!firstEntry) return
+                        const isCurrentSection = activeWordEntry?.sectionId === step.id
+                        const shouldRestart = !isCurrentSection || shouldShowReplay
+
+                        if (shouldRestart) {
+                          onSectionSelect?.(step.id, { autoPlay: true })
+                          onWordSelect?.(firstEntry.globalIndex, { autoPlay: true })
+                          return
+                        }
+
+                        if (!isActive) {
+                          onSectionSelect?.(step.id)
                         }
                         onPlaybackToggle?.(!isPlaying)
                       }}
@@ -578,9 +703,7 @@ export function OfferNarration({
                       data-playing={isSectionPlaying ? 'true' : 'false'}
                       data-completed={isCompleted ? 'true' : 'false'}
                     >
-                      <ListVariantPlayIcon aria-hidden="true">
-                        {isSectionPlaying ? <MdPause size={14} /> : <MdPlayArrow size={16} />}
-                      </ListVariantPlayIcon>
+                      <ListVariantPlayIcon aria-hidden="true">{playButtonIcon}</ListVariantPlayIcon>
                     </ListVariantPlayButton>
                   </ListVariantHeader>
                 </ListVariantCard>
@@ -598,6 +721,7 @@ export function OfferNarration({
                           if (!canPlaySection || sectionEntries.length === 0) return
                           const firstEntry = sectionEntries[0]
                           if (firstEntry) {
+                            onSectionSelect?.(step.id)
                             onWordSelect?.(firstEntry.globalIndex)
                           }
                         }}
@@ -609,6 +733,7 @@ export function OfferNarration({
                             event.preventDefault()
                             const firstEntry = sectionEntries[0]
                             if (firstEntry) {
+                              onSectionSelect?.(step.id)
                               onWordSelect?.(firstEntry.globalIndex)
                             }
                           }
@@ -707,7 +832,7 @@ export function OfferNarration({
           </NextButton>
         </Controls>
 
-        <ScriptPanel aria-live="polite">
+        <ScriptPanel ref={scriptPanelRef} aria-live="polite">
           {currentSection ? highlightedScriptNodes : 'Brak narracji do wyświetlenia.'}
         </ScriptPanel>
 
@@ -801,7 +926,12 @@ const ListVariantProperty = tw.li`flex items-center justify-between gap-4 rounde
 const ListVariantPropertyLabel = tw.span`text-sm font-medium text-slate-600`
 const ListVariantPropertyValue = tw.span`text-sm font-semibold text-slate-900`
 const ListVariantPlayButton = tw.button`
-  inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 transition
-  cursor-pointer hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60
+  inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition
+  relative -translate-y-1 translate-x-1
+  cursor-pointer hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700
+  focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white
+  data-[playing='true']:border-sky-600 data-[playing='true']:bg-sky-600 data-[playing='true']:text-white data-[playing='true']:shadow-sky-600/50 data-[playing='true']:shadow-md
+  data-[completed='true']:border-emerald-300 data-[completed='true']:text-emerald-700 data-[completed='true']:hover:border-emerald-400 data-[completed='true']:hover:text-emerald-800
+  disabled:cursor-not-allowed disabled:opacity-60
 `
-const ListVariantPlayIcon = tw.span`flex items-center justify-center`
+const ListVariantPlayIcon = tw.span`flex h-4 w-4 items-center justify-center`

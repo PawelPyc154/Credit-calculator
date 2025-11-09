@@ -2,10 +2,14 @@
 
 import clsx from 'clsx'
 import type { ChangeEvent } from 'react'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { MdPause, MdPlayArrow } from 'react-icons/md'
 import tw from 'tw-tailwind'
-import type { NarrationOffer, NarrationWordEntry } from './OfferNarration'
+import type {
+  NarrationOffer,
+  NarrationWordEntry,
+  NarrationWordSelectionOptions,
+} from './OfferNarration'
 import { createNarrationSections, createNarrationWordEntries } from './OfferNarration'
 
 type OfferNarrationStickyBarProps = {
@@ -14,13 +18,13 @@ type OfferNarrationStickyBarProps = {
   restoreFocus?: () => void
   initialSectionId?: string | null
   requestedSectionId?: string | null
-  onSectionChange?: (sectionId: string) => void
+  onSectionChange?: (sectionId: string, options?: NarrationWordSelectionOptions) => void
   className?: string
   activeWordIndex: number
-  onWordIndexChange?: (index: number) => void
+  onWordIndexChange?: (index: number, options?: NarrationWordSelectionOptions) => void
   isPlaying?: boolean
   onPlaybackToggle?: (shouldPlay: boolean) => void
-  onWordSelect?: (globalIndex: number) => void
+  onWordSelect?: (globalIndex: number, options?: NarrationWordSelectionOptions) => void
 }
 
 export function OfferNarrationStickyBar({
@@ -64,6 +68,8 @@ export function OfferNarrationStickyBar({
 
   const sliderMax = Math.max(sectionWordEntries.length - 1, 0)
   const isSliderInteractive = sectionWordEntries.length > 1
+
+  const manualSectionSelectionRef = useRef(false)
 
   const clampedWordIndex = sectionWordEntries.length
     ? Math.min(Math.max(activeWordIndex, 0), sliderMax)
@@ -112,9 +118,10 @@ export function OfferNarrationStickyBar({
   const activeSection = sections[activeSectionIndex] ?? null
 
   useEffect(() => {
-    if (activeSection?.id) {
-      onSectionChange?.(activeSection.id)
-    }
+    if (!activeSection?.id) return
+    const shouldAutoPlay = manualSectionSelectionRef.current
+    onSectionChange?.(activeSection.id, shouldAutoPlay ? { autoPlay: true } : undefined)
+    manualSectionSelectionRef.current = false
   }, [activeSection?.id, onSectionChange])
 
   const handleSliderChange = useCallback(
@@ -193,8 +200,9 @@ export function OfferNarrationStickyBar({
                         (entry) => entry.sectionId === section.id,
                       )
                       if (targetEntry) {
-                        onWordIndexChange?.(targetEntry.globalIndex)
-                        onWordSelect?.(targetEntry.globalIndex)
+                        manualSectionSelectionRef.current = true
+                        onWordIndexChange?.(targetEntry.globalIndex, { autoPlay: true })
+                        onWordSelect?.(targetEntry.globalIndex, { autoPlay: true })
                       }
                     }}
                   >

@@ -20,6 +20,7 @@ import {
   createNarrationWordEntries,
   type NarrationOffer,
   type NarrationWordEntry,
+  type NarrationWordSelectionOptions,
   OfferNarration,
 } from 'components/calculator/narration/OfferNarration'
 import { OfferNarrationStickyBar } from 'components/calculator/narration/OfferNarrationStickyBar'
@@ -70,15 +71,15 @@ type BankNarrationState = {
   requestedSectionId?: string | null
   isActive: boolean
   targetSelector?: string
-  onSelectSection: (sectionId: string) => void
-  onSectionChange?: (sectionId: string) => void
+  onSelectSection: (sectionId: string, options?: NarrationWordSelectionOptions) => void
+  onSectionChange?: (sectionId: string, options?: NarrationWordSelectionOptions) => void
   activeWordIndex: number
   activeWordEntry: NarrationWordEntry | null
-  onWordIndexChange: (index: number) => void
+  onWordIndexChange: (index: number, options?: NarrationWordSelectionOptions) => void
   wordEntries: NarrationWordEntry[]
   isPlaying: boolean
   onPlaybackToggle: (shouldPlay: boolean) => void
-  onWordSelect: (globalIndex: number) => void
+  onWordSelect: (globalIndex: number, options?: NarrationWordSelectionOptions) => void
 }
 
 const PLAYBACK_INTERVAL_MS = 200
@@ -94,6 +95,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const [activeTab, setActiveTab] = useState<'details' | 'narration'>('details')
   const [activeWordIndex, setActiveWordIndex] = useState(0)
   const [isNarrationPlaying, setIsNarrationPlaying] = useState(false)
+  const [pendingAutoPlay, setPendingAutoPlay] = useState(false)
   const detailsRef = useRef<HTMLDivElement>(null)
 
   const hasNarrationData = loanAmount > 0 && loanPeriod > 0 && result.monthlyPayment > 0
@@ -182,35 +184,70 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       stopNarrationSpeech()
     }
     setIsNarrationPlaying(false)
+    setPendingAutoPlay(false)
   }, [isSpeechSupported, stopNarrationSpeech])
 
   const targetSelector = useMemo(() => {
     return bankId ? `#offer-details-${bankId}` : undefined
   }, [bankId])
 
-  const handleNarrationSectionChange = useCallback(
-    (sectionId: string) => {
-      stopNarrationPlayback()
-      setActiveWordIndex((prev) => {
-        if (narrationWordEntries[prev]?.sectionId === sectionId) {
-          return prev
-        }
-        const targetIndex = narrationWordEntries.findIndex((entry) => entry.sectionId === sectionId)
-        return targetIndex >= 0 ? targetIndex : prev
-      })
+  const clampWordIndex = useCallback(
+    (value: number) => {
+      const maxIndex = Math.max(narrationWordEntries.length - 1, 0)
+      return narrationWordEntries.length ? Math.min(Math.max(value, 0), maxIndex) : 0
     },
-    [narrationWordEntries, stopNarrationPlayback],
+    [narrationWordEntries],
+  )
+
+  const handleNarrationSectionChange = useCallback(
+    (sectionId: string, options?: NarrationWordSelectionOptions) => {
+      const targetIndex = narrationWordEntries.findIndex((entry) => entry.sectionId === sectionId)
+      if (targetIndex < 0) return
+
+      const currentSectionId = narrationWordEntries[activeWordIndex]?.sectionId ?? null
+      const isDifferentSection = currentSectionId !== sectionId
+      if (isDifferentSection || options?.autoPlay) {
+        stopNarrationPlayback()
+      }
+
+      if (isDifferentSection) {
+        setActiveWordIndex(targetIndex)
+      } else if (options?.autoPlay) {
+        setActiveWordIndex(targetIndex)
+      }
+
+      if (options?.autoPlay) {
+        setPendingAutoPlay(true)
+      }
+    },
+    [activeWordIndex, narrationWordEntries, stopNarrationPlayback],
   )
 
   const handleWordIndexChange = useCallback(
-    (index: number) => {
+    (index: number, options?: NarrationWordSelectionOptions) => {
       stopNarrationPlayback()
-      const maxIndex = Math.max(narrationWordEntries.length - 1, 0)
-      const nextIndex = narrationWordEntries.length ? Math.min(Math.max(index, 0), maxIndex) : 0
+      const nextIndex = clampWordIndex(index)
 
       setActiveWordIndex(nextIndex)
+      if (options?.autoPlay) {
+        setPendingAutoPlay(true)
+      }
     },
-    [narrationWordEntries, stopNarrationPlayback],
+    [clampWordIndex, stopNarrationPlayback],
+  )
+
+  const handleWordSelect = useCallback(
+    (index: number, options?: NarrationWordSelectionOptions) => {
+      const nextIndex = clampWordIndex(index)
+      if (options?.autoPlay) {
+        stopNarrationPlayback()
+      }
+      setActiveWordIndex(nextIndex)
+      if (options?.autoPlay) {
+        setPendingAutoPlay(true)
+      }
+    },
+    [clampWordIndex, stopNarrationPlayback],
   )
 
   const handlePlaybackToggle = useCallback(
@@ -245,6 +282,12 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   )
 
   useEffect(() => {
+    if (!pendingAutoPlay) return
+    setPendingAutoPlay(false)
+    handlePlaybackToggle(true)
+  }, [handlePlaybackToggle, pendingAutoPlay])
+
+  useEffect(() => {
     if (!narrationWordEntries.length) {
       if (activeWordIndex !== 0) {
         setActiveWordIndex(0)
@@ -276,7 +319,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       wordEntries: narrationWordEntries,
       isPlaying: isNarrationPlaying,
       onPlaybackToggle: handlePlaybackToggle,
-      onWordSelect: handleWordIndexChange,
+      onWordSelect: handleWordSelect,
     }
   }, [
     activeTab,
@@ -284,6 +327,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     activeWordIndex,
     handleNarrationSectionChange,
     handleWordIndexChange,
+    handleWordSelect,
     activeSectionId,
     handlePlaybackToggle,
     isNarrationPlaying,
@@ -727,12 +771,15 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     setIsModalOpen(false)
   }
 
-  const handleNarrationSectionSelect = (sectionId: string) => {
+  const handleNarrationSectionSelect = (
+    sectionId: string,
+    options?: NarrationWordSelectionOptions,
+  ) => {
     if (!narration) return
     setActiveTab('narration')
-    narration.onSelectSection(sectionId)
+    narration.onSelectSection(sectionId, options)
     if (narration.onSectionChange && narration.onSectionChange !== narration.onSelectSection) {
-      narration.onSectionChange(sectionId)
+      narration.onSectionChange(sectionId, options)
     }
   }
 
