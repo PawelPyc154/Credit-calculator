@@ -36,7 +36,7 @@ const parsePercentage = (input: string, label: string): number | undefined => {
 
 const extractPercentage = (text: string, pattern: RegExp, label: string): number | undefined => {
   const match = text.match(pattern)
-  if (!match) {
+  if (!match || !match[1]) {
     console.warn(`⚠️ Nie znaleziono wartości dla ${label}`)
     return undefined
   }
@@ -117,7 +117,8 @@ async function main(): Promise<void> {
   const calculationDateMatch = sampleText.match(
     /Kalkulacja została dokonana na\s+(\d{2}\.\d{2}\.\d{4})/i,
   )
-  const calculationDate = calculationDateMatch ? parseDate(calculationDateMatch[1]) : undefined
+  const calculationDateValue = calculationDateMatch?.[1]
+  const calculationDate = calculationDateValue ? parseDate(calculationDateValue) : undefined
 
   console.log('ℹ️ Odnalezione wartości:', {
     rrso,
@@ -137,6 +138,9 @@ async function main(): Promise<void> {
   }
 
   const currentBank = banks[bankIndex]
+  if (!currentBank) {
+    throw new Error(`Nie znaleziono banku o id "${BANK_ID}" w banks.json`)
+  }
   const updatedBank: BankEntry & {
     meta?: Record<string, unknown>
   } = {

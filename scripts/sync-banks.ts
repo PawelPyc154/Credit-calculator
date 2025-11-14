@@ -6,7 +6,7 @@
  */
 
 import { db } from '../src/server/db'
-import banksData from '../src/data/banks.json'
+import { banks as banksData } from '../src/data/banks'
 import type { BankOffer } from '../src/types/bank'
 
 async function syncBanks() {

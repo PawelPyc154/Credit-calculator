@@ -55,6 +55,7 @@
     "@tailwindcss/postcss": "^4.1.16",
     "@types/node": "^24.9.2",
     "@types/node-cron": "^3.0.11",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "dotenv": "^17.2.3",

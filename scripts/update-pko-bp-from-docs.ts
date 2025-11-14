@@ -56,7 +56,7 @@ const extractNumber = (text: string, label: string): number | undefined => {
 
 const matchPercentage = (text: string, pattern: RegExp, label: string): number | undefined => {
   const match = text.match(pattern)
-  if (!match) {
+  if (!match || !match[1]) {
     console.warn(`⚠️ Nie znaleziono wartości dla ${label}`)
     return undefined
   }
@@ -104,6 +104,8 @@ const loadRepresentativeExample = async (): Promise<{
   const snippet = text.slice(snippetStart, snippetStart + 1200)
 
   const marginMatches = [...snippet.matchAll(/marża\s*([\d.,]+)%/gi)]
+  const firstMarginValue = marginMatches[0]?.[1]
+  const lastMarginValue = marginMatches[marginMatches.length - 1]?.[1]
 
   const data = {
     rrso: matchPercentage(snippet, /wynosi\s+([\d.,]+)%/i, 'RRSO'),
@@ -114,12 +116,8 @@ const loadRepresentativeExample = async (): Promise<{
       'oprocentowanie zmienne',
     ),
     wibor: matchPercentage(snippet, /WIBOR\s*6M\s*([\d.,]+)%/i, 'WIBOR 6M'),
-    fixedMargin:
-      marginMatches.length > 0 ? extractNumber(marginMatches[0][1], 'marża stała') : undefined,
-    margin:
-      marginMatches.length > 1
-        ? extractNumber(marginMatches[marginMatches.length - 1][1], 'marża zmienna')
-        : undefined,
+    fixedMargin: firstMarginValue ? extractNumber(firstMarginValue, 'marża stała') : undefined,
+    margin: lastMarginValue ? extractNumber(lastMarginValue, 'marża zmienna') : undefined,
     commission: matchPercentage(snippet, /prowizja\s*([\d.,]+)%/i, 'prowizja'),
     calculationDate: parseDate(
       text.match(/Kalkulacja została dokonana na\s+(\d{2}\.\d{2}\.\d{4})/i)?.[1] ?? '',
@@ -175,6 +173,9 @@ async function main(): Promise<void> {
   }
 
   const current = banks[bankIndex]
+  if (!current) {
+    throw new Error(`Nie znaleziono banku o id "${BANK_ID}" w banks.json`)
+  }
 
   const currentMeta = current.meta ?? {}
 
