@@ -359,10 +359,10 @@
     "id": "pko-bp",
     "name": "PKO Bank Polski",
     "logo": "/images/banks/pko-bp.svg",
-    "baseInterestRate": 7.79,
-    "wibor": 5.85,
-    "margin": 1.94,
-    "commissionRate": 2,
+    "baseInterestRate": 6.56,
+    "wibor": 4.53,
+    "margin": 2.03,
+    "commissionRate": 0,
     "insuranceRate": 0.024,
     "minLoanAmount": 50000,
     "maxLoanAmount": 2000000,
@@ -371,7 +371,7 @@
     "minDownPaymentPercent": 10,
     "supportedPurposes": ["purchase", "refinancing", "construction"],
     "supportedInterestRateTypes": ["fixed", "variable"],
-    "fixedInterestRate": 8.09,
+    "fixedInterestRate": 6.36,
     "description": "Najstarszy bank w Polsce z konkurencyjnymi ofertami i najszerszą siecią oddziałów",
     "earlyRepaymentFee": 0,
     "accountRequired": true,
@@ -395,7 +395,17 @@
       "ratio90": 0.3,
       "ratio95": 0.6
     },
-    "updated": "2025-11-01"
+    "updated": "2025-11-12",
+    "meta": {
+      "sources": [
+        "docs/pko-bp/Informacje_ogólne_dotyczące_umowy_o_kredyt_hipoteczny_pożyczkę_hipoteczną_-_PKO_Banku_Polskiego.pdf",
+        "docs/pko-bp/Oprocentowanie_Kredytu_hipotecznego.pdf"
+      ],
+      "representativeRRSO": 7.25,
+      "representativeFixedMargin": 1.83,
+      "representativeExampleDate": "2025-10-10",
+      "representativeSnippet": "RRSO) dla wypłaconego jednorazowo kredytu Własny Kąt hipoteczny w PKO Banku Polskim zabezpieczonego hipoteką wynosi 7,25% przy następujących założeniach: okres obowiązywania umowy: 25 lat; całkowita kwota kredytu (bez kredytowanych kosztów) 375 000 zł; LTV (kwota kredytu do wartości zabezpieczenia) 61,4%; oprocentowanie stałe: 6,36%/rok (do 5. roku z uwzględnieniem obniżenia o 0,2 p.p.), na które składa się 5-letnia stała stopa bazowa 4,53%/rok z 10.10.2025 r. i marża 1,83%; a następnie oprocentowanie zmienne 6,56%/rok (od 6. roku do końca okresu oprocentowania), na które składa się wskaźnik referencyjny WIBOR 6M 4,53%/rok (przy założeniu, że WIBOR 6M odpowiada 5-letniej stałej stopie bazowej) i marża 2,03%; całkowity koszt kredytu 417 374,27 zł, w tym prowizja 0%, odsetki 384 484,52 zł, ubezpieczenie nieruchomości 7 500 zł (za cały okres kredytowania, dla ubezpieczenia oferowanego za pośrednictwem PKO Banku Polskiego), ocena wartości nieruchomości mającej stanowić zabezpieczenie kredytu 400 zł, PCC 19 zł, ROR (Konto za Zero) 0 zł (za cały okres kredytowania; w związku z deklaracją systematycznych wpływów minimum 3 000 zł na ROR), ubezpieczenie na życie 24 970,75 zł (za cały okres "
+    }
   },
   {
     "id": "santander",

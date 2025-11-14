@@ -47,12 +47,16 @@ Prowizja CPS % zostanie naliczona jeśli:
 **URL**: https://tmlead.pl/redirect/869307_2160
 
 ### Informacje o produkcie
+Czas stworzyć własny dom!
+
 Kredyt hipoteczny w Banku Pekao:
 
-- nawet 0% prowizji
-- od 1,79% marży
+- bez prowizji
+- RRSO 7,90%
+- od 1,89% marży
 - do 90% wartości nieruchomości
 - stała lub zmienna stopa procentowa
+- **Oferta obowiązuje do 30.11.2025 r.**
 
 ### Model wynagrodzenia
 
@@ -275,3 +279,197 @@ W kampanii afiliacyjnej VeloBank S.A. nie jest dozwolona współpraca z wydawcam
 
 ### Uwagi techniczne
 ⚠️ W przypadku korzystania z przeglądarce Mozilla, możliwe są problemy ze zliczaniem wniosku. Wysyłka poprzez przeglądarkę Mozilla Firefox na własne ryzyko wydawcy.
+
+---
+
+## Santander Bank Polska - KONTO SANTANDER
+
+### Link afiliacyjny
+**URL**: https://www.comperialead.pl/a/pp.php?link=2a5ea841aa58af0f695a305e07f2bb64&etykieta_=Santander
+
+### Informacje o produkcie
+KONKURS! 100 zł za KAŻDE 2 ROZLICZONE KONTA!!!
+
+OTWÓRZ KONTO SANTANDER pełne możliwości! Ty decydujesz, ile zyskujesz - do 500 zł za aktywność w ciągu 4 miesięcy albo do 960 zł za aktywność w ciągu 12 miesięcy
+
+- 6% na Lokacie dla Ciebie
+- 100 zł w Programie Poleceń
+
+### Model wynagrodzenia
+
+#### Stawki prowizyjne
+
+| Model rozliczenia | Cel      | Stawka        |
+|-------------------|----------|---------------|
+| CPS               | sprzedaż | 240,00 PLN    |
+
+#### Dodatkowe informacje
+- Prowizja naliczana za założone konto i wykonanie TRANSAKCJI KARTĄ lub BLIKIEM W CIĄGU 30 DNI OD DNIA ZAŁOŻENIA KONTA
+- **Okres kampanii**: 2025-06-01 - do odwołania
+
+### Jak otrzymać prowizję
+
+Prowizja CPS zostanie naliczona jeśli:
+
+1. Osoba wejdzie na stronę reklamodawcy po kliknięciu w link pobrany z panelu wydawcy.
+2. Na stronie reklamodawcy założy konto.
+3. Wykona transakcję kartą lub BLIKiem w ciągu 30 dni od dnia założenia konta.
+
+### Uwagi
+⚠️ Prowizja naliczana tylko w przypadku nowego klienta.
+
+⚠️ **NOWY KLIENT** = od 12 miesięcy nie miał żadnej relacji z bankiem: konta osobistego/firmowego/kredytu
+
+⚠️ Z jednego adresu IP może zostać złożony tylko jeden, unikalny wniosek na powyższy produkt. Kolejne wnioski mogą nie zostać zliczone poprawnie.
+
+### Dostępne narzędzia promocyjne
+- Link
+- Baner
+- Widget
+
+---
+
+## Comperia Free - Kredyt hipoteczny
+
+### Link afiliacyjny
+**URL**: https://www.comperialead.pl/a/pp.php?link=f46cb571c2b7a7599789646877ee493f&etykieta_=comperia
+
+### Informacje o produkcie
+profesjonalna pomoc w znalezieniu najlepszego kredytu hipotecznego
+
+- porównanie ofert w wielu instytucjach finansowych
+- bezpłatne dopasowanie oferty do potrzeb klienta
+- krótki formularz kontaktowy
+
+### Model wynagrodzenia
+
+#### Stawki prowizyjne
+
+| Model rozliczenia | Cel      | Stawka     |
+|-------------------|----------|------------|
+| CPL               | lead     | 7,00 PLN   |
+| CPS               | sprzedaż | 0,25%      |
+
+#### Dodatkowe informacje
+- CPL: Prowizja naliczana za prawidłowo wypełniony, dodzwoniony formularz kontaktowy przez klienta, który podczas weryfikacji przez Contact Center wyrazi realne zainteresowanie produktem
+- CPS: Dodatkowa prowizja naliczana w formie procentowej o wysokości udzielonego kredytu
+- **Okres kampanii**: 2016-04-15 - do odwołania
+
+### Jak otrzymać prowizję
+
+Prowizja CPL zostanie naliczona jeśli:
+
+1. Osoba wejdzie na stronę reklamodawcy po kliknięciu w link pobrany z panelu wydawcy.
+2. Wypełni formularz kontaktowy prawidłowymi danymi.
+3. Klient podczas weryfikacji przez Contact Center wyrazi realne zainteresowanie produktem.
+
+Prowizja CPS zostanie naliczona jeśli:
+
+1. Warunki CPL zostały spełnione.
+2. Klient otrzyma i uruchomi kredyt hipoteczny.
+
+### Uwagi
+⚠️ Prowizja naliczana tylko w przypadku nowego klienta.
+
+⚠️ Z jednego adresu IP może zostać złożony tylko jeden, unikalny wniosek na powyższy produkt. Kolejne wnioski mogą nie zostać zliczone poprawnie.
+
+⚠️ Wnioski z negatywną weryfikacją BIK mogą nie zostać zaakceptowane.
+
+⚠️ Oferta dostępna u doradcy.
+
+### Dostępne narzędzia promocyjne
+- Link
+- Mailing
+
+---
+
+## PKO Bank Polski - Własny Kąt Hipoteczny
+
+### Link afiliacyjny
+**URL**: https://www.comperialead.pl/a/pp.php?link=5567e5119098bc8c2451ad8dcf08ac24&etykieta_=pko
+
+### Informacje o produkcie
+- Finansowanie do 90% wartości nieruchomości
+- Oprocentowanie ze stopą zmienną albo stałą przez 5 lat
+- Niższa marża kredytu w zielonej odsłonie
+- 0% prowizji przy skorzystaniu z ubezpieczenia od utraty pracy
+
+### Model wynagrodzenia
+
+#### Stawki prowizyjne
+
+| Model rozliczenia | Cel      | Stawka |
+|-------------------|----------|--------|
+| CPS               | sprzedaż | 0,30%  |
+
+#### Dodatkowe informacje
+- Prowizja naliczana za uruchomiony kredyt hipoteczny
+- **Okres kampanii**: 2020-09-21 - do odwołania
+
+### Jak otrzymać prowizję
+
+Prowizja CPS % zostanie naliczona jeśli:
+
+1. Osoba wejdzie na stronę reklamodawcy po kliknięciu w link pobrany z panelu wydawcy.
+2. Na stronie reklamodawcy wypełni wniosek o kredyt danymi zgodnymi ze stanem faktycznym.
+3. Warunkiem jest zawarcie przez klienta z Bankiem umowy kredytu hipotecznego i jego uruchomienie.
+4. Klient nie odstąpi od umowy kredytu.
+
+### Uwagi
+⚠️ Z jednego adresu IP może zostać złożony tylko jeden, unikalny wniosek na powyższy produkt. Kolejne wnioski mogą nie zostać zliczone poprawnie.
+
+⚠️ **Zakaz wysyłania wniosków w imieniu klienta**.
+
+### Dostępne narzędzia promocyjne
+- Link
+
+---
+
+## VeloBank - Kredyt hipoteczny
+
+### Link afiliacyjny
+**URL**: https://www.comperialead.pl/a/pp.php?link=0abbe63b2af14359fc60644ddbbaf4ce&etykieta_=velo
+
+### Informacje o produkcie
+Twój dom, Twoja wygoda i miejsce na ziemi
+
+- Kredyt hipoteczny z RRSO 7,11%
+- 0% prowizji z kontem z pakietem i ubezpieczeniem VeloBezpieczny
+- 0% prowizji za wcześniejszą spłatę lub nadpłatę kredytu
+- Długi okres kredytowania do 35 lat
+- kredyt do 90% nieruchomości
+- Waluta kredytu - PLN
+
+### Model wynagrodzenia
+
+#### Stawki prowizyjne
+
+| Model rozliczenia | Cel      | Stawka |
+|-------------------|----------|--------|
+| CPS               | sprzedaż | 0,30%  |
+
+#### Dodatkowe informacje
+- Sprzedaż kredytu hipotecznego z wyłączeniem kredytu udzielonego na podstawie oferty wystawionej dla klienta Banku przez bank w okresie 3 miesięcy od daty złożenia wniosku
+- Kredyt musi być uruchomiony i utrzymany w okresie rozliczeniowym
+- **Okres kampanii**: 2023-05-17 - do odwołania
+
+### Jak otrzymać prowizję
+
+Prowizja CPS % zostanie naliczona jeśli:
+
+1. Osoba wejdzie na stronę reklamodawcy po kliknięciu w link pobrany z panelu wydawcy.
+2. Na stronie reklamodawcy wypełni wniosek o kredyt danymi zgodnymi ze stanem faktycznym.
+3. Warunkiem jest zawarcie przez klienta z Bankiem umowy kredytu hipotecznego i jego uruchomienie.
+4. Kredyt musi być uruchomiony i utrzymany w okresie rozliczeniowym.
+5. Klient nie odstąpi od umowy kredytu.
+
+### Uwagi
+⚠️ Prowizja naliczana tylko w przypadku nowego klienta.
+
+⚠️ Z jednego adresu IP może zostać złożony tylko jeden, unikalny wniosek na powyższy produkt. Kolejne wnioski mogą nie zostać zliczone poprawnie.
+
+⚠️ **Zakaz wysyłania wniosków w imieniu klienta**.
+
+### Dostępne narzędzia promocyjne
+- Link
+- Baner
