@@ -1149,6 +1149,7 @@ const ResetButton = tw.button`
   focus:ring-white/50
   focus:ring-offset-2
   focus:ring-offset-transparent
+  cursor-pointer
 `
 
 const SliderToggleButton = tw.button`
@@ -1171,6 +1172,7 @@ const SliderToggleButton = tw.button`
   focus:ring-white/50
   focus:ring-offset-2
   focus:ring-offset-transparent
+  cursor-pointer
 `
 
 const FieldList = tw.div`grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch`
@@ -1227,6 +1229,7 @@ const DecreaseButton = tw.button`
   disabled:cursor-not-allowed
   disabled:hover:scale-100
   shrink-0
+  cursor-pointer
 `
 
 const IncreaseButton = tw.button`
@@ -1243,6 +1246,7 @@ const IncreaseButton = tw.button`
   disabled:cursor-not-allowed
   disabled:hover:scale-100
   shrink-0
+  cursor-pointer
 `
 
 const FieldDescription = tw.p`text-xs text-green-50/80 m-0`
@@ -1314,6 +1318,7 @@ const SliderButton = tw.button`
   disabled:cursor-not-allowed
   disabled:hover:scale-100
   shrink-0
+  cursor-pointer
 `
 
 const SliderLabels = tw.div`flex justify-between text-xs text-green-50/70`
@@ -1395,6 +1400,7 @@ const SubmitButton = tw.button`
   transition-colors duration-200
   focus:outline-none focus:ring-2 focus:ring-white/50
   disabled:opacity-50 disabled:cursor-not-allowed
+  cursor-pointer
 `
 
 const TooltipContent = tw.div`

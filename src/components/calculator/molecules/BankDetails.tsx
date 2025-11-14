@@ -1703,6 +1703,7 @@ const TabButton = tw.button`
   focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
   [&.is-active]:border-slate-500 [&.is-active]:bg-slate-100 [&.is-active]:text-slate-900 [&.is-active]:shadow-inner
   disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:bg-white
+  cursor-pointer
 `
 const NarrationStickyContainer = tw.div`
   pointer-events-none sticky bottom-0 inset-x-0 z-30 mt-4 flex justify-center -mx-4 sm:bottom-4 sm:mx-0
@@ -1743,6 +1744,7 @@ const AccordionHeader = tw.button`
   text-left
   hover:bg-gray-50
   focus:outline-none
+  cursor-pointer
 `
 
 const AccordionTitle = tw.h4`
@@ -2230,6 +2232,7 @@ const ModalButton = tw.button`
   flex items-center gap-2 px-3 py-1.5 text-xs font-medium
   text-gray-700 bg-gray-100 rounded border border-gray-300
   hover:bg-gray-200 transition-colors
+  cursor-pointer
 `
 
 const PaymentChartContainer = tw.div`
@@ -2257,6 +2260,7 @@ const ModalTitle = tw.h3`
 
 const ModalCloseButton = tw.button`
   p-1 text-gray-400 hover:text-gray-600 transition-colors
+  cursor-pointer
 `
 
 const ModalBody = tw.div`

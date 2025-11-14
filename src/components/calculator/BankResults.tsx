@@ -462,6 +462,7 @@ const DetailsButton = tw.button`
   hover:shadow-md
   active:scale-[0.99]
   focus:outline-none focus:ring-2 focus:ring-gray-300/50
+  cursor-pointer
 `
 
 const DetailsButtonText = tw.span`text-sm`

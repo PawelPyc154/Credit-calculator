@@ -126,5 +126,6 @@ const DotButton = tw.button`
   h-2.5 w-2.5 rounded-full border border-white/40 transition
   data-[active='true']:scale-125 data-[active='true']:border-white data-[active='true']:bg-white
   hover:border-white hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60
+  cursor-pointer
 `
 const ControlButton = tw(Button)`absolute! top-1/2! -translate-y-1/2! shadow-lg! shadow-slate-900/20!`

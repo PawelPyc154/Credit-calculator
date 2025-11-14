@@ -197,6 +197,7 @@ const EditButton = tw.button`
   hover:scale-105
   active:scale-95
   shrink-0
+  cursor-pointer
 `
 
 const EditIcon = tw.span`

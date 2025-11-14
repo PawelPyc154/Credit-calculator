@@ -198,7 +198,7 @@ const BannerButtons = tw.div`
   sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-2 md:w-auto
 `
 
-const sharedButtonClasses = `inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-none sm:w-auto`
+const sharedButtonClasses = `inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition focus-visible:outline-none sm:w-auto cursor-pointer`
 const SettingsButton = tw.button`${sharedButtonClasses} border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2`
 const RejectButton = tw.button`${sharedButtonClasses} border border-transparent bg-slate-100 text-slate-700 hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2`
 const AcceptButton = tw.button`${sharedButtonClasses} bg-linear-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2`
@@ -208,7 +208,7 @@ const Overlay = tw.div`fixed inset-0 z-50 bg-black/50 flex items-center justify-
 const SettingsModal = tw.div`bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col`
 const ModalHeader = tw.div`flex items-center justify-between p-6 border-b border-gray-200`
 const ModalTitle = tw.h2`text-2xl font-bold text-gray-900`
-const CloseButton = tw.button`text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center`
+const CloseButton = tw.button`text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center cursor-pointer`
 const ModalContent = tw.div`p-6 overflow-y-auto flex-1`
 const ModalDescription = tw.p`text-gray-600 mb-6 leading-relaxed`
 
@@ -239,11 +239,13 @@ const SecondaryButton = tw.button`
   inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-5 py-2.5
   text-sm font-medium text-slate-700 transition hover:bg-slate-50
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2
+  cursor-pointer
 `
 const PrimaryButton = tw.button`
   inline-flex items-center justify-center rounded-lg bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5
   text-sm font-semibold text-white transition hover:from-emerald-500 hover:to-emerald-400
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2
+  cursor-pointer
 `
 
 const ModalLinks = tw.div`flex items-center justify-center gap-2 text-sm text-gray-500 pt-4`

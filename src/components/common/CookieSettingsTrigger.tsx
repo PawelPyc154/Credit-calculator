@@ -9,6 +9,7 @@ const TriggerButton = tw.button`
   inline-flex items-center gap-1 text-sm text-gray-500 transition-colors
   hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2
   focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white
+  cursor-pointer
 `
 
 export const CookieSettingsTrigger = forwardRef<HTMLButtonElement, CookieSettingsTriggerProps>(

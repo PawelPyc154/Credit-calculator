@@ -48,4 +48,4 @@ const PostText = tw.p`truncate`
 const NoPostText = tw.p``
 const StyledForm = tw.form`flex flex-col gap-2`
 const StyledInput = tw.input`w-full rounded-full bg-white/10 px-4 py-2 text-white`
-const StyledButton = tw.button`rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20`
+const StyledButton = tw.button`rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20 cursor-pointer`

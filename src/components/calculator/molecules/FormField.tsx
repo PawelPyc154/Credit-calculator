@@ -195,6 +195,7 @@ const SliderButton = tw.button`
   disabled:cursor-not-allowed
   disabled:hover:scale-100
   shrink-0
+  cursor-pointer
 `
 
 const SliderLabels = tw.div`flex justify-between text-xs text-gray-500`

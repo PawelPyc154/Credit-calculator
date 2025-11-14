@@ -228,6 +228,7 @@ const SliderButtonColumn = tw.div`flex items-center pt-1`
 const SliderToggleButton = tw.button`
   flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-400 shadow-sm transition
   hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40
+  cursor-pointer
 `
 const SliderMain = tw.div`flex min-w-0 flex-1 flex-col gap-1.5`
 const SliderTrack = tw.div`w-full min-w-0 flex items-center`
@@ -237,7 +238,7 @@ const WordSlider = tw.input`
 const SliderLegend = tw.div`mt-1 flex items-center gap-1 text-[11px] text-white/60`
 const SliderLegendItem = tw.button`
   flex min-w-0 basis-0 items-center justify-center rounded-lg border border-white/5 bg-white/5 px-3 py-1 text-center text-white/70 transition overflow-hidden
-  cursor-default
+  cursor-pointer
   [&.is-active]:border-sky-300/40 [&.is-active]:bg-sky-500/10 [&.is-active]:text-white
   [&.is-complete]:border-emerald-300/40 [&.is-complete]:bg-emerald-500/10 [&.is-complete]:text-emerald-100
 `

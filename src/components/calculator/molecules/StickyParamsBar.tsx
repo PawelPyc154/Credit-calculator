@@ -49,6 +49,6 @@ const ParamChip = tw.div`flex items-center gap-1 md:gap-2 bg-blue-50 px-2 py-1 m
 const ParamLabel = tw.span`text-xs md:text-xs text-gray-600 font-medium hidden md:inline`
 const ParamValue = tw.span`text-xs md:text-sm font-bold text-blue-600`
 const ParamDivider = tw.span`text-gray-400 hidden md:inline`
-const EditButton = tw.button`flex items-center gap-1 md:gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors whitespace-nowrap shrink-0`
+const EditButton = tw.button`flex items-center gap-1 md:gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer`
 const EditIcon = tw.span`text-sm md:text-base`
 const EditButtonText = tw.span`hidden sm:inline`

@@ -63,4 +63,5 @@ const CtaButton = tw.button`
   transition-colors
   hover:border-gray-400
   focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300
+  cursor-pointer
 `

@@ -109,6 +109,7 @@ const StepTitle = tw.h4`text-base font-semibold text-white`
 const StepDescription = tw.p`max-w-3xl text-xs text-slate-200/80`
 const StepTrigger = tw.button`
   text-xs font-semibold text-sky-300 underline-offset-2 transition hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/60
+  cursor-pointer
 `
 const ItemsGrid = tw.div`grid gap-3 sm:grid-cols-2 lg:grid-cols-3`
 
