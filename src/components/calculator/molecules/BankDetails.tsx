@@ -1086,7 +1086,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
             PARAMETRY OFERTY
           </DetailsSectionSubtitle>
           <ParametersGrid>
-            {formData?.interestRateType === 'variable' && (
+            {formData?.interestRateType === 'variable' && bank.wibor !== undefined && bank.wibor !== null && (
               <ParameterCard>
                 <ParameterLabel>
                   WIBOR
@@ -1123,7 +1123,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                   </Tooltip>
                 </ParameterLabel>
                 <ParameterValue className="text-blue-600">
-                  {formatPercent(bank.wibor ?? 0)}
+                  {formatPercent(bank.wibor)}
                 </ParameterValue>
               </ParameterCard>
             )}
@@ -1168,7 +1168,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                 </ParameterValue>
               </ParameterCard>
             )}
-            {formData?.interestRateType === 'variable' && (
+            {formData?.interestRateType === 'variable' && bank.margin !== undefined && bank.margin !== null && (
               <ParameterCard>
                 <ParameterLabel>
                   Marża banku
@@ -1204,7 +1204,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
                   </Tooltip>
                 </ParameterLabel>
                 <ParameterValue className="text-indigo-600">
-                  {formatPercent(bank.margin ?? 0)}
+                  {formatPercent(bank.margin)}
                 </ParameterValue>
               </ParameterCard>
             )}
