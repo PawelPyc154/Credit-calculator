@@ -18,6 +18,7 @@ export const bankOfferSchema = z.object({
   id: z.string(),
   name: z.string(),
   logo: z.string().optional(),
+  productName: z.string().optional(), // Nazwa produktu kredytowego
   baseInterestRate: z.number(), // Bazowe oprocentowanie (WIBOR + marża)
   wibor: z.number().optional(), // Aktualna wartość WIBOR (jeśli kredyt zmiennoprocentowy)
   margin: z.number().optional(), // Marża banku
@@ -52,6 +53,9 @@ export const bankOfferSchema = z.object({
     .optional(),
   updated: z.string().optional(), // Data ostatniej aktualizacji danych
   affiliate: affiliateSchema.optional(), // Informacje o programie afiliacyjnym
+  rrso: z.number().optional(), // Rzeczywista Roczna Stopa Oprocentowania (ogólna lub dla zmiennego)
+  rrsoFixed: z.number().optional(), // RRSO dla oprocentowania stałego
+  rrsoVariable: z.number().optional(), // RRSO dla oprocentowania zmiennego
 })
 
 export type BankOffer = z.infer<typeof bankOfferSchema>

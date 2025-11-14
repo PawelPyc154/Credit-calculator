@@ -1,15 +1,11 @@
 /**
- * Draft dataset for bank offers.
+ * Główny plik z danymi banków dla kalkulatora kredytów hipotecznych.
  *
- * The runtime of the application nadal korzysta z `banks.json`.
- * Ten plik jest roboczym szkicem w TypeScripcie, w którym można:
- *  - dodawać komentarze do poszczególnych pól,
- *  - dokumentować źródła,
- *  - weryfikować dane przed przeniesieniem ich z powrotem do `banks.json`.
- *
- * Wszystkie pola zostały wyczyszczone – należy je uzupełniać dopiero po
- * potwierdzeniu wartości w oficjalnych dokumentach lub innych zaufanych źródłach.
+ * Ten plik zawiera wszystkie dane o ofertach banków w formacie BankOffer.
+ * Kalkulator pobiera dane bezpośrednio z tego pliku.
  */
+
+import type { BankOffer } from '../types/bank'
 
 type SupportedPurpose = 'purchase' | 'refinancing' | 'construction'
 type InterestRateType = 'fixed' | 'variable'
@@ -34,6 +30,8 @@ export interface DraftCreditProduct {
 
   /** Link do oficjalnej strony produktu/wniosku. */
   offerUrl?: Nullable<string>
+  /** Link afiliacyjny do programu partnerskiego (jeśli dostępny). */
+  affiliateUrl?: Nullable<string>
 
   // --- Parametry cenowe i stopy procentowe ---
 
@@ -194,7 +192,7 @@ export interface DraftBank {
 }
 
 /**
- * Lista wszystkich banków obecnych dotąd w `banks.json`.
+ * Lista wszystkich banków w systemie.
  * Każdy wpis ma puste pola – należy je wypełniać ręcznie, stopniowo,
  * dodając komentarze i źródła w `notes` lub `fieldSources`.
  */
@@ -942,6 +940,7 @@ export const draftCreditProducts: DraftCreditProduct[] = [
     creditName: 'Mieszkaniowy kredyt hipoteczny',
     offerUrl:
       'https://www.pekao.com.pl/klient-indywidualny/wlasne-mieszkanie-lub-dom/kredyt-hipoteczny.html#',
+    affiliateUrl: 'https://tmlead.pl/redirect/869307_2160',
     baseInterestRate: 7.24,
     fixedInterestRate: 6.29,
     wibor: 5.35,
@@ -1936,7 +1935,7 @@ export const draftCreditProducts: DraftCreditProduct[] = [
     creditName: 'Kredyt hipoteczny na nieruchomość energooszczędną',
     offerUrl:
       'https://www.mbank.pl/indywidualny/kredyty/kredyty-hipoteczne/na-nieruchomosc-energooszczedna/',
-    baseInterestRate: null, // Oprocentowanie zmienne = WIBOR + marża (1,65% dla LTV <=80%, 2,10% dla LTV >=80%). Z rankomat.pl: 6,99% (wartość może się różnić)
+    baseInterestRate: 6.99, // Oprocentowanie zmienne = WIBOR + marża (1,65% dla LTV <=80%, 2,10% dla LTV >=80%). Z rankomat.pl: 6,99% (wartość może się różnić)
     fixedInterestRate: 5.93,
     wibor: null, // Wskaźnik referencyjny: WIBOR 1M, WIBOR 3M, WIBOR 6M lub EURIBOR (w zależności od umowy). Z rankomat.pl: 0% (wartość może się różnić)
     margin: 1.65, // Z rankomat.pl: 6,99% (wartość może się różnić, w dokumentach banku: 1,65% dla LTV <=80%, 2,10% dla LTV >=80%)
@@ -2196,6 +2195,8 @@ export const draftCreditProducts: DraftCreditProduct[] = [
     bankId: 'pko-bp',
     creditName: 'Własny Kąt Hipoteczny',
     offerUrl: 'https://www.pkobp.pl/klienci-indywidualni/kredyty-hipoteczne/wlasny-kat-hipoteczny/',
+    affiliateUrl:
+      'https://www.comperialead.pl/a/pp.php?link=5567e5119098bc8c2451ad8dcf08ac24&etykieta_=pko',
     baseInterestRate: 6.56,
     fixedInterestRate: 6.36,
     wibor: 4.53,
@@ -2690,6 +2691,8 @@ export const draftCreditProducts: DraftCreditProduct[] = [
     bankId: 'velobank',
     creditName: 'Kredyt hipoteczny VeloDom',
     offerUrl: 'https://polecam.velobank.pl/lp/main/hipo_kredyt_hipoteczny_velodom_form/',
+    affiliateUrl:
+      'https://www.comperialead.pl/a/pp.php?link=0abbe63b2af14359fc60644ddbbaf4ce&etykieta_=velo',
     baseInterestRate: 7.23, // Oprocentowanie zmienne po 5 latach (WIRON 1M Stopa Składana + marża)
     fixedInterestRate: 6.34, // Oprocentowanie okresowo stałe przez pierwsze 5 lat (6,30-6,34% w różnych źródłach)
     wibor: null, // Wskaźnik referencyjny: WIRON 1M Stopa Składana (nie WIBOR), wartość zmienna
@@ -2919,3 +2922,106 @@ export const draftCreditProducts: DraftCreditProduct[] = [
     ],
   },
 ]
+
+/**
+ * Konwertuje DraftBank do BankOffer dla kalkulatora.
+ * Funkcja łączy dane z draftBanks i draftCreditProducts.
+ */
+function convertDraftToBankOffer(
+  draftBank: DraftBank,
+  creditProducts: DraftCreditProduct[],
+): BankOffer | null {
+  // Znajdź pierwszy produkt kredytowy dla tego banku
+  const product = creditProducts.find((p) => p.bankId === draftBank.id)
+  if (!product) return null
+
+  // Konwertuj ltvAdjustments do ltv
+  const ltv = product.ltvAdjustments
+    ? {
+        ratio80: product.ltvAdjustments.ratio80 ?? undefined,
+        ratio90: product.ltvAdjustments.ratio90 ?? undefined,
+        ratio95: product.ltvAdjustments.ratio95 ?? undefined,
+      }
+    : undefined
+
+  // Konwertuj affiliate
+  const affiliate = product.affiliateUrl
+    ? {
+        enabled: true,
+        url: product.affiliateUrl,
+        campaignId: undefined,
+        commission: undefined,
+        cookiesTime: undefined,
+        restrictions: undefined,
+        notes: undefined,
+      }
+    : undefined
+
+  // Oblicz baseInterestRate jeśli nie jest podane, ale mamy wibor i margin
+  let baseInterestRate = product.baseInterestRate ?? null
+  if (
+    baseInterestRate === null &&
+    product.wibor !== null &&
+    product.wibor !== undefined &&
+    product.margin !== null &&
+    product.margin !== undefined
+  ) {
+    baseInterestRate = product.wibor + product.margin
+  }
+  // Jeśli nadal null, użyj wartości z przykładu reprezentatywnego lub domyślnej
+  if (baseInterestRate === null) {
+    baseInterestRate =
+      product.representativeExampleVariable?.interestRate ??
+      product.representativeExampleFixed?.interestRate ??
+      0
+  }
+
+  return {
+    id: draftBank.id,
+    name: draftBank.name,
+    logo: draftBank.logo ?? undefined,
+    productName: product.creditName ?? undefined,
+    baseInterestRate,
+    wibor: product.wibor ?? undefined,
+    margin: product.margin ?? undefined,
+    commissionRate: product.commissionRate ?? 0,
+    insuranceRate: product.insuranceRate ?? 0,
+    minLoanAmount: product.minLoanAmount ?? 0,
+    maxLoanAmount: product.maxLoanAmount ?? 0,
+    minLoanPeriod: product.minLoanPeriod ?? 0,
+    maxLoanPeriod: product.maxLoanPeriod ?? 0,
+    minDownPaymentPercent: product.minDownPaymentPercent ?? 0,
+    supportedPurposes: (product.supportedPurposes ?? []) as Array<
+      'purchase' | 'refinancing' | 'construction'
+    >,
+    supportedInterestRateTypes: (product.supportedInterestRateTypes ?? ['variable']) as Array<
+      'fixed' | 'variable'
+    >,
+    fixedInterestRate: product.fixedInterestRate ?? undefined,
+    description: product.description ?? undefined,
+    earlyRepaymentFee: product.earlyRepaymentFee ?? undefined,
+    accountRequired: product.accountRequired ?? undefined,
+    accountFee: product.accountFee ?? undefined,
+    propertyInsuranceRequired: product.propertyInsuranceRequired ?? undefined,
+    lifeInsuranceRequired: product.lifeInsuranceRequired ?? undefined,
+    processingTime: product.processingTime ?? undefined,
+    specialOffers: product.specialOffers ?? undefined,
+    advantages: product.advantages ?? undefined,
+    disadvantages: product.disadvantages ?? undefined,
+    ltv,
+    updated: product.updated ?? undefined,
+    affiliate,
+    // RRSO z produktu lub z przykładu reprezentatywnego
+    rrso: product.rrso ?? undefined,
+    rrsoFixed: product.representativeExampleFixed?.rrso ?? undefined,
+    rrsoVariable: product.representativeExampleVariable?.rrso ?? undefined,
+  }
+}
+
+/**
+ * Eksport danych banków w formacie BankOffer dla kalkulatora.
+ * Dane są generowane z draftBanks i draftCreditProducts.
+ */
+export const banks: BankOffer[] = draftBanks
+  .map((bank) => convertDraftToBankOffer(bank, draftCreditProducts))
+  .filter((bank): bank is BankOffer => bank !== null)

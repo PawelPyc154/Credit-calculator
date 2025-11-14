@@ -75,6 +75,9 @@ export const BankCardHeader = ({ result, index, isTopThree }: BankCardHeaderProp
         <ContentHeader>
           <BankNameWrapper>
             <BankName>{result.bankName}</BankName>
+            {result.bank?.productName && (
+              <ProductName>{result.bank.productName}</ProductName>
+            )}
             {isTopThree && (
               <TopBadge
                 className={clsx(
@@ -186,6 +189,11 @@ const BankNameWrapper = tw.div`flex flex-col gap-2`
 
 const BankName = tw.h3`
   text-xl md:text-2xl font-bold text-gray-900
+  leading-tight
+`
+
+const ProductName = tw.p`
+  text-sm md:text-base font-medium text-gray-600
   leading-tight
 `
 

@@ -145,10 +145,20 @@ export function calculateBankOffers(
   // Oblicz wyniki dla każdego banku
   const results: CalculationResult[] = eligibleBanks.map((bank) => {
     // Wybierz odpowiednie oprocentowanie w zależności od typu
-    const interestRate =
+    let interestRate =
       formData.interestRateType === 'fixed' && bank.fixedInterestRate
         ? bank.fixedInterestRate
         : bank.baseInterestRate
+
+    // Jeśli baseInterestRate jest null/undefined, spróbuj obliczyć z wibor + margin
+    if (interestRate === null || interestRate === undefined) {
+      if (bank.wibor !== undefined && bank.margin !== undefined) {
+        interestRate = bank.wibor + bank.margin
+      } else {
+        // Fallback: użyj fixedInterestRate jeśli dostępne, w przeciwnym razie 0
+        interestRate = bank.fixedInterestRate ?? 0
+      }
+    }
 
     const monthlyPayment = calculateMonthlyPayment(loanAmount, interestRate, loanPeriod)
 
@@ -159,7 +169,17 @@ export function calculateBankOffers(
 
     const totalCost = calculateTotalCost(monthlyPayment, loanPeriod, commission, insurance)
 
-    const rrso = calculateRRSO(loanAmount, totalCost, loanPeriod)
+    // Użyj RRSO z produktu jeśli jest dostępne, w przeciwnym razie oblicz
+    let rrso: number
+    if (formData.interestRateType === 'fixed' && bank.rrsoFixed !== undefined) {
+      rrso = bank.rrsoFixed
+    } else if (formData.interestRateType === 'variable' && bank.rrsoVariable !== undefined) {
+      rrso = bank.rrsoVariable
+    } else if (bank.rrso !== undefined) {
+      rrso = bank.rrso
+    } else {
+      rrso = calculateRRSO(loanAmount, totalCost, loanPeriod)
+    }
 
     return {
       bankId: bank.id,

@@ -119,7 +119,12 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
                           size="md"
                         />
                       </LogoWrapper>
-                      <OfferName>{offer.bankName}</OfferName>
+                      <OfferNameWrapper>
+                        <OfferName>{offer.bankName}</OfferName>
+                        {offer.bank?.productName ? (
+                          <ProductName>{offer.bank.productName}</ProductName>
+                        ) : null}
+                      </OfferNameWrapper>
                     </OfferLead>
                   </OfferHeader>
 
@@ -351,7 +356,11 @@ const LogoWrapper = tw.div`
   [&>div>img]:p-0
 `
 
+const OfferNameWrapper = tw.div`flex flex-col gap-1`
+
 const OfferName = tw.span`font-semibold text-lg text-gray-900 truncate`
+
+const ProductName = tw.span`text-sm font-medium text-gray-600 truncate`
 
 const OfferRankNumber = tw.span`
   text-sm font-medium text-gray-400

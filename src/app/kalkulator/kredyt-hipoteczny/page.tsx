@@ -7,14 +7,12 @@ import { FooterMain } from 'components/calculator/FooterMain'
 import { NavigationTabs } from 'components/calculator/NavigationTabs'
 import { StickySummaryBar } from 'components/calculator/StickySummaryBar'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { api } from 'trpc/react'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
-import { parseBankOffers } from 'types/bank'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { trackCalculation, trackTimeOnPage } from 'utils/analytics'
 import { calculateBankOffers } from 'utils/calculator'
-import banksData from '../../../data/banks.json'
+import { banks } from '../../../data/banks'
 
 const defaultFormData: CalculatorFormData = {
   loanAmount: 500000,
@@ -26,27 +24,8 @@ const defaultFormData: CalculatorFormData = {
 }
 
 export default function HipotecznyCalculatorPage() {
-  const {
-    data: banksFromDb,
-    isLoading,
-    error,
-  } = api.bank.getAll.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  })
-
-  const banks = useMemo(() => {
-    if (banksFromDb && banksFromDb.length > 0) {
-      return banksFromDb
-    }
-
-    try {
-      return parseBankOffers(banksData)
-    } catch (error) {
-      console.error('Błąd podczas ładowania ofert banków:', error)
-      return [] as BankOffer[]
-    }
-  }, [banksFromDb])
+  // Dane banków są teraz pobierane bezpośrednio z pliku banks.ts
+  const banksData: BankOffer[] = banks
 
   const [results, setResults] = useState<CalculationResult[]>([])
   const [formData, setFormData] = useState<CalculatorFormData>(defaultFormData)
@@ -64,7 +43,7 @@ export default function HipotecznyCalculatorPage() {
   const handleCalculate = useCallback(
     (formData: CalculatorFormData) => {
       try {
-        const calculatedResults = calculateBankOffers(formData, banks)
+        const calculatedResults = calculateBankOffers(formData, banksData)
         setResults(calculatedResults)
         setFormData(formData)
 
@@ -81,7 +60,7 @@ export default function HipotecznyCalculatorPage() {
         console.error('Błąd podczas kalkulacji:', error)
       }
     },
-    [banks],
+    [banksData],
   )
 
   useEffect(() => {
