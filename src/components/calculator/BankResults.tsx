@@ -3,11 +3,7 @@
 import clsx from 'clsx'
 import { BankLogo } from 'components/common/BankLogo'
 import { useState } from 'react'
-import {
-  HiOutlineCurrencyDollar,
-  HiOutlineCalculator,
-  HiOutlineChartBar,
-} from 'react-icons/hi'
+import { HiOutlineCalculator, HiOutlineChartBar, HiOutlineCurrencyDollar } from 'react-icons/hi'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { trackAffiliateClick, trackBankDetailsExpand, trackViewModeChange } from 'utils/analytics'

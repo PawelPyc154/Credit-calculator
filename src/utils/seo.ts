@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
-export function generateStructuredDataLoanCalculator(params: {
+export function generateStructuredDataLoanCalculator(_params: {
   loanAmount: number
   loanPeriod: number
   downPayment: number
@@ -143,4 +143,3 @@ export function generateCalculatorMetadata(): Metadata {
     },
   }
 }
-

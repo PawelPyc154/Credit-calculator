@@ -1,9 +1,9 @@
-import { HipotecznyCalculatorClient } from './HipotecznyCalculatorClient'
-import { calculateBankOffers } from 'utils/calculator'
-import { banks } from '../../../data/banks'
-import type { CalculatorFormData } from 'types/calculator'
-import { generateCalculatorMetadata, generateStructuredDataLoanCalculator } from 'utils/seo'
 import type { Metadata } from 'next'
+import type { CalculatorFormData } from 'types/calculator'
+import { calculateBankOffers } from 'utils/calculator'
+import { generateCalculatorMetadata, generateStructuredDataLoanCalculator } from 'utils/seo'
+import { banks } from '../../../data/banks'
+import { HipotecznyCalculatorClient } from './HipotecznyCalculatorClient'
 
 export const metadata: Metadata = generateCalculatorMetadata()
 
@@ -19,12 +19,12 @@ const defaultFormData: CalculatorFormData = {
 
 /**
  * Server Component - oblicza wyniki na serwerze z domyślnymi wartościami
- * 
+ *
  * WAŻNE DLA SEO:
  * - Wyniki są obliczane na serwerze i renderowane w HTML od razu
  * - Google widzi pełne dane (listę banków) zamiast komunikatu "Brak wyników"
  * - To poprawia indeksowanie i ranking w wyszukiwarkach
- * 
+ *
  * Dzięki temu:
  * - Strona ma pełną treść już w pierwszym renderze (SSR)
  * - Użytkownicy widzą wyniki natychmiast, bez czekania na JavaScript

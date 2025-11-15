@@ -140,7 +140,7 @@ export const CalculatorForm = ({
     // Jeśli nie jest widoczny, użyj stałej wartości zależnej od rozmiaru ekranu
     let stickyBarHeight = 0
     const isMobile = window.innerWidth < 640 // sm breakpoint
-    
+
     if (stickyBar) {
       const style = window.getComputedStyle(stickyBar)
       if (style.display !== 'none' && style.visibility !== 'hidden') {
