@@ -1,21 +1,13 @@
 import 'styles/globals.css'
 
 import { AnalyticsTracker } from 'components/common/AnalyticsTracker'
+import { LazyCookieBanner } from 'components/common/LazyCookieBanner'
 import type { Metadata } from 'next'
-import dynamic from 'next/dynamic'
 import { Geist } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
 
 import { TRPCReactProvider } from 'trpc/react'
-
-// Lazy load CookieBanner - nie blokuje pierwszego renderu
-const LazyCookieBanner = dynamic(
-  () => import('components/common/CookieBanner').then((mod) => ({ default: mod.CookieBanner })),
-  {
-    ssr: false, // Nie renderuj na serwerze - tylko po załadowaniu klienta
-  },
-)
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
