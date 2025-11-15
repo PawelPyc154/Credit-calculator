@@ -28,6 +28,16 @@ import { Tooltip } from 'components/common/tooltip'
 import { useNarrationSpeech } from 'hooks/useNarrationSpeech'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Chart } from 'react-chartjs-2'
+import {
+  HiOutlineCurrencyDollar,
+  HiOutlineChartBar,
+  HiOutlineCalculator,
+  HiOutlineCash,
+  HiOutlineTag,
+  HiOutlineClock,
+  HiOutlineDocument,
+  HiOutlineShieldCheck,
+} from 'react-icons/hi'
 import tw from 'tw-tailwind'
 import type { BankOffer } from 'types/bank'
 import type { CalculatorFormData } from 'types/calculator'
@@ -876,34 +886,344 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     )
   }
 
+  // Najważniejsze metryki - do wyświetlenia w dużych kartach
+  const keyMetrics = [
+    {
+      label: 'Miesięczna rata',
+      value: formatCurrencyNoCents(result.monthlyPayment),
+      icon: HiOutlineCurrencyDollar,
+      key: 'monthlyPayment',
+      highlight: true,
+      tooltip: (
+        <div className="space-y-2">
+          <p className="font-semibold">Kwota do zapłaty co miesiąc</p>
+          <p className="text-sm">
+            To jest kwota, którą będziesz płacić bankowi każdego miesiąca przez cały okres kredytowania.
+          </p>
+          <p className="text-sm">
+            <strong>Ważne:</strong> Upewnij się, że rata nie przekracza 30-40% Twojego miesięcznego dochodu,
+            aby zachować płynność finansową.
+          </p>
+          <p className="text-sm text-gray-600">
+            Rata może się zmieniać przy kredytach ze zmiennym oprocentowaniem, jeśli zmienią się stopy
+            procentowe.
+          </p>
+        </div>
+      ),
+    },
+    {
+      label: 'Całkowity koszt',
+      value: formatCurrencyNoCents(result.totalCost),
+      icon: HiOutlineCalculator,
+      key: 'totalCost',
+      highlight: true,
+      tooltip: (
+        <div className="space-y-2">
+          <p className="font-semibold">Łączny koszt kredytu</p>
+          <p className="text-sm">
+            To jest suma wszystkich kosztów związanych z kredytem: kwota kredytu + odsetki + prowizja +
+            ubezpieczenia.
+          </p>
+          <p className="text-sm">
+            <strong>Różnica między kwotą kredytu a całkowitym kosztem:</strong>{' '}
+            {formatCurrencyNoCents(result.totalCost - (result.loanAmount ?? formData?.loanAmount ?? 0))}
+          </p>
+          <p className="text-sm text-gray-600">
+            To są dodatkowe koszty, które zapłacisz oprócz pożyczonej kwoty. Im niższy całkowity koszt,
+            tym lepsza oferta.
+          </p>
+        </div>
+      ),
+    },
+    {
+      label: 'RRSO',
+      value: formatPercent(result.rrso),
+      icon: HiOutlineChartBar,
+      key: 'apr',
+      highlight: true,
+      tooltip: (
+        <div className="space-y-2">
+          <p className="font-semibold">Rzeczywista Roczna Stopa Oprocentowania</p>
+          <p className="text-sm">
+            RRSO to wskaźnik, który pokazuje prawdziwy koszt kredytu. Uwzględnia oprocentowanie, prowizję
+            i wszystkie opłaty.
+          </p>
+          <p className="text-sm">
+            <strong>Dlaczego RRSO jest ważne?</strong> Pozwala porównać oferty różnych banków na
+            porównywalnych zasadach. Im niższe RRSO, tym tańszy kredyt.
+          </p>
+          <p className="text-sm text-gray-600">
+            RRSO jest wyższe niż oprocentowanie nominalne, bo uwzględnia wszystkie koszty dodatkowe.
+            To najlepszy wskaźnik do porównywania ofert.
+          </p>
+        </div>
+      ),
+    },
+  ]
+
+  // Pozostałe dane - do wyświetlenia w mniejszych boksach
+  // Uporządkowane logicznie: podstawowe parametry -> okres -> koszty
+  const detailOrder = ['loanAmount', 'interestRate', 'loanPeriod', 'raty', 'totalInterest', 'commission', 'insurance']
+  
+  // Tooltips dla szczegółów
+  const getDetailTooltip = (key: string, value: string, label: string) => {
+    switch (key) {
+      case 'loanAmount':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Kwota kredytu</p>
+            <p className="text-sm">
+              To jest kwota, którą pożyczasz od banku. Razem z wkładem własnym stanowi wartość nieruchomości,
+              którą chcesz kupić.
+            </p>
+            <p className="text-sm">
+              <strong>Warto wiedzieć:</strong> Im wyższy wkład własny, tym niższa kwota kredytu i niższe
+              koszty odsetek.
+            </p>
+          </div>
+        )
+      case 'interestRate':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Oprocentowanie nominalne</p>
+            <p className="text-sm">
+              To jest podstawowa stopa procentowa kredytu, która składa się z marży banku i stawki referencyjnej
+              (np. WIBOR).
+            </p>
+            <p className="text-sm">
+              <strong>Różnica między oprocentowaniem nominalnym a RRSO:</strong> Oprocentowanie nominalne nie
+              uwzględnia prowizji i innych opłat, dlatego RRSO jest wyższe i lepiej odzwierciedla rzeczywisty
+              koszt kredytu.
+            </p>
+            <p className="text-sm text-gray-600">
+              Przy kredytach ze zmiennym oprocentowaniem stawka może się zmieniać w zależności od zmian stóp
+              procentowych.
+            </p>
+          </div>
+        )
+      case 'loanPeriod':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Okres kredytowania</p>
+            <p className="text-sm">
+              To jest czas, w którym będziesz spłacać kredyt. Standardowo kredyty hipoteczne są udzielane na
+              25-30 lat.
+            </p>
+            <p className="text-sm">
+              <strong>Wpływ na ratę:</strong> Im dłuższy okres, tym niższa miesięczna rata, ale wyższy
+              całkowity koszt kredytu (więcej odsetek).
+            </p>
+            <p className="text-sm text-gray-600">
+              Możesz skrócić okres kredytowania, co zwiększy ratę, ale zmniejszy całkowity koszt.
+            </p>
+          </div>
+        )
+      case 'raty':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Liczba rat</p>
+            <p className="text-sm">
+              To jest łączna liczba miesięcznych rat, które będziesz płacić przez cały okres kredytowania.
+            </p>
+            <p className="text-sm">
+              <strong>Przykład:</strong> Przy okresie kredytowania 25 lat będziesz płacić 300 rat (25 × 12).
+            </p>
+            <p className="text-sm text-gray-600">
+              Każda rata składa się z części kapitałowej (spłata pożyczonej kwoty) i części odsetkowej
+              (koszt kredytu).
+            </p>
+          </div>
+        )
+      case 'totalInterest':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Suma odsetek</p>
+            <p className="text-sm">
+              To jest łączna kwota odsetek, którą zapłacisz przez cały okres kredytowania. To są koszty
+              związane z pożyczeniem pieniędzy.
+            </p>
+            <p className="text-sm">
+              <strong>Jak zmniejszyć odsetki:</strong> Wybierz krótszy okres kredytowania, wyższy wkład
+              własny lub kredyt z niższym oprocentowaniem.
+            </p>
+            <p className="text-sm text-gray-600">
+              Odsetki stanowią znaczną część całkowitego kosztu kredytu, dlatego warto porównać oferty
+              pod kątem oprocentowania.
+            </p>
+          </div>
+        )
+      case 'commission':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Prowizja za udzielenie kredytu</p>
+            <p className="text-sm">
+              To jest jednorazowa opłata, którą bank pobiera przy udzieleniu kredytu. Może być wyrażona jako
+              procent kwoty kredytu lub stała kwota.
+            </p>
+            <p className="text-sm">
+              <strong>Dobra wiadomość:</strong> Wiele banków oferuje 0% prowizji, szczególnie przy spełnieniu
+              określonych warunków (np. konto w banku, ubezpieczenie).
+            </p>
+            <p className="text-sm text-gray-600">
+              Prowizja jest uwzględniana w RRSO, więc nawet jeśli wynosi 0%, warto sprawdzić inne koszty
+              ukryte w RRSO.
+            </p>
+          </div>
+        )
+      case 'insurance':
+        return (
+          <div className="space-y-2">
+            <p className="font-semibold">Ubezpieczenie kredytu</p>
+            <p className="text-sm">
+              To są koszty ubezpieczenia, które bank może wymagać. Najczęściej jest to ubezpieczenie na życie
+              lub ubezpieczenie pomostowe.
+            </p>
+            <p className="text-sm">
+              <strong>Warto wiedzieć:</strong> Niektóre banki wymagają ubezpieczenia, inne oferują je jako
+              opcję. Koszty mogą się różnić w zależności od wieku i stanu zdrowia.
+            </p>
+            <p className="text-sm text-gray-600">
+              Ubezpieczenie chroni Cię i Twoją rodzinę przed koniecznością spłaty kredytu w przypadku
+              nieprzewidzianych zdarzeń losowych.
+            </p>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+  
+  const otherDetails = detailsData
+    .filter((item) => !keyMetrics.some((km) => km.key === item.key))
+    .sort((a, b) => {
+      const indexA = detailOrder.indexOf(a.key)
+      const indexB = detailOrder.indexOf(b.key)
+      // Jeśli klucz nie jest w liście kolejności, umieść na końcu
+      if (indexA === -1) return 1
+      if (indexB === -1) return -1
+      return indexA - indexB
+    })
+    .map((item) => {
+      // Przypisz ikony do różnych typów danych
+      let icon = HiOutlineDocument
+      if (item.key === 'loanAmount') icon = HiOutlineCash
+      else if (item.key === 'interestRate') icon = HiOutlineTag
+      else if (item.key === 'totalInterest') icon = HiOutlineCurrencyDollar
+      else if (item.key === 'commission' || item.key === 'insurance') icon = HiOutlineShieldCheck
+      else if (item.key === 'raty' || item.key === 'loanPeriod') icon = HiOutlineClock
+
+      const tooltip = getDetailTooltip(item.key, item.value, item.label)
+
+      return { ...item, icon, tooltip }
+    })
+
   return (
     <DetailsSection ref={detailsRef}>
       {tabsHeader}
-      {/* Prosta tabela z podstawowymi informacjami */}
-      <SimpleInfoTable>
-        {detailsData.map((item, index) => (
-          <SimpleInfoRow
-            key={item.key}
-            className={clsx(index === 0 && 'border-blue-200 border-b-2 bg-blue-50')}
-          >
-            <SimpleInfoLabel className={clsx(index === 0 && 'text-blue-700')} data-narration-key={item.key}>
-              {item.label}
-            </SimpleInfoLabel>
-            <SimpleInfoValue
-              className={clsx(index === 0 && 'text-blue-600', item.highlight && 'font-bold')}
-              data-narration-key={item.key}
-            >
-              {item.value}
-            </SimpleInfoValue>
-          </SimpleInfoRow>
-        ))}
-      </SimpleInfoTable>
 
-      {/* Harmonogram spłat - wykres w sekcji wyżej */}
+      {/* Najważniejsze informacje - duże karty */}
+      <KeyMetricsSection>
+        <KeyMetricsTitle>Najważniejsze informacje</KeyMetricsTitle>
+        <KeyMetricsGrid>
+          {keyMetrics.map((metric) => {
+            const IconComponent = metric.icon
+            return (
+              <KeyMetricCard key={metric.key} className={clsx(metric.highlight && 'highlight')}>
+                <KeyMetricIcon className={clsx(metric.highlight && 'highlight-icon')}>
+                  <IconComponent size={24} />
+                </KeyMetricIcon>
+              <KeyMetricContent>
+                <KeyMetricLabelRow>
+                  <KeyMetricLabel data-narration-key={metric.key}>{metric.label}</KeyMetricLabel>
+                  <Tooltip content={metric.tooltip}>
+                    <KeyMetricInfoIcon
+                      type="button"
+                      aria-label="Informacja"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <title>Informacja</title>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                    </KeyMetricInfoIcon>
+                  </Tooltip>
+                </KeyMetricLabelRow>
+                <KeyMetricValue
+                  data-narration-key={metric.key}
+                  className={clsx(metric.highlight && 'highlight')}
+                >
+                  {metric.value}
+                </KeyMetricValue>
+              </KeyMetricContent>
+            </KeyMetricCard>
+            )
+          })}
+        </KeyMetricsGrid>
+      </KeyMetricsSection>
+
+      {/* Szczegóły - pozostałe informacje w mniejszych boksach */}
+      <DetailsSectionTitle>Szczegóły oferty</DetailsSectionTitle>
+      <DetailsGrid>
+        {otherDetails.map((item, index) => {
+          const IconComponent = item.icon
+          const isLast = index === otherDetails.length - 1
+          return (
+            <DetailCard key={item.key} className={isLast ? 'sm:col-span-2' : ''}>
+              <DetailIcon>
+                <IconComponent size={20} />
+              </DetailIcon>
+              <DetailContent>
+                <DetailLabelRow>
+                  <DetailLabel data-narration-key={item.key}>{item.label}</DetailLabel>
+                  {item.tooltip && (
+                    <Tooltip content={item.tooltip}>
+                      <DetailInfoIcon
+                        type="button"
+                        aria-label="Informacja"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <title>Informacja</title>
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 16v-4" />
+                          <path d="M12 8h.01" />
+                        </svg>
+                      </DetailInfoIcon>
+                    </Tooltip>
+                  )}
+                </DetailLabelRow>
+                <DetailValue data-narration-key={item.key}>{item.value}</DetailValue>
+              </DetailContent>
+            </DetailCard>
+          )
+        })}
+      </DetailsGrid>
+
+      {/* Harmonogram spłat - wykres */}
       {chartData && paymentSchedule && paymentSchedule.schedule.length > 0 && (
-        <PaymentChartCard>
-          <PaymentChartHeader>
-            <PaymentChartTitle>Harmonogram spłat</PaymentChartTitle>
+        <>
+          <PaymentChartSectionHeader>
+            <DetailsSectionTitle className="mb-0 mt-0">Harmonogram spłat</DetailsSectionTitle>
             <ModalButton onClick={openModal}>
               <svg
                 className="h-4 w-4"
@@ -921,8 +1241,9 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
               </svg>
               Pokaż tabelę
             </ModalButton>
-          </PaymentChartHeader>
-          <PaymentChartContainer>
+          </PaymentChartSectionHeader>
+          <PaymentChartCard>
+            <PaymentChartContainer>
             <Chart
               type="bar"
               data={{
@@ -983,9 +1304,12 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
               }}
               options={chartOptions}
             />
-          </PaymentChartContainer>
-        </PaymentChartCard>
+            </PaymentChartContainer>
+          </PaymentChartCard>
+        </>
       )}
+
+      {/* Parametry oferty - zawsze widoczne */}
 
       {/* Modal z tabelą harmonogramu */}
       {isModalOpen && paymentSchedule && (
@@ -1207,44 +1531,6 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
             )}
             <ParameterCard>
               <ParameterLabel>
-                Czas rozpatrzenia
-                <Tooltip
-                  content={
-                    <span>
-                      Szacowany czas, w jakim bank rozpatrzy Twój wniosek kredytowy.{' '}
-                      <strong>Im krótszy, tym szybciej otrzymasz decyzję.</strong>
-                    </span>
-                  }
-                >
-                  <ParameterTooltipIcon
-                    type="button"
-                    aria-label="Informacja"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <title>Informacja</title>
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 16v-4" />
-                      <path d="M12 8h.01" />
-                    </svg>
-                  </ParameterTooltipIcon>
-                </Tooltip>
-              </ParameterLabel>
-              <ParameterValue className="text-purple-600">
-                {bank.processingTime ?? 'Brak danych'}
-              </ParameterValue>
-            </ParameterCard>
-            <ParameterCard>
-              <ParameterLabel>
                 Wcześniejsza spłata
                 <Tooltip
                   content={
@@ -1362,6 +1648,44 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
               <ParameterValue className="text-gray-600! text-xs">
                 {formatCurrencyNoCents(bank.minLoanAmount)} -{' '}
                 {formatCurrencyNoCents(bank.maxLoanAmount)}
+              </ParameterValue>
+            </ParameterCard>
+            <ParameterCard className="sm:col-span-2">
+              <ParameterLabel>
+                Czas rozpatrzenia
+                <Tooltip
+                  content={
+                    <span>
+                      Szacowany czas, w jakim bank rozpatrzy Twój wniosek kredytowy.{' '}
+                      <strong>Im krótszy, tym szybciej otrzymasz decyzję.</strong>
+                    </span>
+                  }
+                >
+                  <ParameterTooltipIcon
+                    type="button"
+                    aria-label="Informacja"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <title>Informacja</title>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                  </ParameterTooltipIcon>
+                </Tooltip>
+              </ParameterLabel>
+              <ParameterValue className="text-purple-600">
+                {bank.processingTime ?? 'Brak danych'}
               </ParameterValue>
             </ParameterCard>
           </ParametersGrid>
@@ -1657,7 +1981,118 @@ const DetailsSection = tw.div`
   bg-white
 `
 
-// Simple info table
+// Key metrics section - najważniejsze informacje
+const KeyMetricsSection = tw.div`
+  mb-6
+`
+
+const KeyMetricsTitle = tw.h3`
+  text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 mt-6
+`
+
+const KeyMetricsGrid = tw.div`
+  grid grid-cols-1 md:grid-cols-3 gap-4
+`
+
+const KeyMetricCard = tw.div`
+  bg-white rounded-xl border-2 border-gray-200 p-4
+  transition-all duration-200
+  hover:shadow-lg hover:-translate-y-0.5
+  [&.highlight]:border-emerald-300 [&.highlight]:bg-gradient-to-br [&.highlight]:from-emerald-50 [&.highlight]:to-green-50
+  [&.highlight]:shadow-md
+  flex items-start gap-3
+`
+
+const KeyMetricIcon = tw.div`
+  w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600
+  transition-colors duration-200 shrink-0
+  [&.highlight-icon]:bg-emerald-100 [&.highlight-icon]:text-emerald-600
+`
+
+const KeyMetricContent = tw.div`
+  flex flex-col gap-1 flex-1 min-w-0
+`
+
+const KeyMetricLabelRow = tw.div`
+  flex items-center gap-1.5
+`
+
+const KeyMetricLabel = tw.div`
+  text-xs font-semibold text-gray-600 uppercase tracking-wide
+`
+
+const KeyMetricInfoIcon = tw.button`
+  inline-flex items-center justify-center
+  w-5 h-5
+  rounded-full
+  text-gray-400
+  hover:text-gray-600
+  hover:bg-gray-100
+  transition-all duration-200
+  cursor-help
+  focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1
+  shrink-0
+`
+
+const KeyMetricValue = tw.div`
+  text-2xl font-bold text-gray-900
+  [&.highlight]:text-emerald-700
+`
+
+const DetailsSectionTitle = tw.h3`
+  text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 mt-6
+`
+
+const PaymentChartSectionHeader = tw.div`
+  flex items-center justify-between mb-4 mt-6
+`
+
+const DetailsGrid = tw.div`
+  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3
+`
+
+const DetailCard = tw.div`
+  bg-white rounded-lg border border-gray-200 p-3
+  flex items-start gap-2.5
+  transition-all duration-200
+  hover:shadow-md hover:-translate-y-0.5 hover:border-gray-300
+`
+
+const DetailIcon = tw.div`
+  w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600
+  shrink-0
+  transition-colors duration-200
+`
+
+const DetailContent = tw.div`
+  flex flex-col gap-0.5 flex-1 min-w-0
+`
+
+const DetailLabelRow = tw.div`
+  flex items-center gap-1
+`
+
+const DetailLabel = tw.div`
+  text-xs text-gray-600 font-medium
+`
+
+const DetailInfoIcon = tw.button`
+  inline-flex items-center justify-center
+  w-4 h-4
+  rounded-full
+  text-gray-400
+  hover:text-gray-600
+  hover:bg-gray-100
+  transition-all duration-200
+  cursor-help
+  focus:outline-none focus:ring-1 focus:ring-gray-300 focus:ring-offset-1
+  shrink-0
+`
+
+const DetailValue = tw.div`
+  text-base font-bold text-gray-900
+`
+
 const SimpleInfoTable = tw.div`
   w-full border border-gray-200 rounded-lg bg-white
   divide-y divide-gray-200
@@ -1680,6 +2115,8 @@ const SimpleInfoRow = tw.div`
   grid grid-cols-[auto_1fr] items-center
   py-3 px-4 sm:px-6
   gap-x-3
+  transition-colors duration-150
+  hover:bg-gray-50
 `
 
 const SimpleInfoLabel = tw.div`
@@ -1827,7 +2264,7 @@ const SectionDivider = tw.div`
 
 // Subsection titles
 const DetailsSectionSubtitle = tw.h4`
-  mb-3 flex items-center gap-2
+  mb-3 mt-6 flex items-center gap-2
   text-xs font-semibold text-gray-700 uppercase tracking-wide
 `
 
@@ -1876,6 +2313,10 @@ const ParameterValue = tw.span`
 
 const ParameterSubvalue = tw.span`
   ml-1.5 text-xs text-gray-500 font-normal
+`
+
+const ParameterDescription = tw.p`
+  text-xs text-gray-600 mt-2 leading-relaxed
 `
 
 // Special offers
@@ -2225,15 +2666,9 @@ const PaymentChartsWrapper = tw.div`
 `
 
 const PaymentChartCard = tw.div`
-  bg-white rounded border border-gray-200 p-3 mb-6
-`
-
-const PaymentChartHeader = tw.div`
-  flex items-center justify-between mb-3
-`
-
-const PaymentChartTitle = tw.h5`
-  font-medium text-xs text-gray-700
+  bg-white rounded-lg border border-gray-200 p-4
+  transition-all duration-200
+  hover:shadow-md hover:-translate-y-0.5 hover:border-gray-300
 `
 
 const ModalButton = tw.button`

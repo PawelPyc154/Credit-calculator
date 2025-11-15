@@ -3,6 +3,11 @@
 import clsx from 'clsx'
 import { BankLogo } from 'components/common/BankLogo'
 import { useState } from 'react'
+import {
+  HiOutlineCurrencyDollar,
+  HiOutlineCalculator,
+  HiOutlineChartBar,
+} from 'react-icons/hi'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
@@ -185,42 +190,46 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
                       </OfferHeader>
 
                       <OfferMetrics>
-                        <MetricItem className="text-left sm:text-left lg:text-left">
-                          <MetricLabel>
-                            RRSO
-                            {formData.interestRateType && (
-                              <InterestRateTypeBadge>
-                                {formData.interestRateType === 'fixed' ? 'Stałe' : 'Zmienne'}
-                              </InterestRateTypeBadge>
-                            )}
-                          </MetricLabel>
-                          <MetricValue>{formatPercent(offer.rrso)}</MetricValue>
-                        </MetricItem>
-                        <MetricItem className="text-left sm:text-center lg:text-left">
-                          <MetricLabel>Całkowity koszt</MetricLabel>
-                          <MetricValue>{formatCurrencyNoCents(offer.totalCost)}</MetricValue>
-                        </MetricItem>
-                        <MetricItemHighlight
-                          className={clsx(
-                            'text-left sm:text-right lg:text-left',
-                            isTopThree && index === 0 && 'highlight-best',
-                            isTopThree && index === 1 && 'highlight-second',
-                            isTopThree && index === 2 && 'highlight-third',
-                          )}
-                        >
-                          <MetricLabelHighlight
-                            className={clsx(
-                              isTopThree && index === 0 && 'label-best',
-                              isTopThree && index === 1 && 'label-second',
-                              isTopThree && index === 2 && 'label-third',
-                            )}
-                          >
-                            Miesięczna rata
-                          </MetricLabelHighlight>
-                          <MetricValueHighlight>
-                            {formatCurrencyNoCents(offer.monthlyPayment)}
-                          </MetricValueHighlight>
-                        </MetricItemHighlight>
+                        <OfferMetricCard className="highlight">
+                          <OfferMetricIcon className="highlight-icon">
+                            <HiOutlineCurrencyDollar size={20} />
+                          </OfferMetricIcon>
+                          <OfferMetricContent>
+                            <OfferMetricLabel>Miesięczna rata</OfferMetricLabel>
+                            <OfferMetricValue className="highlight">
+                              {formatCurrencyNoCents(offer.monthlyPayment)}
+                            </OfferMetricValue>
+                          </OfferMetricContent>
+                        </OfferMetricCard>
+                        <OfferMetricCard className="highlight">
+                          <OfferMetricIcon className="highlight-icon">
+                            <HiOutlineCalculator size={20} />
+                          </OfferMetricIcon>
+                          <OfferMetricContent>
+                            <OfferMetricLabel>Całkowity koszt</OfferMetricLabel>
+                            <OfferMetricValue className="highlight">
+                              {formatCurrencyNoCents(offer.totalCost)}
+                            </OfferMetricValue>
+                          </OfferMetricContent>
+                        </OfferMetricCard>
+                        <OfferMetricCard className="highlight">
+                          <OfferMetricIcon className="highlight-icon">
+                            <HiOutlineChartBar size={20} />
+                          </OfferMetricIcon>
+                          <OfferMetricContent>
+                            <OfferMetricLabel>
+                              RRSO
+                              {formData.interestRateType && (
+                                <InterestRateTypeBadge>
+                                  {formData.interestRateType === 'fixed' ? 'Stałe' : 'Zmienne'}
+                                </InterestRateTypeBadge>
+                              )}
+                            </OfferMetricLabel>
+                            <OfferMetricValue className="highlight">
+                              {formatPercent(offer.rrso)}
+                            </OfferMetricValue>
+                          </OfferMetricContent>
+                        </OfferMetricCard>
                       </OfferMetrics>
                     </OfferContentWrapper>
 
@@ -458,7 +467,11 @@ const OfferNameWrapper = tw.div`flex flex-col gap-1`
 
 const OfferName = tw.span`font-semibold text-lg text-gray-900 truncate`
 
-const ProductName = tw.span`text-sm font-medium text-gray-600 truncate`
+const ProductName = tw.span`
+  text-sm font-medium text-gray-600
+  break-words
+  line-clamp-2
+`
 
 const OfferRankNumber = tw.span`
   text-sm font-medium text-gray-400
@@ -466,9 +479,37 @@ const OfferRankNumber = tw.span`
 `
 
 const OfferMetrics = tw.div`
-  flex flex-col sm:flex-row gap-4
+  grid grid-cols-1 sm:grid-cols-3 gap-3
   w-full
-  items-stretch
+`
+
+const OfferMetricCard = tw.div`
+  bg-white rounded-lg border border-gray-200 p-3
+  flex items-start gap-2.5
+  transition-all duration-200
+  hover:shadow-md hover:-translate-y-0.5 hover:border-gray-300
+  [&.highlight]:border-emerald-300 [&.highlight]:bg-gradient-to-br [&.highlight]:from-emerald-50 [&.highlight]:to-green-50
+  [&.highlight]:shadow-md
+`
+
+const OfferMetricIcon = tw.div`
+  w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600
+  shrink-0
+  transition-colors duration-200
+  [&.highlight-icon]:bg-emerald-100 [&.highlight-icon]:text-emerald-600
+`
+
+const OfferMetricContent = tw.div`
+  flex flex-col gap-0.5 flex-1 min-w-0
+`
+
+const OfferMetricLabel = tw.span`
+  text-xs text-gray-600 font-medium
+`
+
+const OfferMetricValue = tw.span`
+  text-base font-bold text-gray-900
+  [&.highlight]:text-emerald-700
 `
 
 const MetricItem = tw.div`
