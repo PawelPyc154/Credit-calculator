@@ -237,7 +237,9 @@ const WordSlider = tw.input`
 `
 const SliderLegend = tw.div`mt-1 flex items-center gap-1 text-[11px] text-white/60`
 const SliderLegendItem = tw.button`
-  flex min-w-0 basis-0 items-center justify-center rounded-lg border border-white/5 bg-white/5 px-3 py-1 text-center text-white/70 transition overflow-hidden
+  flex min-w-0 basis-0 items-center justify-center rounded-lg border border-white/5 bg-white/5 px-1 py-1 text-center text-white/70 transition overflow-hidden
+  sm:px-2
+  md:px-3
   cursor-pointer
   [&.is-active]:border-sky-300/40 [&.is-active]:bg-sky-500/10 [&.is-active]:text-white
   [&.is-complete]:border-emerald-300/40 [&.is-complete]:bg-emerald-500/10 [&.is-complete]:text-emerald-100
