@@ -538,13 +538,13 @@ export const createNarrationSections = (
 
   // Jeśli mamy analizę, zaczynamy od szybkiego podsumowania i porównania
   const sections: NarrationSection[] = []
-  
+
   if (offer.analysis && offer.monthlyIncome) {
     const analysis = offer.analysis
-    
+
     // Sekcja 0: Szybkie podsumowanie i porównanie (na początku!)
     let quickSummaryScript = `Oferta ${offer.bankName}. `
-    
+
     if (analysis.comparison.isTopOffer) {
       quickSummaryScript += `To jedna z najlepszych ofert spośród ${analysis.comparison.totalOffers} dostępnych. `
     } else if (analysis.comparison.rank <= 3) {
@@ -552,7 +552,7 @@ export const createNarrationSections = (
     } else {
       quickSummaryScript += `Ta oferta zajmuje ${analysis.comparison.rank}. miejsce na ${analysis.comparison.totalOffers} dostępnych ofert. `
     }
-    
+
     const affordabilityLevelText = {
       excellent: 'doskonała',
       good: 'dobra',
@@ -560,18 +560,18 @@ export const createNarrationSections = (
       risky: 'ryzykowna',
       critical: 'krytyczna',
     }[analysis.affordability.affordabilityLevel]
-    
+
     quickSummaryScript += `Miesięczna rata wynosi ${formatCurrencyNoCents(offer.monthlyPayment)}, co oznacza ${affordabilityLevelText} zdolność kredytową. `
-    
+
     const matchLevelText = {
       excellent: 'bardzo dobrze',
       good: 'dobrze',
       moderate: 'umiarkowanie',
       poor: 'słabo',
     }[analysis.overall.matchLevel]
-    
+
     quickSummaryScript += `Oferta pasuje ${matchLevelText} do Twojej sytuacji finansowej.`
-    
+
     sections.push({
       id: 'quickSummary',
       title: 'Szybkie podsumowanie',
