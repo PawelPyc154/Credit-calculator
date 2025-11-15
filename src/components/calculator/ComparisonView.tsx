@@ -2,11 +2,17 @@
 
 import clsx from 'clsx'
 import { BankLogo } from 'components/common/BankLogo'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import tw from 'tw-tailwind'
 import type { CalculationResult } from 'types/calculator'
 import { trackAffiliateClick } from 'utils/analytics'
 import { formatCurrencyNoCents, formatPercent } from 'utils/calculator'
+
+type SortDirection = 'asc' | 'desc' | null
+type SortConfig = {
+  key: string
+  direction: SortDirection
+}
 
 type ComparisonViewProps = {
   offers: CalculationResult[]
@@ -17,6 +23,8 @@ type ComparisonViewProps = {
 }
 
 export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProps) => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null })
+
   // Blokuj scroll strony gdy modal jest otwarty i obsługa ESC
   useEffect(() => {
     if (onClose) {
@@ -36,6 +44,77 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
       }
     }
   }, [onClose])
+
+  // Sortowanie ofert
+  const sortedOffers = useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction) {
+      return offers
+    }
+
+    const getSortValue = (offer: CalculationResult, key: string): number | string => {
+      switch (key) {
+        case 'monthlyPayment':
+          return offer.monthlyPayment
+        case 'totalCost':
+          return offer.totalCost
+        case 'rrso':
+          return offer.rrso
+        case 'interestRate':
+          return offer.interestRate
+        case 'totalInterest':
+          return offer.totalInterest
+        case 'commission':
+          return offer.commission
+        case 'insurance':
+          return offer.insurance
+        case 'bank':
+          return offer.bankName.toLowerCase()
+        case 'margin':
+          return offer.bank?.margin ?? 0
+        case 'minDownPaymentPercent':
+          return offer.bank?.minDownPaymentPercent ?? 0
+        case 'earlyRepaymentFee':
+          return offer.bank?.earlyRepaymentFee ?? 0
+        default:
+          return ''
+      }
+    }
+
+    const sorted = [...offers].sort((a, b) => {
+      const aValue = getSortValue(a, sortConfig.key)
+      const bValue = getSortValue(b, sortConfig.key)
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
+      }
+
+      const aStr = String(aValue).toLowerCase()
+      const bStr = String(bValue).toLowerCase()
+
+      if (sortConfig.direction === 'asc') {
+        return aStr.localeCompare(bStr)
+      }
+      return bStr.localeCompare(aStr)
+    })
+
+    return sorted
+  }, [offers, sortConfig])
+
+  const handleSort = (key: string) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        // Przełącz kierunek sortowania
+        if (prev.direction === 'asc') {
+          return { key, direction: 'desc' }
+        }
+        if (prev.direction === 'desc') {
+          return { key: '', direction: null }
+        }
+      }
+      return { key, direction: 'asc' }
+    })
+  }
+
   if (offers.length === 0) {
     return (
       <EmptyComparisonState>
@@ -62,6 +141,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Logo',
       key: 'logo',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => (
         <BankLogo
           src={offer.bankLogo ?? '/images/banks/placeholder.png'}
@@ -75,6 +155,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Bank',
       key: 'bank',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate font-semibold text-gray-900 text-xs leading-tight">
@@ -91,6 +172,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Miesięczna rata',
       key: 'monthlyPayment',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="font-bold text-gray-900 text-sm sm:text-base">
           {formatCurrencyNoCents(offer.monthlyPayment)}
@@ -101,6 +183,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Całkowity koszt',
       key: 'totalCost',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="font-semibold text-gray-900">
           {formatCurrencyNoCents(offer.totalCost)}
@@ -111,6 +194,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'RRSO',
       key: 'rrso',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="font-medium text-gray-900">{formatPercent(offer.rrso)}</span>
       ),
@@ -118,6 +202,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Oprocentowanie',
       key: 'interestRate',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="font-medium text-gray-900">{formatPercent(offer.interestRate)}</span>
       ),
@@ -125,6 +210,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Całkowite odsetki',
       key: 'totalInterest',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">{formatCurrencyNoCents(offer.totalInterest)}</span>
       ),
@@ -132,6 +218,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Prowizja banku',
       key: 'commission',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">{formatCurrencyNoCents(offer.commission)}</span>
       ),
@@ -139,6 +226,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Ubezpieczenia',
       key: 'insurance',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">{formatCurrencyNoCents(offer.insurance)}</span>
       ),
@@ -146,6 +234,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Marża banku',
       key: 'margin',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">
           {offer.bank?.margin !== undefined && offer.bank?.margin !== null
@@ -156,7 +245,8 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     },
     {
       label: 'Min. wkład własny',
-      key: 'minDownPayment',
+      key: 'minDownPaymentPercent',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">
           {offer.bank?.minDownPaymentPercent !== undefined
@@ -168,6 +258,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Opłata za wcześniejszą spłatę',
       key: 'earlyRepaymentFee',
+      sortable: true,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">
           {offer.bank?.earlyRepaymentFee !== undefined && offer.bank?.earlyRepaymentFee !== null
@@ -181,6 +272,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Wymagane konto',
       key: 'accountRequired',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => (
         <div className="flex flex-col gap-0.5">
           <span className="text-gray-700 text-xs leading-tight">
@@ -204,6 +296,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Czas rozpatrzenia',
       key: 'processingTime',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => (
         <span className="text-gray-700">{offer.bank?.processingTime || '-'}</span>
       ),
@@ -211,6 +304,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Parametry oferty',
       key: 'parameters',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => {
         const bank = offer.bank
         if (!bank) return <span className="text-gray-500">-</span>
@@ -255,6 +349,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Specjalne oferty',
       key: 'specialOffers',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => {
         const offers = offer.bank?.specialOffers
         if (!offers || offers.length === 0) {
@@ -275,6 +370,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Zalety',
       key: 'advantages',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => {
         const advantages = offer.bank?.advantages
         if (!advantages || advantages.length === 0) {
@@ -295,6 +391,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Wady',
       key: 'disadvantages',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => {
         const disadvantages = offer.bank?.disadvantages
         if (!disadvantages || disadvantages.length === 0) {
@@ -315,6 +412,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Wpływ wkładu własnego (LTV)',
       key: 'ltv',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => {
         const ltv = offer.bank?.ltv
         if (!ltv || (!ltv.ratio80 && !ltv.ratio90 && !ltv.ratio95)) {
@@ -344,6 +442,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
     {
       label: 'Wniosek',
       key: 'affiliate',
+      sortable: false,
       render: (offer: CalculationResult, _index: number) => {
         const hasAffiliate = offer.bank?.affiliate?.enabled && offer.bank?.affiliate?.url
         if (!hasAffiliate) {
@@ -413,15 +512,57 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
                     field.key === 'logo' && 'sticky-header',
                     field.key === 'affiliate' &&
                       'md:sticky md:right-0 md:z-10 md:bg-gray-50 md:shadow-[-2px_0_4px_rgba(0,0,0,0.05)]',
+                    field.sortable && 'sortable-header',
                   )}
+                  onClick={() => field.sortable && handleSort(field.key)}
                 >
-                  {field.label}
+                  <div className="flex items-center gap-1.5">
+                    <span>{field.label}</span>
+                    {field.sortable && (
+                      <div className="flex flex-col">
+                        <svg
+                          className={clsx(
+                            'h-3 w-3 transition-colors',
+                            sortConfig.key === field.key && sortConfig.direction === 'asc'
+                              ? 'text-gray-900'
+                              : 'text-gray-400',
+                          )}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <svg
+                          className={clsx(
+                            '-mt-1.5 h-3 w-3 transition-colors',
+                            sortConfig.key === field.key && sortConfig.direction === 'desc'
+                              ? 'text-gray-900'
+                              : 'text-gray-400',
+                          )}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                 </TableHeader>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {offers.map((offer, offerIndex) => (
+            {sortedOffers.map((offer, offerIndex) => (
               <TableRow key={offer.bankId}>
                 {comparisonFields.map((field) => (
                   <TableCell
@@ -518,6 +659,7 @@ const TableHeader = tw.th`
   border-b border-gray-200 px-2 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 whitespace-nowrap sm:px-3
   [&.highlight]:bg-emerald-50
   [&.sticky-header]:sticky [&.sticky-header]:left-0 [&.sticky-header]:z-10 [&.sticky-header]:bg-gray-50 [&.sticky-header]:shadow-[2px_0_4px_rgba(0,0,0,0.05)]
+  [&.sortable-header]:cursor-pointer [&.sortable-header]:select-none [&.sortable-header]:hover:bg-gray-100 [&.sortable-header]:transition-colors
 `
 
 const TableBody = tw.tbody`
