@@ -106,6 +106,44 @@ function calculateScore(
 }
 
 /**
+ * Oblicza LTV (Loan-to-Value) - stosunek kwoty kredytu do wartości nieruchomości
+ */
+function calculateLTV(loanAmount: number, downPayment: number): number {
+  const propertyValue = loanAmount + downPayment
+  if (propertyValue === 0) return 0
+  return (loanAmount / propertyValue) * 100
+}
+
+/**
+ * Oblicza korektę oprocentowania na podstawie LTV
+ * Zwraca dodatkową marżę w punktach procentowych, którą należy dodać do oprocentowania
+ * 
+ * Logika progów:
+ * - LTV >= 95% → użyj ratio95 (jeśli dostępne)
+ * - LTV >= 90% (ale < 95%) → użyj ratio90 (jeśli dostępne)
+ * - LTV >= 80% (ale < 90%) → użyj ratio80 (jeśli dostępne)
+ * - LTV < 80% → brak korekty
+ */
+function getLTVAdjustment(ltv: number, bank: BankOffer): number {
+  if (!bank.ltv) return 0
+
+  // Sprawdź próg LTV i zwróć odpowiednią korektę
+  // Korekty są w punktach procentowych (np. 0.30 = +0.30 p.p.)
+  // Sprawdzamy od najwyższego progu w dół
+  if (ltv >= 95 && bank.ltv.ratio95 !== undefined) {
+    return bank.ltv.ratio95
+  }
+  if (ltv >= 90 && bank.ltv.ratio90 !== undefined) {
+    return bank.ltv.ratio90
+  }
+  if (ltv >= 80 && bank.ltv.ratio80 !== undefined) {
+    return bank.ltv.ratio80
+  }
+
+  return 0
+}
+
+/**
  * Sprawdza czy bank spełnia wymagania kredytowe
  */
 function isBankEligible(bank: BankOffer, formData: CalculatorFormData): boolean {
@@ -137,7 +175,10 @@ export function calculateBankOffers(
   formData: CalculatorFormData,
   banks: BankOffer[],
 ): CalculationResult[] {
-  const { loanAmount, loanPeriod } = formData
+  const { loanAmount, loanPeriod, downPayment } = formData
+
+  // Oblicz LTV dla wszystkich banków (używamy tego samego LTV dla wszystkich)
+  const ltv = calculateLTV(loanAmount, downPayment)
 
   // Filtruj banki, które spełniają wymagania
   const eligibleBanks = banks.filter((bank) => isBankEligible(bank, formData))
@@ -159,6 +200,10 @@ export function calculateBankOffers(
         interestRate = bank.fixedInterestRate ?? 0
       }
     }
+
+    // Uwzględnij korektę LTV (dodaj dodatkową marżę w zależności od poziomu wkładu własnego)
+    const ltvAdjustment = getLTVAdjustment(ltv, bank)
+    interestRate = interestRate + ltvAdjustment
 
     const monthlyPayment = calculateMonthlyPayment(loanAmount, interestRate, loanPeriod)
 
