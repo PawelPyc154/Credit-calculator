@@ -9,48 +9,138 @@ export const FooterMain = () => {
 
   return (
     <FooterSection>
-      <FooterContent>
-        <Brand>Kalkulator Kredytowy</Brand>
-        <InfoLine>Orientacyjne wyliczenia na podstawie podanych parametrów.</InfoLine>
-        <Links>
-          <FooterLink href="/regulamin">Regulamin</FooterLink>
-          <Separator>•</Separator>
-          <FooterLink href="/polityka-prywatnosci">Polityka prywatności</FooterLink>
-          <Separator>•</Separator>
-          <CookieSettingsTrigger>Preferencje cookies</CookieSettingsTrigger>
-          <Separator>•</Separator>
-          <FooterLink href="/blog/zagrozenia-kredytowe">Zagrożenia kredytowe</FooterLink>
-          <Separator>•</Separator>
-          <FooterLink href="/kontakt">Kontakt</FooterLink>
-        </Links>
-        <Copyright>© {currentYear} Kalkulator Kredytowy</Copyright>
-      </FooterContent>
+      <FooterContainer>
+        <FooterTop>
+          <BrandSection>
+            <Brand>Kalkulator Kredytowy</Brand>
+            <BrandDescription>
+              Porównaj oferty kredytów hipotecznych i znajdź najlepszą dla siebie
+            </BrandDescription>
+          </BrandSection>
+
+          <LinksSection>
+            <LinksGroup>
+              <LinksTitle>Nawigacja</LinksTitle>
+              <LinksList>
+                <LinkItem>
+                  <FooterLink href="/kalkulator/kredyt-hipoteczny">Kalkulator</FooterLink>
+                </LinkItem>
+                <LinkItem>
+                  <FooterLink href="/blog">Blog</FooterLink>
+                </LinkItem>
+                <LinkItem>
+                  <FooterLink href="/kontakt">Kontakt</FooterLink>
+                </LinkItem>
+              </LinksList>
+            </LinksGroup>
+
+            <LinksGroup>
+              <LinksTitle>Informacje</LinksTitle>
+              <LinksList>
+                <LinkItem>
+                  <FooterLink href="/regulamin">Regulamin</FooterLink>
+                </LinkItem>
+                <LinkItem>
+                  <FooterLink href="/polityka-prywatnosci">Polityka prywatności</FooterLink>
+                </LinkItem>
+                <LinkItem>
+                  <CookieSettingsTrigger className="text-sm text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                    Preferencje cookies
+                  </CookieSettingsTrigger>
+                </LinkItem>
+              </LinksList>
+            </LinksGroup>
+          </LinksSection>
+        </FooterTop>
+
+        <FooterBottom>
+          <InfoLine>Orientacyjne wyliczenia na podstawie podanych parametrów.</InfoLine>
+          <Copyright>© {currentYear} Kalkulator Kredytowy. Wszelkie prawa zastrzeżone.</Copyright>
+        </FooterBottom>
+      </FooterContainer>
     </FooterSection>
   )
 }
 
-const FooterSection = tw.footer`w-full border-t border-gray-200 bg-white`
-
-const FooterContent = tw.div`
-  mx-auto
-  flex flex-col
-  items-center
-  gap-3
-  px-4 sm:px-6
-  py-8
-  text-center
-  text-sm text-gray-500
-  max-w-4xl
+const FooterSection = tw.footer`
+  w-full
+  border-t border-gray-200
+  bg-gradient-to-b from-white to-gray-50
 `
 
-const Brand = tw.span`text-base font-semibold text-gray-900`
+const FooterContainer = tw.div`
+  mx-auto
+  max-w-7xl
+  px-4 sm:px-6 lg:px-8
+  pt-6 lg:pt-8
+  pb-2 lg:pb-3
+`
 
-const InfoLine = tw.p`text-sm text-gray-500`
+const FooterTop = tw.div`
+  grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12
+  mb-6 lg:mb-8
+`
 
-const Links = tw.div`flex flex-wrap items-center justify-center gap-2 text-sm text-gray-500`
+const BrandSection = tw.div`
+  flex flex-col gap-3
+`
 
-const FooterLink = tw(Link)`hover:text-gray-700 transition-colors`
+const Brand = tw.h3`
+  text-xl font-bold text-gray-900
+  tracking-tight
+`
 
-const Separator = tw.span`text-gray-300`
+const BrandDescription = tw.p`
+  text-sm text-gray-600
+  max-w-md
+  leading-relaxed
+`
 
-const Copyright = tw.span`text-xs text-gray-400`
+const LinksSection = tw.div`
+  grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8
+`
+
+const LinksGroup = tw.div`
+  flex flex-col gap-3
+`
+
+const LinksTitle = tw.h4`
+  text-sm font-semibold text-gray-900
+  uppercase tracking-wide
+`
+
+const LinksList = tw.ul`
+  flex flex-col gap-2.5
+  list-none
+  m-0
+  p-0
+`
+
+const LinkItem = tw.li`
+  m-0
+  p-0
+`
+
+const FooterLink = tw(Link)`
+  text-sm text-gray-600
+  hover:text-emerald-600
+  transition-colors duration-200
+  inline-block
+`
+
+const FooterBottom = tw.div`
+  border-t border-gray-200
+  pt-3
+  flex flex-col gap-1.5
+  items-center
+  text-center
+`
+
+const InfoLine = tw.p`
+  text-xs text-gray-500
+  max-w-2xl
+`
+
+const Copyright = tw.p`
+  text-xs text-gray-400
+`

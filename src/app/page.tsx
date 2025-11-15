@@ -14,6 +14,7 @@ import {
   HiOutlineShieldCheck,
   HiOutlineSparkles,
 } from 'react-icons/hi'
+import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
 import tw from 'tw-tailwind'
 
 const features = [
@@ -135,6 +136,18 @@ const faqs = [
 ]
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+
+const blogPosts = [
+  {
+    slug: 'zagrozenia-kredytowe',
+    title: 'Zagrożenia kredytowe',
+    description:
+      'Poznaj najczęstsze zagrożenia związane z kredytami: rosnące raty, ukryte koszty, zmienne oprocentowanie i ryzyko utraty płynności.',
+    category: 'Ryzyka kredytowe',
+    icon: HiOutlineExclamationTriangle,
+    readTime: '8 min',
+  },
+]
 
 export const metadata: Metadata = {
   title: 'Kalkulator kredytu hipotecznego | Porównaj raty i oferty banków',
@@ -369,6 +382,50 @@ export default function LandingPage() {
         </FaqList>
       </Section>
 
+      {blogPosts.length > 0 && (
+        <Section id="blog">
+          <SectionHeader>
+            <SectionBadge>
+              <HiOutlineCollection size={18} />
+              Blog
+            </SectionBadge>
+            <SectionTitle>Najnowsze artykuły o kredytach hipotecznych</SectionTitle>
+            <SectionSubtitle>
+              Poznaj praktyczne poradniki i dowiedz się więcej o kredytach hipotecznych przed
+              podjęciem decyzji.
+            </SectionSubtitle>
+          </SectionHeader>
+          <BlogPostsGrid>
+            {blogPosts.slice(0, 3).map((post) => {
+              const IconComponent = post.icon
+              return (
+                <BlogPostCard key={post.slug} href={`/blog/${post.slug}`}>
+                  <BlogPostIcon aria-hidden="true">
+                    <IconComponent size={24} />
+                  </BlogPostIcon>
+                  <BlogPostCategory>{post.category}</BlogPostCategory>
+                  <BlogPostTitle>{post.title}</BlogPostTitle>
+                  <BlogPostDescription>{post.description}</BlogPostDescription>
+                  <BlogPostFooter>
+                    <BlogReadTime>{post.readTime} czytania</BlogReadTime>
+                    <BlogReadMore>
+                      Czytaj więcej
+                      <HiOutlineArrowRight size={16} />
+                    </BlogReadMore>
+                  </BlogPostFooter>
+                </BlogPostCard>
+              )
+            })}
+          </BlogPostsGrid>
+          <BlogActions>
+            <BlogLink href="/blog">
+              Zobacz wszystkie artykuły
+              <HiOutlineArrowRight size={18} />
+            </BlogLink>
+          </BlogActions>
+        </Section>
+      )}
+
       <FinalSection>
         <FinalContent>
           <FinalEyebrow>Bezpieczna decyzja kredytowa</FinalEyebrow>
@@ -545,3 +602,25 @@ const FinalPrimaryCta = tw(
 const FinalSecondaryCta = tw(
   BaseCta,
 )`border border-white/70 bg-transparent text-white hover:border-white hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/40 sm:px-6 sm:py-3`
+
+const BlogPostsGrid = tw.div`
+  mt-8
+  grid
+  gap-6
+  sm:grid-cols-2
+  lg:grid-cols-3
+`
+const BlogPostCard = tw(
+  Link,
+)`group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/40 transition-all duration-200 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md`
+const BlogPostIcon = tw.span`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50/80 text-emerald-600 group-hover:bg-emerald-100 transition-colors`
+const BlogPostCategory = tw.span`mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-600`
+const BlogPostTitle = tw.h3`mb-3 text-xl font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors`
+const BlogPostDescription = tw.p`mb-4 flex-1 text-sm leading-relaxed text-slate-600`
+const BlogPostFooter = tw.div`flex items-center justify-between pt-4 border-t border-slate-100`
+const BlogReadTime = tw.span`text-xs text-slate-500`
+const BlogReadMore = tw.span`inline-flex items-center gap-1 text-sm font-medium text-emerald-700 group-hover:text-emerald-800 transition-colors`
+const BlogActions = tw.div`mt-8 flex justify-center`
+const BlogLink = tw(
+  Link,
+)`inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-6 py-3 text-sm font-semibold text-emerald-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:border-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40`

@@ -190,10 +190,16 @@ export const searchConsoleRouter = createTRPCRouter({
               pageViews: parseInt(row.metricValues?.[1]?.value || '0', 10),
             })) || []
         } catch (error) {
-          // Dimension searchQuery może nie być dostępny jeśli GSC nie jest połączone
+          // Dimension searchQuery może nie być dostępny jeśli GSC nie jest połączone lub nie ma danych
+          const errorMessage = error instanceof Error ? error.message : String(error)
           console.log(
-            'Uwaga: searchQuery dimension nie jest dostępny. Połącz Search Console z Analytics.',
+            `Uwaga: searchQuery dimension nie jest dostępny. Połącz Search Console z Analytics. Błąd: ${errorMessage}`,
           )
+          
+          // Sprawdź czy to błąd związany z niedostępnym dimension czy brak danych
+          if (errorMessage.includes('INVALID_DIMENSION') || errorMessage.includes('searchQuery')) {
+            console.log('Search Console może nie być w pełni zsynchronizowane lub nie ma ruchu organicznego.')
+          }
         }
 
         return {
