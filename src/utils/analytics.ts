@@ -263,3 +263,43 @@ export const trackTimeOnPage = (seconds: number) => {
     })
   }
 }
+
+/**
+ * Śledzi widoczność sekcji (scroll depth)
+ */
+export const trackScrollDepth = (depth: number) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'scroll_depth', {
+      event_category: 'engagement',
+      event_label: `Scroll depth: ${depth}%`,
+      value: depth,
+    })
+  }
+}
+
+/**
+ * Śledzi użycie widoku tabeli vs lista
+ */
+export const trackViewModeChange = (mode: 'list' | 'table') => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'view_mode_change', {
+      event_category: 'ui',
+      event_label: `Tryb widoku: ${mode}`,
+      view_mode: mode,
+    })
+  }
+}
+
+/**
+ * Śledzi interakcje z formularzem (focus, blur)
+ */
+export const trackFormInteraction = (action: 'focus' | 'blur', field: string) => {
+  if (isProduction && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'form_interaction', {
+      event_category: 'form',
+      event_label: `${action}: ${field}`,
+      interaction_type: action,
+      field_name: field,
+    })
+  }
+}

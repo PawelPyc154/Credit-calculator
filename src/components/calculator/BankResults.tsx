@@ -10,7 +10,7 @@ import {
 } from 'react-icons/hi'
 import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
-import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
+import { trackAffiliateClick, trackBankDetailsExpand, trackViewModeChange } from 'utils/analytics'
 import { formatCurrencyNoCents, formatPercent } from 'utils/calculator'
 import { ComparisonView } from './ComparisonView'
 import { BankDetails } from './molecules/BankDetails'
@@ -88,7 +88,10 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
           </ResultsTitleWrapper>
           <ViewToggle>
             <ViewToggleButton
-              onClick={() => setViewMode('list')}
+              onClick={() => {
+                setViewMode('list')
+                trackViewModeChange('list')
+              }}
               className={clsx(viewMode === 'list' && 'active')}
               aria-label="Widok listy"
             >
@@ -110,7 +113,10 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
               <span className="hidden sm:inline">Lista</span>
             </ViewToggleButton>
             <ViewToggleButton
-              onClick={() => setViewMode('table')}
+              onClick={() => {
+                setViewMode('table')
+                trackViewModeChange('table')
+              }}
               className={clsx(viewMode === 'table' && 'active')}
               aria-label="Widok tabeli"
             >
@@ -412,10 +418,16 @@ const TopBadge = tw.div`
 `
 
 const OfferRow = tw.div`
-  flex flex-col lg:flex-row
-  gap-4
-  p-5
-  items-start lg:items-end
+  flex flex-col 
+  lg:flex-row
+  gap-3
+  xs:gap-3.5
+  sm:gap-4
+  p-3
+  xs:p-4
+  sm:p-5
+  items-start 
+  lg:items-end
 `
 
 const OfferContentWrapper = tw.div`
@@ -485,7 +497,13 @@ const OfferRankNumber = tw.span`
 `
 
 const OfferMetrics = tw.div`
-  grid grid-cols-1 sm:grid-cols-3 gap-3
+  grid 
+  grid-cols-1 
+  xs:grid-cols-2
+  sm:grid-cols-3 
+  gap-2
+  xs:gap-2.5
+  sm:gap-3
   w-full
 `
 
@@ -621,7 +639,6 @@ const DetailsIcon = tw.span`
 
 const ExpandedSection = tw.div`
   border-t border-gray-200 bg-gray-50
-  animate-in fade-in duration-200
   flex flex-col gap-4
   md:gap-6
 `

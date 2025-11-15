@@ -42,7 +42,8 @@ export const metadata: Metadata = {
         url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Kalkulator kredytu hipotecznego',
+        alt: 'Kalkulator kredytu hipotecznego - porównaj oferty banków',
+        type: 'image/jpeg',
       },
     ],
   },
@@ -50,7 +51,16 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Kalkulator kredytu hipotecznego | Kalkulator Kredytowy',
     description: 'Oblicz ratę kredytu hipotecznego i porównaj oferty banków w jednym miejscu.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [
+      {
+        url: `${siteUrl}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'Kalkulator kredytu hipotecznego',
+      },
+    ],
+    creator: '@kredytanaliza',
+    site: '@kredytanaliza',
   },
   icons: {
     icon: [

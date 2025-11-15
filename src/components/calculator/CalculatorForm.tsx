@@ -1145,10 +1145,13 @@ const Card = tw.div`
   w-full
   max-w-7xl
   mx-auto
-  px-4 py-8
+  px-3 py-6
+  xs:px-4 xs:py-8
   sm:px-6 sm:py-10
   md:px-8 md:py-12
-  flex flex-col gap-6
+  flex flex-col gap-4
+  sm:gap-5
+  md:gap-6
 `
 
 const Form = tw.form`flex flex-col gap-8`
@@ -1212,7 +1215,16 @@ const SliderToggleButton = tw.button`
   cursor-pointer
 `
 
-const FieldList = tw.div`grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch`
+const FieldList = tw.div`
+  grid 
+  grid-cols-1 
+  sm:grid-cols-1 
+  md:grid-cols-2 
+  gap-4 
+  sm:gap-5 
+  md:gap-6 
+  items-stretch
+`
 
 const Field = tw.div`flex flex-col gap-3`
 
@@ -1220,7 +1232,9 @@ const FieldBox = tw.div`
   bg-white/10
   backdrop-blur-sm
   rounded-lg
-  p-3 sm:p-4
+  p-2.5
+  xs:p-3
+  sm:p-4
   border border-white/20
   flex flex-col gap-2
   h-full

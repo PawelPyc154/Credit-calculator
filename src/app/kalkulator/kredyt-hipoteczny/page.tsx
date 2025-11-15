@@ -2,6 +2,10 @@ import { HipotecznyCalculatorClient } from './HipotecznyCalculatorClient'
 import { calculateBankOffers } from 'utils/calculator'
 import { banks } from '../../../data/banks'
 import type { CalculatorFormData } from 'types/calculator'
+import { generateCalculatorMetadata, generateStructuredDataLoanCalculator } from 'utils/seo'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = generateCalculatorMetadata()
 
 // Domyślne wartości formularza - te same co w komponencie klienckim
 const defaultFormData: CalculatorFormData = {
@@ -31,10 +35,27 @@ export default function HipotecznyCalculatorPage() {
   // To zapewnia, że dane są dostępne w HTML od razu (SSR)
   const initialResults = calculateBankOffers(defaultFormData, banks)
 
+  // Generuj structured data dla SEO
+  const structuredData = generateStructuredDataLoanCalculator({
+    loanAmount: defaultFormData.loanAmount,
+    loanPeriod: defaultFormData.loanPeriod,
+    downPayment: defaultFormData.downPayment,
+    monthlyIncome: defaultFormData.monthlyIncome,
+    purpose: defaultFormData.purpose,
+    interestRateType: defaultFormData.interestRateType,
+  })
+
   return (
-    <HipotecznyCalculatorClient
-      initialResults={initialResults}
-      initialFormData={defaultFormData}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <HipotecznyCalculatorClient
+        initialResults={initialResults}
+        initialFormData={defaultFormData}
+      />
+    </>
   )
 }
