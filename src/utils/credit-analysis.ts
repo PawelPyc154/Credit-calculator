@@ -197,8 +197,9 @@ export function analyzeCreditMatch(
   const riskRecommendations: string[] = []
   
   if (hasVariableRate) {
-    const worstCaseDTI = riskScenarios.length > 0 
-      ? (riskScenarios[riskScenarios.length - 1].newMonthlyPayment / monthlyIncome) * 100
+    const lastScenario = riskScenarios[riskScenarios.length - 1]
+    const worstCaseDTI = lastScenario
+      ? (lastScenario.newMonthlyPayment / monthlyIncome) * 100
       : dtiPercentage
     
     if (worstCaseDTI > 50) {

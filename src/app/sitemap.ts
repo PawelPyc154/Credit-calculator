@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { blogPostDates, isPostPublished } from 'utils/blog-posts'
 
 function getBaseUrl() {
   // W przeglądarce użyj aktualnego origin
@@ -16,6 +17,21 @@ function getBaseUrl() {
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getBaseUrl()
+
+  // Lista wszystkich artykułów blogowych (tylko opublikowane)
+  const blogSlugs = Object.keys(blogPostDates).filter((slug) => isPostPublished(slug))
+  const blogRoutes = blogSlugs
+    .map((slug) => {
+      const publishDate = blogPostDates[slug]
+      if (!publishDate) return null
+      return {
+        url: `${baseUrl}/blog/${slug}`,
+        lastModified: new Date(publishDate),
+        changeFrequency: 'monthly' as const,
+        priority: 0.8,
+      }
+    })
+    .filter((route): route is NonNullable<typeof route> => route !== null)
 
   // Lista wszystkich stron w aplikacji
   const routes = [
@@ -55,6 +71,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
+    // Dodaj wszystkie opublikowane artykuły blogowe
+    ...blogRoutes,
+    // Stary artykuł (bez daty publikacji) - zostawiamy dla kompatybilności
     {
       url: `${baseUrl}/blog/zagrozenia-kredytowe`,
       lastModified: new Date(),

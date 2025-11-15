@@ -81,7 +81,7 @@ Właśnie to spotkało tysiące Polaków w 2022-2023, gdy stopy procentowe poszy
 ✅ 📄 Zanim podpiszesz, poproś o projekt umowy i sprawdź klauzule z doradcą
 
 📚 **Pełny przewodnik po ryzykach kredytowych i jak ich uniknąć:**
-🔗 👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://kalkulatorkredytow.pl/zagrozenia-kredytowe)
+🔗 👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://www.kredytanaliza.pl/zagrozenia-kredytowe)
 
 💬 **Pytanie do Was:** Które z tych ryzyk najbardziej Was zaskoczyło? Podzielcie się w komentarzach 👇
 
@@ -115,7 +115,7 @@ Większość ludzi myśli tylko o racie. **A to błąd, który może kosztować 
 **Jak się zabezpieczyć?**
 
 📋 Sprawdź pełny przewodnik po ryzykach kredytowych:
-🔗 👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://kalkulatorkredytow.pl/zagrozenia-kredytowe)
+🔗 👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://www.kredytanaliza.pl/zagrozenia-kredytowe)
 
 **Zawiera:**
 📊 • 6 głównych zagrożeń kredytowych
@@ -154,7 +154,7 @@ To nie jest teoria. To rzeczywistość, która dotknęła setki tysięcy kredyto
 ✅ Zbuduj poduszkę finansową (6 miesięcy rat)
 
 **Pełna analiza ryzyk + lista pytań do banku:**
-👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://kalkulatorkredytow.pl/zagrozenia-kredytowe)
+👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://www.kredytanaliza.pl/zagrozenia-kredytowe)
 
 **Dla kogo:** Dla wszystkich, którzy planują kredyt hipoteczny lub już go mają.
 
@@ -195,7 +195,7 @@ Jeśli planujesz kredyt hipoteczny, sprawdź te 6 punktów:
    • Co jeśli wartość spadnie?
 
 **Szczegółowy przewodnik z przykładami i pytaniami do banku:**
-👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://kalkulatorkredytow.pl/zagrozenia-kredytowe)
+👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://www.kredytanaliza.pl/zagrozenia-kredytowe)
 
 **Zapisz ten post** - przyda się przed wizytą w banku! 🔖
 
@@ -233,7 +233,7 @@ Jeśli planujesz kredyt hipoteczny, sprawdź te 6 punktów:
 **Nie popełniaj tych błędów.** ⚠️
 
 📖 Pełny przewodnik po ryzykach kredytowych:
-🔗 👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://kalkulatorkredytow.pl/zagrozenia-kredytowe)
+🔗 👉 [kalkulatorkredytow.pl/zagrozenia-kredytowe](https://www.kredytanaliza.pl/zagrozenia-kredytowe)
 
 **Zawiera:**
    📊 • 6 głównych zagrożeń z przykładami

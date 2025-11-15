@@ -135,7 +135,7 @@ const faqs = [
   },
 ]
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
 const blogPosts = [
   {

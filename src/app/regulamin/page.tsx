@@ -6,11 +6,10 @@ import {
   HiOutlineArrowLongRight,
   HiOutlineDocumentText,
   HiOutlineShieldCheck,
-  HiOutlineSparkles,
 } from 'react-icons/hi2'
 import tw from 'tw-tailwind'
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
 export const metadata: Metadata = {
   title: 'Regulamin | Kalkulator Kredytowy',
@@ -118,8 +117,8 @@ export default function RegulaminPage() {
           </HeroBadge>
           <HeroTitle>Regulamin Kalkulatora Kredytowego</HeroTitle>
           <HeroLead>
-            Poznaj warunki korzystania z naszego narzędzia, dowiedz się, jakie są obowiązki użytkownika
-            i jakie prawa chronią Twoje dane podczas przygotowywania symulacji kredytu.
+            Poznaj warunki korzystania z naszego narzędzia, dowiedz się, jakie są obowiązki
+            użytkownika i jakie prawa chronią Twoje dane podczas przygotowywania symulacji kredytu.
           </HeroLead>
           <HeroHint>
             Regulamin obowiązuje wszystkich użytkowników. W przypadku pytań skontaktuj się z nami na

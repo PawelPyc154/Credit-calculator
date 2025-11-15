@@ -16,7 +16,7 @@ import {
 } from 'react-icons/hi2'
 import tw from 'tw-tailwind'
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
 export const metadata: Metadata = {
   title: 'Zagrożenia kredytowe | Na co uważać przy zaciąganiu kredytu',
@@ -238,8 +238,8 @@ export default function CreditRisksPage() {
           <HeroEyebrow>Świadome finansowanie</HeroEyebrow>
           <HeroTitle>Zanim podpiszesz umowę kredytową, poznaj największe zagrożenia</HeroTitle>
           <HeroLead>
-            Kredyt to decyzja na lata. Zrozum, co może pójść nie tak, jakie koszty mogą Cię zaskoczyć i
-            jak przygotować budżet, aby chronić siebie oraz bliskich.
+            Kredyt to decyzja na lata. Zrozum, co może pójść nie tak, jakie koszty mogą Cię
+            zaskoczyć i jak przygotować budżet, aby chronić siebie oraz bliskich.
           </HeroLead>
           <HeroActions>
             <PrimaryCta href="/kalkulator/kredyt-hipoteczny">
@@ -257,16 +257,16 @@ export default function CreditRisksPage() {
             <IntroTitle>Najważniejsze wnioski</IntroTitle>
             <IntroList>
               <li>
-                <strong>Przygotuj scenariusze stresowe</strong> – rata przy zmiennej stopie może wzrosnąć
-                nawet o 30%.
+                <strong>Przygotuj scenariusze stresowe</strong> – rata przy zmiennej stopie może
+                wzrosnąć nawet o 30%.
               </li>
               <li>
-                <strong>Analizuj RRSO, a nie tylko marżę</strong> – dodatkowe produkty potrafią podnieść
-                koszt o kilkanaście tysięcy złotych.
+                <strong>Analizuj RRSO, a nie tylko marżę</strong> – dodatkowe produkty potrafią
+                podnieść koszt o kilkanaście tysięcy złotych.
               </li>
               <li>
-                <strong>Zanim podpiszesz</strong>, poproś o projekt umowy i sprawdź kluczowe klauzule z
-                doradcą lub prawnikiem.
+                <strong>Zanim podpiszesz</strong>, poproś o projekt umowy i sprawdź kluczowe
+                klauzule z doradcą lub prawnikiem.
               </li>
             </IntroList>
           </IntroContent>
@@ -310,8 +310,8 @@ export default function CreditRisksPage() {
             </SectionBadge>
             <SectionTitle>Kiedy zachować szczególną czujność</SectionTitle>
             <SectionSubtitle>
-              Jeśli zauważysz poniższe sygnały w trakcie rozmów z bankiem lub pośrednikiem, zweryfikuj
-              ofertę ponownie lub skorzystaj z niezależnej opinii.
+              Jeśli zauważysz poniższe sygnały w trakcie rozmów z bankiem lub pośrednikiem,
+              zweryfikuj ofertę ponownie lub skorzystaj z niezależnej opinii.
             </SectionSubtitle>
           </SectionHeader>
           <WarningList role="list">
@@ -423,7 +423,9 @@ const HeroTitle = tw.h1`mb-4 text-3xl font-bold text-gray-900 sm:text-4xl lg:tex
 const HeroLead = tw.p`mx-auto mb-8 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg`
 const HeroActions = tw.div`flex flex-col items-center justify-center gap-3 sm:flex-row`
 
-const PrimaryCta = tw(Link)`inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500`
+const PrimaryCta = tw(
+  Link,
+)`inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500`
 const IntroCard = tw.section`mt-12 flex flex-col gap-4 rounded-3xl border border-emerald-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:gap-6 sm:p-8`
 const IntroIcon = tw.span`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white`
 const IntroContent = tw.div`flex-1`
@@ -466,4 +468,3 @@ const FinalContent = tw.div`mx-auto flex max-w-3xl flex-col items-center text-ce
 const FinalTitle = tw.h2`text-2xl font-bold sm:text-3xl`
 const FinalText = tw.p`mt-3 text-base leading-relaxed text-emerald-50`
 const FinalActions = tw.div`mt-6 flex flex-col gap-3 sm:flex-row`
-

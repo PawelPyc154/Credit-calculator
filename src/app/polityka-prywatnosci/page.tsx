@@ -10,7 +10,7 @@ import {
 } from 'react-icons/hi2'
 import tw from 'tw-tailwind'
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
 export const metadata: Metadata = {
   title: 'Polityka prywatności | Kalkulator Kredytowy',

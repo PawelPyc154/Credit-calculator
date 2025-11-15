@@ -604,7 +604,7 @@ export const createNarrationSections = (
   sections.push({
     id: 'costs',
     title: 'Koszty',
-    script: `Łączny koszt kredytu to ${formatCurrencyNoCents(offer.totalCost)}${insurancePart ? `, w tym ubezpieczenia ${formatCurrencyNoCents(offer.insurance)}` : ''}.`,
+    script: `Łączny koszt kredytu to ${formatCurrencyNoCents(offer.totalCost)}${offer.insurance ? `, w tym ubezpieczenia ${formatCurrencyNoCents(offer.insurance)}` : ''}.`,
     highlights: ['totalCost', 'insurance'],
   })
 

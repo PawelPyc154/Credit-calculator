@@ -1,15 +1,15 @@
 import 'styles/globals.css'
 
-import { Suspense } from 'react'
 import { AnalyticsTracker } from 'components/common/AnalyticsTracker'
 import { CookieBanner } from 'components/common/CookieBanner'
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import Script from 'next/script'
+import { Suspense } from 'react'
 
 import { TRPCReactProvider } from 'trpc/react'
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://kalkulatorkredytow.pl'
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
