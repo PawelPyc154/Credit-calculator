@@ -289,28 +289,28 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
               )
             })}
           </OfferList>
-          {latestUpdateDate && (
-            <UpdateInfo>
-              <svg
-                className="h-4 w-4 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>Dane zaktualizowane: {latestUpdateDate}</span>
-            </UpdateInfo>
-          )}
         </ResultsContainer>
       ) : (
         <ComparisonView offers={results} formData={formData} onClose={() => setViewMode('list')} />
+      )}
+      {latestUpdateDate && (
+        <UpdateInfo>
+          <svg
+            className="h-4 w-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>Dane zaktualizowane: {latestUpdateDate}</span>
+        </UpdateInfo>
       )}
     </>
   )
@@ -580,8 +580,9 @@ const ExpandedSection = tw.div`
 `
 
 const UpdateInfo = tw.div`
-  mt-2 pt-2
-  border-t border-gray-200
+  mx-auto
+  max-w-7xl
+  px-4 sm:px-6 lg:px-8
   flex items-center justify-center gap-2
   text-xs text-gray-500
 `
