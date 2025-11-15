@@ -407,7 +407,7 @@ export default function LandingPage() {
               Uruchom kalkulator
               <HiOutlineArrowRight size={18} />
             </FinalPrimaryCta>
-            <FinalSecondaryCta href="/zagrozenia-kredytowe">
+            <FinalSecondaryCta href="/blog/zagrozenia-kredytowe">
               Poznaj ryzyka kredytowe
             </FinalSecondaryCta>
           </FinalActions>

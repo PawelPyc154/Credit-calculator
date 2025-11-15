@@ -19,7 +19,7 @@ export const FooterMain = () => {
           <Separator>•</Separator>
           <CookieSettingsTrigger>Preferencje cookies</CookieSettingsTrigger>
           <Separator>•</Separator>
-          <FooterLink href="/zagrozenia-kredytowe">Zagrożenia kredytowe</FooterLink>
+          <FooterLink href="/blog/zagrozenia-kredytowe">Zagrożenia kredytowe</FooterLink>
           <Separator>•</Separator>
           <FooterLink href="/kontakt">Kontakt</FooterLink>
         </Links>

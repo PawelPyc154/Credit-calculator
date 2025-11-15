@@ -145,7 +145,7 @@ export default function KontaktPage() {
               kontakt@kalkulatorkredytowy.pl
               <HiOutlineArrowLongRight size={18} />
             </PrimaryCta>
-            <SecondaryCta href="/zagrozenia-kredytowe">
+            <SecondaryCta href="/blog/zagrozenia-kredytowe">
               Zobacz przewodnik o ryzykach kredytowych
             </SecondaryCta>
           </HeroActions>
