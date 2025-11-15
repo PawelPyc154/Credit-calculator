@@ -536,47 +536,23 @@ export const createNarrationSections = (
     ? `, co oznacza około ${formatCurrencyNoCents(offer.totalInterest)} odsetek`
     : ''
 
-  const sections: NarrationSection[] = [
-    {
-      id: 'basics',
-      title: 'Podstawowe parametry',
-      script: `Kwota finansowania to ${formatCurrencyNoCents(offer.loanAmount)}, spłacana przez ${formatLoanTermYears(
-        offer.loanPeriodYears,
-      )}. Szacunkowa rata wynosi około ${formatCurrencyNoCents(offer.monthlyPayment)} miesięcznie.`,
-      highlights: ['loanAmount', 'loanPeriod', 'monthlyPayment'],
-    },
-    {
-      id: 'interest',
-      title: 'Oprocentowanie',
-      script: `Oprocentowanie nominalne to ${formatPercentForNarration(offer.interestRate)}, a RRSO wynosi ${formatPercentForNarration(
-        offer.apr,
-      )}. Dzięki temu wiesz, jaki jest realny koszt finansowania${interestPart}.`,
-      highlights: ['interestRate', 'apr', 'totalInterest'],
-    },
-    {
-      id: 'costs',
-      title: 'Koszty i prowizje',
-      script: `Prowizja przy uruchomieniu kredytu to ${formatCurrencyNoCents(offer.commission)}${insurancePart}. Całkowity koszt kredytu wraz z wszystkimi opłatami to ${formatCurrencyNoCents(
-        offer.totalCost,
-      )}.`,
-      highlights: ['commission', 'insurance', 'totalCost'],
-    },
-  ]
-
-  sections.push({
-    id: 'benefits',
-    title: 'Dodatkowe informacje',
-    script: hasBenefits
-      ? `W tej ofercie możesz liczyć na dodatkowe korzyści: ${realBenefits.join(', ')}.`
-      : 'Bank nie zadeklarował dodatkowych benefitów w tej ofercie, ale podstawowe warunki pozostają korzystne.',
-    highlights: ['benefits'],
-  })
-
-  // Dodaj sekcje analizy, jeśli dostępna
+  // Jeśli mamy analizę, zaczynamy od szybkiego podsumowania i porównania
+  const sections: NarrationSection[] = []
+  
   if (offer.analysis && offer.monthlyIncome) {
     const analysis = offer.analysis
-
-    // Sekcja 1: Zdolność kredytowa
+    
+    // Sekcja 0: Szybkie podsumowanie i porównanie (na początku!)
+    let quickSummaryScript = `Oferta ${offer.bankName}. `
+    
+    if (analysis.comparison.isTopOffer) {
+      quickSummaryScript += `To jedna z najlepszych ofert spośród ${analysis.comparison.totalOffers} dostępnych. `
+    } else if (analysis.comparison.rank <= 3) {
+      quickSummaryScript += `To ${analysis.comparison.rank}. najlepsza oferta spośród ${analysis.comparison.totalOffers} dostępnych. `
+    } else {
+      quickSummaryScript += `Ta oferta zajmuje ${analysis.comparison.rank}. miejsce na ${analysis.comparison.totalOffers} dostępnych ofert. `
+    }
+    
     const affordabilityLevelText = {
       excellent: 'doskonała',
       good: 'dobra',
@@ -584,38 +560,94 @@ export const createNarrationSections = (
       risky: 'ryzykowna',
       critical: 'krytyczna',
     }[analysis.affordability.affordabilityLevel]
-
-    const affordabilityScript = `Zdolność kredytowa. Rata stanowi ${formatPercentForNarration(
-      analysis.affordability.dtiPercentage,
-    )} Twojego dochodu, co oznacza ${affordabilityLevelText} zdolność kredytową. Po spłacie raty pozostanie Ci około ${formatCurrencyNoCents(
-      analysis.affordability.remainingIncome,
-    )} miesięcznie. ${analysis.affordability.recommendation}`
-
+    
+    quickSummaryScript += `Miesięczna rata wynosi ${formatCurrencyNoCents(offer.monthlyPayment)}, co oznacza ${affordabilityLevelText} zdolność kredytową. `
+    
+    const matchLevelText = {
+      excellent: 'bardzo dobrze',
+      good: 'dobrze',
+      moderate: 'umiarkowanie',
+      poor: 'słabo',
+    }[analysis.overall.matchLevel]
+    
+    quickSummaryScript += `Oferta pasuje ${matchLevelText} do Twojej sytuacji finansowej.`
+    
     sections.push({
-      id: 'affordability',
-      title: 'Zdolność kredytowa',
-      script: affordabilityScript,
-      highlights: ['affordability', 'affordabilityLevel', 'remainingIncome'],
+      id: 'quickSummary',
+      title: 'Szybkie podsumowanie',
+      script: quickSummaryScript,
+      highlights: ['monthlyPayment', 'rank', 'comparison', 'affordabilityLevel'],
     })
+  }
 
-    // Sekcja 2: Porównanie z innymi ofertami
-    let comparisonScript = `Porównanie z innymi ofertami. `
-    if (analysis.comparison.isTopOffer) {
-      comparisonScript += `Ta oferta jest w top ${analysis.comparison.rank} najlepszych ofert spośród ${analysis.comparison.totalOffers} dostępnych. `
-    } else {
-      comparisonScript += `Ta oferta zajmuje ${analysis.comparison.rank}. miejsce spośród ${analysis.comparison.totalOffers} dostępnych ofert. `
+  // Podstawowe parametry - uproszczone
+  sections.push({
+    id: 'basics',
+    title: 'Podstawowe parametry',
+    script: `Kwota kredytu: ${formatCurrencyNoCents(offer.loanAmount)} na ${formatLoanTermYears(
+      offer.loanPeriodYears,
+    )}. Miesięczna rata: ${formatCurrencyNoCents(offer.monthlyPayment)}.`,
+    highlights: ['loanAmount', 'loanPeriod', 'monthlyPayment'],
+  })
+
+  // Oprocentowanie - uproszczone, skupiamy się na RRSO
+  sections.push({
+    id: 'interest',
+    title: 'Oprocentowanie',
+    script: `Rzeczywisty koszt kredytu, czyli RRSO, wynosi ${formatPercentForNarration(
+      offer.apr,
+    )}. To najważniejszy wskaźnik, który pokazuje ile naprawdę zapłacisz${interestPart}.`,
+    highlights: ['apr', 'totalInterest'],
+  })
+
+  // Koszty - tylko najważniejsze
+  sections.push({
+    id: 'costs',
+    title: 'Koszty',
+    script: `Łączny koszt kredytu to ${formatCurrencyNoCents(offer.totalCost)}${insurancePart ? `, w tym ubezpieczenia ${formatCurrencyNoCents(offer.insurance)}` : ''}.`,
+    highlights: ['totalCost', 'insurance'],
+  })
+
+  // Benefits tylko jeśli są istotne
+  if (hasBenefits && realBenefits.length > 0) {
+    sections.push({
+      id: 'benefits',
+      title: 'Dodatkowe korzyści',
+      script: `Warto zwrócić uwagę na: ${realBenefits.slice(0, 3).join(', ')}.`,
+      highlights: ['benefits'],
+    })
+  }
+
+  // Dodaj sekcje analizy, jeśli dostępna
+  if (offer.analysis && offer.monthlyIncome) {
+    const analysis = offer.analysis
+
+    // Sekcja 1: Zdolność kredytowa - tylko jeśli nie było w quickSummary
+    if (!offer.analysis?.comparison?.isTopOffer || offer.analysis.comparison.rank > 1) {
+      const affordabilityLevelText = {
+        excellent: 'doskonała',
+        good: 'dobra',
+        moderate: 'umiarkowana',
+        risky: 'ryzykowna',
+        critical: 'krytyczna',
+      }[analysis.affordability.affordabilityLevel]
+
+      const affordabilityScript = `Rata stanowi ${formatPercentForNarration(
+        analysis.affordability.dtiPercentage,
+      )} Twojego dochodu, co oznacza ${affordabilityLevelText} zdolność kredytową. Po spłacie raty zostanie Ci około ${formatCurrencyNoCents(
+        analysis.affordability.remainingIncome,
+      )} miesięcznie. ${analysis.affordability.recommendation}`
+
+      sections.push({
+        id: 'affordability',
+        title: 'Zdolność kredytowa',
+        script: affordabilityScript,
+        highlights: ['affordability', 'affordabilityLevel', 'remainingIncome'],
+      })
     }
-    comparisonScript += analysis.comparison.recommendation
 
-    sections.push({
-      id: 'comparison',
-      title: 'Porównanie z innymi ofertami',
-      script: comparisonScript,
-      highlights: ['rank', 'comparison'],
-    })
-
-    // Sekcja 3: Analiza ryzyk
-    let risksScript = `Analiza ryzyk. `
+    // Sekcja 2: Analiza ryzyk - uproszczona
+    let risksScript = ``
     if (analysis.risks.hasVariableRate) {
       const riskText = {
         low: 'niskie',
@@ -623,17 +655,12 @@ export const createNarrationSections = (
         high: 'wysokie',
       }[analysis.risks.interestRateRisk]
 
-      risksScript += `Kredyt ze zmiennym oprocentowaniem oznacza ${riskText} ryzyko związane ze zmianami stóp procentowych. `
+      risksScript += `Kredyt ze zmiennym oprocentowaniem oznacza ${riskText} ryzyko zmian raty. `
 
       if (analysis.risks.riskScenarios.length > 0) {
         const worstCase = analysis.risks.riskScenarios[analysis.risks.riskScenarios.length - 1]
         if (worstCase && !worstCase.isAffordable) {
-          const pointsText = worstCase.scenario.includes('3')
-            ? '3'
-            : worstCase.scenario.includes('2')
-              ? '2'
-              : '1'
-          risksScript += `W przypadku wzrostu stóp o ${pointsText} punkty procentowe, rata może wzrosnąć do około ${formatCurrencyNoCents(
+          risksScript += `W najgorszym scenariuszu rata może wzrosnąć do około ${formatCurrencyNoCents(
             worstCase.newMonthlyPayment,
           )}. `
         }
@@ -643,7 +670,7 @@ export const createNarrationSections = (
         risksScript += analysis.risks.recommendations[0]
       }
     } else {
-      risksScript += `Kredyt ze stałym oprocentowaniem zapewnia stabilność raty przez cały okres kredytowania. Nie musisz się martwić o zmiany stóp procentowych.`
+      risksScript += `Stałe oprocentowanie oznacza, że rata nie zmieni się przez cały okres kredytowania.`
     }
 
     sections.push({
@@ -653,65 +680,42 @@ export const createNarrationSections = (
       highlights: ['risk', 'riskScenarios'],
     })
 
-    // Sekcja 4: Ocena dopasowania oferty
-    const matchLevelText = {
-      excellent: 'bardzo dobrze',
-      good: 'dobrze',
-      moderate: 'umiarkowanie',
-      poor: 'słabo',
-    }[analysis.overall.matchLevel]
+    // Sekcja 3: Ocena dopasowania - tylko jeśli nie było w quickSummary lub jeśli jest szczegółowa
+    if (!offer.analysis?.comparison?.isTopOffer || offer.analysis.comparison.rank > 1) {
+      const matchLevelText = {
+        excellent: 'bardzo dobrze',
+        good: 'dobrze',
+        moderate: 'umiarkowanie',
+        poor: 'słabo',
+      }[analysis.overall.matchLevel]
 
-    const overallScript = `Ocena dopasowania oferty. Ogólna ocena dopasowania: ${analysis.overall.score} na 100 punktów, co oznacza że oferta pasuje ${matchLevelText} do Twojej sytuacji finansowej. ${analysis.overall.summary} ${analysis.overall.finalRecommendation}`
+      const overallScript = `${analysis.overall.summary} ${analysis.overall.finalRecommendation}`
 
-    sections.push({
-      id: 'overall',
-      title: 'Ocena dopasowania oferty',
-      script: overallScript,
-      highlights: ['score', 'matchLevel', 'overall'],
-    })
+      sections.push({
+        id: 'overall',
+        title: 'Ocena dopasowania',
+        script: overallScript,
+        highlights: ['overall'],
+      })
+    }
   }
 
-  // Sekcja harmonogramu spłat
+  // Sekcja harmonogramu spłat - uproszczona, tylko najważniejsze
   if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
     const schedule = offer.paymentSchedule
-    const firstYear = schedule.slice(0, 12)
-    const midYear = schedule[Math.floor(schedule.length / 2)]
-    const lastYear = schedule.slice(-12)
-    const firstPayment = firstYear[0]
-    const lastPayment = lastYear[lastYear.length - 1]
+    const firstPayment = schedule[0]
+    const lastPayment = schedule[schedule.length - 1]
 
-    if (firstPayment) {
-      let scheduleScript = `Harmonogram spłat. W pierwszym roku rata wynosi ${formatCurrencyNoCents(
+    if (firstPayment && lastPayment) {
+      const scheduleScript = `Harmonogram spłat. Rata przez cały okres wynosi około ${formatCurrencyNoCents(
         firstPayment.payment,
-      )} miesięcznie, z czego około ${formatCurrencyNoCents(
-        firstPayment.principal,
-      )} to spłata kapitału, a ${formatCurrencyNoCents(firstPayment.interest)} to odsetki. `
-
-      if (midYear) {
-        scheduleScript += `W połowie okresu kredytowania rata pozostaje taka sama, ale proporcje się zmieniają: około ${formatCurrencyNoCents(
-          midYear.principal,
-        )} kapitału i ${formatCurrencyNoCents(midYear.interest)} odsetek. `
-      }
-
-      if (lastPayment) {
-        scheduleScript += `W ostatnim roku rata wynosi ${formatCurrencyNoCents(
-          lastPayment.payment,
-        )}, z czego większość to już spłata kapitału. `
-      }
-
-      scheduleScript += `Z czasem udział odsetek w racie maleje, a udział spłaty kapitału rośnie.`
+      )} miesięcznie. Z czasem udział odsetek maleje, a udział spłaty kapitału rośnie.`
 
       sections.push({
         id: 'schedule',
         title: 'Harmonogram spłat',
         script: scheduleScript,
-        highlights: [
-          'firstPayment',
-          'firstPrincipal',
-          'firstInterest',
-          'midPayment',
-          'lastPayment',
-        ],
+        highlights: ['firstPayment'],
       })
     }
   }
@@ -726,18 +730,26 @@ export const createNarrationSections = (
     if (hasAdvantages && offer.advantages) {
       const filteredAdvantages = filterRealBenefits(offer.advantages)
       if (filteredAdvantages.length > 0) {
-        prosConsScript += `Zalety tej oferty to: ${filteredAdvantages.join(', ')}. `
+        if (filteredAdvantages.length === 1) {
+          prosConsScript += `Zaletą tej oferty jest: ${filteredAdvantages[0]}. `
+        } else {
+          prosConsScript += `Zaletami tej oferty są: ${filteredAdvantages.join(', ')}. `
+        }
       }
     }
 
     if (hasDisadvantages && offer.disadvantages) {
       const filteredDisadvantages = filterRealBenefits(offer.disadvantages)
       if (filteredDisadvantages.length > 0) {
-        prosConsScript += `Wady to: ${filteredDisadvantages.join(', ')}. `
+        if (filteredDisadvantages.length === 1) {
+          prosConsScript += `Wadą jest: ${filteredDisadvantages[0]}. `
+        } else {
+          prosConsScript += `Wadami są: ${filteredDisadvantages.join(', ')}. `
+        }
       }
     }
 
-    prosConsScript += `Warto rozważyć wszystkie aspekty przed podjęciem decyzji.`
+    prosConsScript += `Przed podjęciem decyzji warto rozważyć wszystkie aspekty oferty.`
 
     sections.push({
       id: 'prosCons',
@@ -747,14 +759,17 @@ export const createNarrationSections = (
     })
   }
 
-  sections.push({
-    id: 'summary',
-    title: 'Podsumowanie',
-    script: `Podsumowując: rata ${formatCurrencyNoCents(offer.monthlyPayment)} przez ${formatLoanTermYears(
-      offer.loanPeriodYears,
-    )} daje całkowity koszt ${formatCurrencyNoCents(offer.totalCost)}. ${hasCta ? 'Jeśli chcesz przejść dalej, użyj przycisku poniżej.' : 'Możesz porównać tę ofertę z innymi i wybrać najlepszą.'}`,
-    highlights: ['monthlyPayment', 'totalCost'],
-  })
+  // Podsumowanie tylko jeśli nie było quickSummary
+  if (!offer.analysis || !offer.monthlyIncome) {
+    sections.push({
+      id: 'summary',
+      title: 'Podsumowanie',
+      script: `Miesięczna rata: ${formatCurrencyNoCents(offer.monthlyPayment)} przez ${formatLoanTermYears(
+        offer.loanPeriodYears,
+      )}. Łączny koszt: ${formatCurrencyNoCents(offer.totalCost)}. ${hasCta ? 'Jeśli chcesz przejść dalej, użyj przycisku poniżej.' : 'Możesz porównać tę ofertę z innymi i wybrać najlepszą dla siebie.'}`,
+      highlights: ['monthlyPayment', 'totalCost'],
+    })
+  }
 
   return sections
 }
@@ -798,6 +813,60 @@ export const createNarrationDisplaySteps = (offer: NarrationOffer): NarrationDis
   const sections = createNarrationSections(offer, true, false)
   return sections.map((section) => {
     switch (section.id) {
+      case 'quickSummary':
+        if (!offer.analysis) {
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [],
+          }
+        }
+        {
+          const analysis = offer.analysis
+          const affordabilityLevelText = {
+            excellent: 'Doskonała',
+            good: 'Dobra',
+            moderate: 'Umiarkowana',
+            risky: 'Ryzykowna',
+            critical: 'Krytyczna',
+          }[analysis.affordability.affordabilityLevel]
+
+          const matchLevelText = {
+            excellent: 'Bardzo dobra',
+            good: 'Dobra',
+            moderate: 'Umiarkowana',
+            poor: 'Słaba',
+          }[analysis.overall.matchLevel]
+
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [
+              {
+                label: 'Pozycja w rankingu',
+                value: `${analysis.comparison.rank}. / ${analysis.comparison.totalOffers}`,
+                highlightKey: 'rank',
+              },
+              {
+                label: 'Miesięczna rata',
+                value: formatCurrency(offer.monthlyPayment),
+                highlightKey: 'monthlyPayment',
+              },
+              {
+                label: 'Zdolność kredytowa',
+                value: affordabilityLevelText,
+                highlightKey: 'affordabilityLevel',
+              },
+              {
+                label: 'Dopasowanie',
+                value: matchLevelText,
+                highlightKey: 'comparison',
+              },
+            ],
+          }
+        }
       case 'basics':
         return {
           id: section.id,
@@ -1414,29 +1483,44 @@ export function OfferNarration({
         // Znajdź fragment zdania odpowiadający highlightKey
         switch (highlightKey) {
           case 'loanAmount':
-            // "Kwota finansowania to [wartość]"
-            phraseToFind = `Kwota finansowania to ${formatCurrencyNoCents(offer.loanAmount)}`
+            // W sekcji basics: "Kwota kredytu: [wartość]"
+            if (section.id === 'basics') {
+              phraseToFind = `Kwota kredytu: ${formatCurrencyNoCents(offer.loanAmount)}`
+            } else {
+              phraseToFind = `Kwota kredytu: ${formatCurrencyNoCents(offer.loanAmount)}`
+            }
             break
           case 'loanPeriod':
-            // "spłacana przez [wartość]"
-            phraseToFind = `spłacana przez ${formatLoanTermYears(offer.loanPeriodYears)}`
+            // W sekcji basics: "na [wartość]"
+            if (section.id === 'basics') {
+              phraseToFind = `na ${formatLoanTermYears(offer.loanPeriodYears)}`
+            } else {
+              phraseToFind = `spłacana przez ${formatLoanTermYears(offer.loanPeriodYears)}`
+            }
             break
           case 'monthlyPayment':
-            // W sekcji basics: "Szacunkowa rata wynosi około [wartość] miesięcznie"
-            // W sekcji summary: "rata [wartość] przez"
-            if (section.id === 'basics') {
-              phraseToFind = `Szacunkowa rata wynosi około ${formatCurrencyNoCents(offer.monthlyPayment)} miesięcznie`
+            // W sekcji quickSummary: "Miesięczna rata wynosi [wartość]"
+            // W sekcji basics: "Miesięczna rata: [wartość]"
+            // W sekcji summary: "Miesięczna rata: [wartość]"
+            if (section.id === 'quickSummary') {
+              phraseToFind = `Miesięczna rata wynosi ${formatCurrencyNoCents(offer.monthlyPayment)}`
+            } else if (section.id === 'basics') {
+              phraseToFind = `Miesięczna rata: ${formatCurrencyNoCents(offer.monthlyPayment)}`
             } else if (section.id === 'summary') {
-              phraseToFind = `rata ${formatCurrencyNoCents(offer.monthlyPayment)} przez`
+              phraseToFind = `Miesięczna rata: ${formatCurrencyNoCents(offer.monthlyPayment)}`
             }
             break
           case 'interestRate':
-            // "Oprocentowanie nominalne to [wartość]"
-            phraseToFind = `Oprocentowanie nominalne to ${formatPercentForNarration(offer.interestRate)}`
+            // W sekcji interest: "Oprocentowanie nominalne wynosi [wartość]"
+            phraseToFind = `Oprocentowanie nominalne wynosi ${formatPercentForNarration(offer.interestRate)}`
             break
           case 'apr':
-            // "a RRSO wynosi [wartość]"
-            phraseToFind = `a RRSO wynosi ${formatPercentForNarration(offer.apr)}`
+            // W sekcji interest: "Rzeczywisty koszt kredytu, czyli RRSO, wynosi [wartość]"
+            if (section.id === 'interest') {
+              phraseToFind = `Rzeczywisty koszt kredytu, czyli RRSO, wynosi ${formatPercentForNarration(offer.apr)}`
+            } else {
+              phraseToFind = `RRSO wynosi ${formatPercentForNarration(offer.apr)}`
+            }
             break
           case 'totalInterest':
             // "co oznacza około [wartość] odsetek"
@@ -1445,8 +1529,8 @@ export function OfferNarration({
             }
             break
           case 'commission':
-            // "Prowizja przy uruchomieniu kredytu to [wartość]"
-            phraseToFind = `Prowizja przy uruchomieniu kredytu to ${formatCurrencyNoCents(offer.commission)}`
+            // W sekcji costs: "Prowizja banku przy uruchomieniu kredytu wynosi [wartość]"
+            phraseToFind = `Prowizja banku przy uruchomieniu kredytu wynosi ${formatCurrencyNoCents(offer.commission)}`
             break
           case 'insurance':
             // ", a ubezpieczenia wynoszą [wartość]"
@@ -1474,7 +1558,8 @@ export function OfferNarration({
             }
             break
           case 'affordabilityLevel':
-            // "co oznacza [poziom] zdolność kredytową"
+            // W quickSummary: "co oznacza [poziom] zdolność kredytową"
+            // W affordability: "co oznacza [poziom] zdolność kredytową"
             if (offer.analysis) {
               const levelText = {
                 excellent: 'doskonała',
@@ -1483,7 +1568,11 @@ export function OfferNarration({
                 risky: 'ryzykowna',
                 critical: 'krytyczna',
               }[offer.analysis.affordability.affordabilityLevel]
-              phraseToFind = `co oznacza ${levelText} zdolność kredytową`
+              if (section.id === 'quickSummary') {
+                phraseToFind = `co oznacza ${levelText} zdolność kredytową`
+              } else {
+                phraseToFind = `co oznacza ${levelText} zdolność kredytową`
+              }
             }
             break
           case 'remainingIncome':
@@ -1494,12 +1583,23 @@ export function OfferNarration({
             break
           case 'rank':
           case 'comparison':
-            // "Ta oferta jest w top [rank] najlepszych" lub "Ta oferta zajmuje [rank]. miejsce"
+            // W quickSummary: "To jedna z najlepszych ofert" lub "To X. najlepsza oferta" lub "Ta oferta zajmuje X. miejsce"
+            // W comparison: "Ta oferta zajmuje X. miejsce"
             if (offer.analysis) {
-              if (offer.analysis.comparison.isTopOffer) {
-                phraseToFind = `Ta oferta jest w top ${offer.analysis.comparison.rank} najlepszych ofert`
+              if (section.id === 'quickSummary') {
+                if (offer.analysis.comparison.isTopOffer) {
+                  phraseToFind = `To jedna z najlepszych ofert spośród ${offer.analysis.comparison.totalOffers} dostępnych`
+                } else if (offer.analysis.comparison.rank <= 3) {
+                  phraseToFind = `To ${offer.analysis.comparison.rank}. najlepsza oferta spośród ${offer.analysis.comparison.totalOffers} dostępnych`
+                } else {
+                  phraseToFind = `Ta oferta zajmuje ${offer.analysis.comparison.rank}. miejsce na ${offer.analysis.comparison.totalOffers} dostępnych ofert`
+                }
               } else {
-                phraseToFind = `Ta oferta zajmuje ${offer.analysis.comparison.rank}. miejsce`
+                if (offer.analysis.comparison.isTopOffer) {
+                  phraseToFind = `Ta oferta znajduje się wśród ${offer.analysis.comparison.rank} najlepszych`
+                } else {
+                  phraseToFind = `Ta oferta zajmuje ${offer.analysis.comparison.rank}. miejsce`
+                }
               }
             }
             break
