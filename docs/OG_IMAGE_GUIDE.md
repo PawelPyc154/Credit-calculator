@@ -101,7 +101,34 @@ Po dodaniu/zmianie obrazu:
 
 - `public/og-image-source.svg` - SVG źródłowy (można edytować)
 - `scripts/generate-og-image.html` - Generator HTML do tworzenia JPG/PNG
-- `public/og-image.jpg` - Finalny obraz (do utworzenia)
+- `public/og-image.jpg` - Finalny obraz JPG (wygenerowany z SVG)
+
+## ⚠️ WAŻNE: SVG nie działa na Facebooku!
+
+**Facebook nie obsługuje SVG dla obrazków Open Graph.** Musisz używać JPG lub PNG.
+
+### Automatyczne generowanie JPG z SVG
+
+Użyj skryptu Node.js do automatycznego generowania:
+
+```bash
+npm run og:main
+```
+
+lub
+
+```bash
+yarn og:main
+```
+
+Skrypt automatycznie konwertuje `og-image-source.svg` na `og-image.jpg` (1200x630px, JPG, jakość 95%).
+
+### Ręczne generowanie
+
+Jeśli wolisz ręcznie:
+1. Otwórz `scripts/generate-og-image.html` w przeglądarce
+2. Kliknij "Pobierz jako JPG"
+3. Zapisz jako `og-image.jpg` w folderze `public/`
 
 ## Konfiguracja w kodzie
 

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator OG Image - Zagrożenia Kredytowe</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #059669;
+      margin-top: 0;
+    }
+    .preview {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 8px;
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      max-width: 100%;
+      height: auto;
+    }
+    .download-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+    }
+    button {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #047857;
+    }
+    .info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .specs {
+      background: #fef2f2;
+      border-left: 4px solid #dc2626;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚠️ Generator OG Image - Zagrożenia Kredytowe</h1>
+    
+    <div class="info">
+      <strong>Wymagania Facebooka:</strong>
+      <ul>
+        <li>Rozmiar: 1200x630px (zalecany)</li>
+        <li>Format: JPG lub PNG</li>
+        <li>Maksymalny rozmiar pliku: 8MB</li>
+        <li>Proporcje: 1.91:1</li>
+      </ul>
+    </div>
+
+    <div class="specs">
+      <strong>Zawartość obrazu:</strong>
+      <ul>
+        <li>Tło: Gradient emerald z czerwonymi akcentami</li>
+        <li>Ikona: Ostrzeżenie / Tarcza ochronna</li>
+        <li>Tytuł: "Zagrożenia kredytowe"</li>
+        <li>Podtytuł: "Na co uważać przy zaciąganiu kredytu"</li>
+        <li>Kolory: Emerald + czerwone akcenty dla ostrzeżeń</li>
+      </ul>
+    </div>
+
+    <div class="preview">
+      <h3>Podgląd obrazu Open Graph (1200x630px)</h3>
+      <canvas id="ogCanvas" width="1200" height="630"></canvas>
+    </div>
+
+    <div class="download-section">
+      <h2>Pobierz obraz</h2>
+      <button onclick="downloadOGImage('jpg')">Pobierz jako JPG (zagrozenia-kredytowe-og.jpg)</button>
+      <button onclick="downloadOGImage('png')">Pobierz jako PNG (zagrozenia-kredytowe-og.png)</button>
+    </div>
+
+    <div class="info">
+      <strong>Instrukcja:</strong>
+      <ol>
+        <li>Kliknij przycisk powyżej, aby pobrać obraz</li>
+        <li>Zapisz plik jako <code>zagrozenia-kredytowe-og.jpg</code> w folderze <code>public/images/blog/</code></li>
+        <li>Upewnij się, że folder <code>public/images/blog/</code> istnieje</li>
+        <li>Obraz będzie automatycznie używany przez Facebooka przy udostępnianiu linków</li>
+        <li>Przetestuj obraz na: <a href="https://developers.facebook.com/tools/debug/" target="_blank">Facebook Sharing Debugger</a></li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('ogCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    function drawOGImage() {
+      const width = 1200;
+      const height = 630;
+      
+      // Tło z gradientem emerald
+      const gradient = ctx.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#059669');
+      gradient.addColorStop(1, '#10b981');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+      
+      // Dekoracyjne kółka tła
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.beginPath();
+      ctx.arc(100, 100, 80, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(1100, 530, 120, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Czerwone akcenty dla ostrzeżeń
+      ctx.fillStyle = 'rgba(220, 38, 38, 0.15)';
+      ctx.beginPath();
+      ctx.arc(200, 200, 60, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(1000, 400, 80, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Główna ikona ostrzeżenia (tarcza z wykrzyknikiem)
+      const iconX = width / 2;
+      const iconY = 250;
+      const iconSize = 120;
+      
+      // Tarcza ochronna (okrąg z tłem)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.beginPath();
+      ctx.arc(iconX, iconY, iconSize, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Czerwone tło dla wykrzyknika
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(iconX, iconY, iconSize * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Wykrzyknik (biały)
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${iconSize * 0.8}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('!', iconX, iconY);
+      
+      // Cień ikony
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 10;
+      
+      // Tekst główny
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 5;
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 64px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Zagrożenia kredytowe', width / 2, 420);
+      
+      // Podtytuł
+      ctx.shadowBlur = 8;
+      ctx.font = '32px system-ui, -apple-system, sans-serif';
+      ctx.globalAlpha = 0.95;
+      ctx.fillText('Na co uważać przy zaciąganiu kredytu', width / 2, 480);
+      
+      // URL strony
+      ctx.shadowBlur = 5;
+      ctx.font = '24px system-ui, -apple-system, sans-serif';
+      ctx.globalAlpha = 0.85;
+      ctx.fillText('www.kredytanaliza.pl', width / 2, 540);
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.globalAlpha = 1;
+      
+      // Dekoracyjne linie ostrzegawcze
+      ctx.strokeStyle = 'rgba(220, 38, 38, 0.3)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([10, 5]);
+      
+      // Górna linia
+      ctx.beginPath();
+      ctx.moveTo(100, 50);
+      ctx.lineTo(1100, 50);
+      ctx.stroke();
+      
+      // Dolna linia
+      ctx.beginPath();
+      ctx.moveTo(100, 580);
+      ctx.lineTo(1100, 580);
+      ctx.stroke();
+      
+      ctx.setLineDash([]);
+    }
+    
+    // Rysuj obraz przy załadowaniu
+    drawOGImage();
+    
+    // Funkcja pobierania
+    function downloadOGImage(format) {
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `zagrozenia-kredytowe-og.${format}`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, `image/${format}`, 0.95);
+    }
+  </script>
+</body>
+</html>
+

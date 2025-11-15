@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/zagrozenia-kredytowe-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Zagrożenia przy kredycie hipotecznym',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: 'Zagrożenia kredytowe – przewodnik',
     description:
       'Poznaj najważniejsze ryzyka przy zaciąganiu kredytu i dowiedz się, jak chronić domowy budżet.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/zagrozenia-kredytowe-og.jpg`],
   },
 }
 

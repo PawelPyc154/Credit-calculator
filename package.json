@@ -15,6 +15,8 @@
     "banks:sync": "tsx scripts/sync-banks.ts",
     "banks:update": "tsx scripts/cron-update-banks.ts",
     "cron:start": "ENABLE_CRON=true tsx scripts/cron-update-banks.ts",
+    "og:zagrozenia": "tsx scripts/generate-zagrozenia-og-png.ts",
+    "og:main": "tsx scripts/generate-main-og-image.ts",
     "dev": "next dev --turbo",
     "postinstall": "prisma generate",
     "preview": "next build && next start",
@@ -61,6 +63,7 @@
     "dotenv": "^17.2.3",
     "postcss": "^8.5.6",
     "prisma": "^6.18.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.16",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
