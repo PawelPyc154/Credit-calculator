@@ -24,6 +24,47 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/', '/_next/', '/trpc/'],
       },
+      // Optymalizacja dla AI crawlers - pozwól im indeksować całą stronę
+      {
+        userAgent: 'GPTBot',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'ChatGPT-User',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'CCBot',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'anthropic-ai',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'Claude-Web',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'Google-Extended',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'PerplexityBot',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
+      {
+        userAgent: 'Applebot-Extended',
+        allow: '/',
+        disallow: ['/api/', '/_next/', '/trpc/'],
+      },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
   }

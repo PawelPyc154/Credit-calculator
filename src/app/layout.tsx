@@ -25,7 +25,16 @@ export const metadata: Metadata = {
     'porównanie kredytów',
     'ranking banków',
     'zdolność kredytowa',
+    'kredyt hipoteczny',
+    'oferty banków',
+    'symulacja kredytu',
+    'koszt kredytu',
   ],
+  authors: [{ name: 'Kalkulator Kredytowy' }],
+  creator: 'Kalkulator Kredytowy',
+  publisher: 'Kalkulator Kredytowy',
+  applicationName: 'Kalkulator Kredytowy',
+  category: 'Finanse',
   alternates: {
     canonical: '/',
   },
@@ -77,12 +86,68 @@ const geist = Geist({
   preload: true, // Preloads font for better performance
 })
 
+// Structured data dla AI crawlers (GPT, Google AI, etc.)
+const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c')
+
+const organizationStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Kalkulator Kredytowy',
+  url: siteUrl,
+  logo: `${siteUrl}/og-image.jpg`,
+  description:
+    'Kalkulator kredytu hipotecznego - oblicz ratę i porównaj aktualne oferty banków w Polsce. Analizuj koszty, porównuj scenariusze i znajdź najlepiej dopasowane finansowanie.',
+  sameAs: [
+    'https://twitter.com/kredytanaliza',
+    // Dodaj inne social media jeśli masz
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'Customer Service',
+    url: `${siteUrl}/kontakt`,
+  },
+}
+
+const websiteStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Kalkulator Kredytowy',
+  url: siteUrl,
+  description:
+    'Oblicz ratę kredytu hipotecznego i porównaj aktualne oferty banków w Polsce. Analizuj koszty, porównuj scenariusze i znajdź najlepiej dopasowane finansowanie.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Kalkulator Kredytowy',
+    logo: {
+      '@type': 'ImageObject',
+      url: `${siteUrl}/og-image.jpg`,
+    },
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${siteUrl}/blog?q={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+}
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const isProduction = process.env.NODE_ENV === 'production'
+  const orgJsonLd = toJsonLd(organizationStructuredData)
+  const websiteJsonLd = toJsonLd(websiteStructuredData)
 
   return (
     <html lang="pl" className={`${geist.variable}`}>
       <head>
+        {/* Structured data dla AI crawlers */}
+        <script type="application/ld+json" suppressHydrationWarning>
+          {orgJsonLd}
+        </script>
+        <script type="application/ld+json" suppressHydrationWarning>
+          {websiteJsonLd}
+        </script>
         {/* Resource hints dla lepszej wydajności */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
