@@ -1,13 +1,21 @@
 import 'styles/globals.css'
 
 import { AnalyticsTracker } from 'components/common/AnalyticsTracker'
-import { CookieBanner } from 'components/common/CookieBanner'
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import { Geist } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
 
 import { TRPCReactProvider } from 'trpc/react'
+
+// Lazy load CookieBanner - nie blokuje pierwszego renderu
+const LazyCookieBanner = dynamic(
+  () => import('components/common/CookieBanner').then((mod) => ({ default: mod.CookieBanner })),
+  {
+    ssr: false, // Nie renderuj na serwerze - tylko po załadowaniu klienta
+  },
+)
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
@@ -86,6 +94,8 @@ export const metadata: Metadata = {
 const geist = Geist({
   subsets: ['latin'],
   variable: '--font-geist-sans',
+  display: 'swap', // Prevents invisible text during font load
+  preload: true, // Preloads font for better performance
 })
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -94,13 +104,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pl" className={`${geist.variable}`}>
       <head>
+        {/* Resource hints dla lepszej wydajności */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         {isProduction && process.env.NEXT_PUBLIC_GA_TRACKING_ID && (
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_TRACKING_ID}`}
-              strategy="afterInteractive"
+              strategy="lazyOnload"
             />
-            <Script id="google-analytics" strategy="afterInteractive">
+            <Script id="google-analytics" strategy="lazyOnload">
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
@@ -112,11 +125,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         )}
       </head>
       <body>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
         <Suspense fallback={null}>
           <AnalyticsTracker />
         </Suspense>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-        <CookieBanner />
+        <LazyCookieBanner />
       </body>
     </html>
   )

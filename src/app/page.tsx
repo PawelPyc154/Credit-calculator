@@ -503,6 +503,7 @@ const HeroContent = tw.div`
 `
 
 const HeroBadge = tw.span`inline-flex w-fit items-center rounded-full bg-white/20 px-3 py-1 text-xs font-semibold tracking-wide uppercase`
+// HeroTitle jest LCP elementem - optymalizacja dla szybkiego renderowania
 const HeroTitle = tw.h1`text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight`
 const HeroSubtitle = tw.p`max-w-3xl text-base sm:text-lg text-white/90`
 
