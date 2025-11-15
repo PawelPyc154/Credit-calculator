@@ -7,6 +7,7 @@ import tw from 'tw-tailwind'
 import type { CalculationResult, CalculatorFormData } from 'types/calculator'
 import { trackAffiliateClick, trackBankDetailsExpand } from 'utils/analytics'
 import { formatCurrencyNoCents, formatPercent } from 'utils/calculator'
+import { ComparisonView } from './ComparisonView'
 import { BankDetails } from './molecules/BankDetails'
 
 type BankResultsProps = {
@@ -14,8 +15,11 @@ type BankResultsProps = {
   formData: CalculatorFormData
 }
 
+type ViewMode = 'list' | 'table'
+
 export const BankResults = ({ results, formData }: BankResultsProps) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
 
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
@@ -71,199 +75,271 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
   }
 
   return (
-    <ResultsContainer>
-      <ResultsHeader>
-        <ResultsTitle>Porównanie ofert ({results.length})</ResultsTitle>
-      </ResultsHeader>
-      <OfferList>
-        {results.map((offer, index) => {
-          const isExpanded = expandedIds.has(offer.bankId)
-          const hasAffiliate = offer.bank?.affiliate?.enabled && offer.bank?.affiliate?.url
-          const isTopThree = index < 3 && offer.isRecommended
-          const expandedSectionId = `offer-details-${offer.bankId}`
-          const targetSelector = `#${expandedSectionId}`
-
-          return (
-            <OfferCard
-              key={offer.bankId}
-              className={clsx(
-                isTopThree && index === 0 && 'is-best',
-                isTopThree && index === 1 && 'is-second',
-                isTopThree && index === 2 && 'is-third',
-              )}
+    <>
+      <ResultsHeaderContainer>
+        <ResultsHeader>
+          <ResultsTitleWrapper>
+            <ResultsTitle>Porównanie ofert ({results.length})</ResultsTitle>
+          </ResultsTitleWrapper>
+          <ViewToggle>
+            <ViewToggleButton
+              onClick={() => setViewMode('list')}
+              className={clsx(viewMode === 'list' && 'active')}
+              aria-label="Widok listy"
             >
-              {isTopThree ? (
-                <TopBadge
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <title>Ikona listy</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+              <span className="hidden sm:inline">Lista</span>
+            </ViewToggleButton>
+            <ViewToggleButton
+              onClick={() => setViewMode('table')}
+              className={clsx(viewMode === 'table' && 'active')}
+              aria-label="Widok tabeli"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <title>Ikona tabeli</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="hidden sm:inline">Tabela</span>
+            </ViewToggleButton>
+          </ViewToggle>
+        </ResultsHeader>
+      </ResultsHeaderContainer>
+      {viewMode === 'list' ? (
+        <ResultsContainer>
+          <OfferList>
+            {results.map((offer, index) => {
+              const isExpanded = expandedIds.has(offer.bankId)
+              const hasAffiliate = offer.bank?.affiliate?.enabled && offer.bank?.affiliate?.url
+              const isTopThree = index < 3 && offer.isRecommended
+              const expandedSectionId = `offer-details-${offer.bankId}`
+              const targetSelector = `#${expandedSectionId}`
+
+              return (
+                <OfferCard
+                  key={offer.bankId}
                   className={clsx(
-                    index === 0 && 'badge-best',
-                    index === 1 && 'badge-second',
-                    index === 2 && 'badge-third',
+                    isTopThree && index === 0 && 'is-best',
+                    isTopThree && index === 1 && 'is-second',
+                    isTopThree && index === 2 && 'is-third',
                   )}
                 >
-                  {index === 0 && 'Najlepsza oferta'}
-                  {index === 1 && 'Druga najlepsza'}
-                  {index === 2 && 'Trzecia najlepsza'}
-                </TopBadge>
-              ) : (
-                <TopBadge className="badge-default">#{index + 1}</TopBadge>
-              )}
-              <OfferRow>
-                <OfferContentWrapper>
-                  <OfferHeader>
-                    <OfferLead>
-                      <LogoWrapper>
-                        <BankLogo
-                          src={offer.bankLogo ?? '/images/banks/placeholder.png'}
-                          alt={offer.bankName}
-                          bankName={offer.bankName}
-                          size="md"
-                        />
-                      </LogoWrapper>
-                      <OfferNameWrapper>
-                        <OfferName>{offer.bankName}</OfferName>
-                        {offer.bank?.productName ? (
-                          <ProductName>{offer.bank.productName}</ProductName>
-                        ) : null}
-                      </OfferNameWrapper>
-                    </OfferLead>
-                  </OfferHeader>
-
-                  <OfferMetrics>
-                    <MetricItem className="text-left sm:text-left lg:text-left">
-                      <MetricLabel>
-                        RRSO
-                        {formData.interestRateType && (
-                          <InterestRateTypeBadge>
-                            {formData.interestRateType === 'fixed' ? 'Stałe' : 'Zmienne'}
-                          </InterestRateTypeBadge>
-                        )}
-                      </MetricLabel>
-                      <MetricValue>{formatPercent(offer.rrso)}</MetricValue>
-                    </MetricItem>
-                    <MetricItem className="text-left sm:text-center lg:text-left">
-                      <MetricLabel>Całkowity koszt</MetricLabel>
-                      <MetricValue>{formatCurrencyNoCents(offer.totalCost)}</MetricValue>
-                    </MetricItem>
-                    <MetricItemHighlight
+                  {isTopThree ? (
+                    <TopBadge
                       className={clsx(
-                        'text-left sm:text-right lg:text-left',
-                        isTopThree && index === 0 && 'highlight-best',
-                        isTopThree && index === 1 && 'highlight-second',
-                        isTopThree && index === 2 && 'highlight-third',
+                        index === 0 && 'badge-best',
+                        index === 1 && 'badge-second',
+                        index === 2 && 'badge-third',
                       )}
                     >
-                      <MetricLabelHighlight
-                        className={clsx(
-                          isTopThree && index === 0 && 'label-best',
-                          isTopThree && index === 1 && 'label-second',
-                          isTopThree && index === 2 && 'label-third',
-                        )}
-                      >
-                        Miesięczna rata
-                      </MetricLabelHighlight>
-                      <MetricValueHighlight>
-                        {formatCurrencyNoCents(offer.monthlyPayment)}
-                      </MetricValueHighlight>
-                    </MetricItemHighlight>
-                  </OfferMetrics>
-                </OfferContentWrapper>
-
-                {/* Przyciski akcji */}
-                <OfferActions className={clsx(!hasAffiliate && 'justify-center md:justify-end')}>
-                  {hasAffiliate && (
-                    <AffiliateButton
-                      href={offer.bank?.affiliate?.url ?? '#'}
-                      target="_blank"
-                      rel="noopener noreferrer sponsored"
-                      onClick={() => handleAffiliateClick(offer)}
-                      className={clsx(isTopThree && index === 0 && 'animate-pulse-glow')}
-                    >
-                      <AffiliateIconWrapper>
-                        <svg
-                          className="h-full w-full"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <title>Ikona wniosku</title>
-                          <path d="M10 2v6m0 0L8 6m2 2l2-2" />
-                          <path d="M2 12.4V17a1 1 0 001 1h14a1 1 0 001-1v-4.6" />
-                          <path d="M18 9l-8 8-8-8" />
-                        </svg>
-                      </AffiliateIconWrapper>
-                      <AffiliateContent>
-                        <AffiliateText>Złóż wniosek online</AffiliateText>
-                      </AffiliateContent>
-                    </AffiliateButton>
+                      {index === 0 && 'Najlepsza oferta'}
+                      {index === 1 && 'Druga najlepsza'}
+                      {index === 2 && 'Trzecia najlepsza'}
+                    </TopBadge>
+                  ) : (
+                    <TopBadge className="badge-default">#{index + 1}</TopBadge>
                   )}
-                  <DetailsButton
-                    onClick={() => toggleExpanded(offer.bankId)}
-                    aria-expanded={isExpanded}
-                    aria-label={isExpanded ? 'Ukryj szczegóły oferty' : 'Zobacz szczegóły oferty'}
-                  >
-                    <DetailsButtonText>
-                      {isExpanded ? 'Ukryj szczegóły' : 'Zobacz szczegóły'}
-                    </DetailsButtonText>
-                  </DetailsButton>
-                </OfferActions>
-              </OfferRow>
+                  <OfferRow>
+                    <OfferContentWrapper>
+                      <OfferHeader>
+                        <OfferLead>
+                          <LogoWrapper>
+                            <BankLogo
+                              src={offer.bankLogo ?? '/images/banks/placeholder.png'}
+                              alt={offer.bankName}
+                              bankName={offer.bankName}
+                              size="md"
+                            />
+                          </LogoWrapper>
+                          <OfferNameWrapper>
+                            <OfferName>{offer.bankName}</OfferName>
+                            {offer.bank?.productName ? (
+                              <ProductName>{offer.bank.productName}</ProductName>
+                            ) : null}
+                          </OfferNameWrapper>
+                        </OfferLead>
+                      </OfferHeader>
 
-              {/* Rozwinięte szczegóły */}
-              {isExpanded && (
-                <ExpandedSection id={expandedSectionId}>
-                  <BankDetails
-                    result={{
-                      ...offer,
-                      loanAmount: formData.loanAmount,
-                      loanPeriod: formData.loanPeriod,
-                    }}
-                    formData={formData}
-                  />
-                </ExpandedSection>
-              )}
-            </OfferCard>
-          )
-        })}
-      </OfferList>
-      {latestUpdateDate && (
-        <UpdateInfo>
-          <svg
-            className="h-4 w-4 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>Dane zaktualizowane: {latestUpdateDate}</span>
-        </UpdateInfo>
+                      <OfferMetrics>
+                        <MetricItem className="text-left sm:text-left lg:text-left">
+                          <MetricLabel>
+                            RRSO
+                            {formData.interestRateType && (
+                              <InterestRateTypeBadge>
+                                {formData.interestRateType === 'fixed' ? 'Stałe' : 'Zmienne'}
+                              </InterestRateTypeBadge>
+                            )}
+                          </MetricLabel>
+                          <MetricValue>{formatPercent(offer.rrso)}</MetricValue>
+                        </MetricItem>
+                        <MetricItem className="text-left sm:text-center lg:text-left">
+                          <MetricLabel>Całkowity koszt</MetricLabel>
+                          <MetricValue>{formatCurrencyNoCents(offer.totalCost)}</MetricValue>
+                        </MetricItem>
+                        <MetricItemHighlight
+                          className={clsx(
+                            'text-left sm:text-right lg:text-left',
+                            isTopThree && index === 0 && 'highlight-best',
+                            isTopThree && index === 1 && 'highlight-second',
+                            isTopThree && index === 2 && 'highlight-third',
+                          )}
+                        >
+                          <MetricLabelHighlight
+                            className={clsx(
+                              isTopThree && index === 0 && 'label-best',
+                              isTopThree && index === 1 && 'label-second',
+                              isTopThree && index === 2 && 'label-third',
+                            )}
+                          >
+                            Miesięczna rata
+                          </MetricLabelHighlight>
+                          <MetricValueHighlight>
+                            {formatCurrencyNoCents(offer.monthlyPayment)}
+                          </MetricValueHighlight>
+                        </MetricItemHighlight>
+                      </OfferMetrics>
+                    </OfferContentWrapper>
+
+                    {/* Przyciski akcji */}
+                    <OfferActions
+                      className={clsx(!hasAffiliate && 'justify-center md:justify-end')}
+                    >
+                      {hasAffiliate && (
+                        <AffiliateButton
+                          href={offer.bank?.affiliate?.url ?? '#'}
+                          target="_blank"
+                          rel="noopener noreferrer sponsored"
+                          onClick={() => handleAffiliateClick(offer)}
+                          className={clsx(isTopThree && index === 0 && 'animate-pulse-glow')}
+                        >
+                          <AffiliateIconWrapper>
+                            <svg
+                              className="h-full w-full"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <title>Ikona wniosku</title>
+                              <path d="M10 2v6m0 0L8 6m2 2l2-2" />
+                              <path d="M2 12.4V17a1 1 0 001 1h14a1 1 0 001-1v-4.6" />
+                              <path d="M18 9l-8 8-8-8" />
+                            </svg>
+                          </AffiliateIconWrapper>
+                          <AffiliateContent>
+                            <AffiliateText>Złóż wniosek online</AffiliateText>
+                          </AffiliateContent>
+                        </AffiliateButton>
+                      )}
+                      <DetailsButton
+                        onClick={() => toggleExpanded(offer.bankId)}
+                        aria-expanded={isExpanded}
+                        aria-label={
+                          isExpanded ? 'Ukryj szczegóły oferty' : 'Zobacz szczegóły oferty'
+                        }
+                      >
+                        <DetailsButtonText>
+                          {isExpanded ? 'Ukryj szczegóły' : 'Zobacz szczegóły'}
+                        </DetailsButtonText>
+                      </DetailsButton>
+                    </OfferActions>
+                  </OfferRow>
+
+                  {/* Rozwinięte szczegóły */}
+                  {isExpanded && (
+                    <ExpandedSection id={expandedSectionId}>
+                      <BankDetails
+                        result={{
+                          ...offer,
+                          loanAmount: formData.loanAmount,
+                          loanPeriod: formData.loanPeriod,
+                        }}
+                        formData={formData}
+                      />
+                    </ExpandedSection>
+                  )}
+                </OfferCard>
+              )
+            })}
+          </OfferList>
+          {latestUpdateDate && (
+            <UpdateInfo>
+              <svg
+                className="h-4 w-4 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>Dane zaktualizowane: {latestUpdateDate}</span>
+            </UpdateInfo>
+          )}
+        </ResultsContainer>
+      ) : (
+        <ComparisonView offers={results} formData={formData} onClose={() => setViewMode('list')} />
       )}
-    </ResultsContainer>
+    </>
   )
 }
+
+const ResultsHeaderContainer = tw.div`
+  mx-auto
+  w-full
+  max-w-7xl
+  px-4 sm:px-6 lg:px-8
+  py-6 sm:py-8 md:py-10
+`
 
 const ResultsContainer = tw.section`
   mx-auto
   w-full
   max-w-7xl
   px-4 sm:px-6 lg:px-8
-  pt-6 pb-6 sm:pt-8 sm:pb-8 md:pt-10 md:pb-10
+  pb-6 sm:pb-8 md:pb-10
   flex flex-col gap-4
 `
 
 const ResultsHeader = tw.div`
-  mb-2
+  flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4
+`
+
+const ResultsTitleWrapper = tw.div`
   flex flex-col gap-1
+  flex-1
 `
 
 const ResultsTitle = tw.h2`
@@ -334,6 +410,26 @@ const OfferContentWrapper = tw.div`
 
 const OfferHeader = tw.div`
   flex items-center gap-4
+`
+
+const ViewToggle = tw.div`
+  flex items-center gap-2
+  bg-gray-100
+  rounded-lg
+  p-1
+  shrink-0
+`
+
+const ViewToggleButton = tw.button`
+  flex items-center gap-2
+  px-3 py-2
+  rounded-md
+  text-sm font-medium
+  text-gray-600
+  transition-all duration-200
+  hover:text-gray-900 hover:bg-white
+  focus:outline-none focus:ring-2 focus:ring-gray-300
+  [&.active]:bg-white [&.active]:text-gray-900 [&.active]:shadow-sm
 `
 
 const OfferLead = tw.div`flex items-center gap-3 min-w-0 flex-1`

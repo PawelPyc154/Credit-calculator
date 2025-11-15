@@ -783,23 +783,58 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     }
   }
 
+  const detailsData = [
+    { label: 'Miesięczna rata', value: formatCurrencyNoCents(result.monthlyPayment), highlight: true, key: 'monthlyPayment' },
+    { label: 'Kwota kredytu', value: formatCurrencyNoCents(result.loanAmount ?? formData?.loanAmount ?? 0), key: 'loanAmount' },
+    { label: 'Oprocentowanie nominalne', value: formatPercent(result.interestRate), key: 'interestRate' },
+    { label: 'RRSO', value: formatPercent(result.rrso), key: 'apr' },
+    { label: 'Całkowity koszt kredytu', value: formatCurrencyNoCents(result.totalCost), key: 'totalCost' },
+    { label: 'Suma odsetek w okresie kredytowania', value: formatCurrencyNoCents(result.totalInterest), key: 'totalInterest' },
+    { label: 'Prowizja za udzielenie kredytu', value: formatCurrencyNoCents(result.commission), key: 'commission' },
+    { label: 'Ubezpieczenie kredytu', value: formatCurrencyNoCents(result.insurance), key: 'insurance' },
+    { label: 'Liczba rat', value: totalPayments.toString(), key: 'raty' },
+    { label: 'Okres kredytowania', value: `${loanPeriod} lat`, key: 'loanPeriod' },
+  ]
+
   const tabsHeader = (
     <TabsWrapper>
-      <TabButton
-        type="button"
-        className={clsx(activeTab === 'details' && 'is-active')}
-        onClick={() => setActiveTab('details')}
-      >
-        Szczegóły
-      </TabButton>
-      <TabButton
-        type="button"
-        className={clsx(activeTab === 'narration' && 'is-active')}
-        onClick={() => narration && setActiveTab('narration')}
-        disabled={!narration}
-      >
-        Analiza
-      </TabButton>
+      <ViewToggle>
+        <ViewToggleButton
+          type="button"
+          onClick={() => setActiveTab('details')}
+          className={clsx(activeTab === 'details' && 'active')}
+          aria-label="Szczegóły"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <title>Ikona szczegółów</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <span className="hidden sm:inline">Szczegóły</span>
+        </ViewToggleButton>
+        <ViewToggleButton
+          type="button"
+          onClick={() => narration && setActiveTab('narration')}
+          className={clsx(activeTab === 'narration' && 'active')}
+          disabled={!narration}
+          aria-label="Analiza"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <title>Ikona analizy</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          <span className="hidden sm:inline">Analiza</span>
+        </ViewToggleButton>
+      </ViewToggle>
     </TabsWrapper>
   )
 
@@ -846,60 +881,22 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       {tabsHeader}
       {/* Prosta tabela z podstawowymi informacjami */}
       <SimpleInfoTable>
-        <SimpleInfoRow className="border-blue-200 border-b-2 bg-blue-50">
-          <SimpleInfoLabel className="text-blue-700">Miesięczna rata</SimpleInfoLabel>
-          <SimpleInfoValue className="text-blue-600" data-narration-key="monthlyPayment">
-            {formatCurrencyNoCents(result.monthlyPayment)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Kwota kredytu</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="loanAmount">
-            {formatCurrencyNoCents(result.loanAmount ?? formData?.loanAmount ?? 0)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Oprocentowanie nominalne</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="interestRate">
-            {formatPercent(result.interestRate)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>RRSO</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="apr">{formatPercent(result.rrso)}</SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Całkowity koszt kredytu</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="totalCost">
-            {formatCurrencyNoCents(result.totalCost)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Suma odsetek w okresie kredytowania</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="totalInterest">
-            {formatCurrencyNoCents(result.totalInterest)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Prowizja za udzielenie kredytu</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="commission">
-            {formatCurrencyNoCents(result.commission)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Ubezpieczenie kredytu</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="insurance">
-            {formatCurrencyNoCents(result.insurance)}
-          </SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Liczba rat</SimpleInfoLabel>
-          <SimpleInfoValue>{totalPayments}</SimpleInfoValue>
-        </SimpleInfoRow>
-        <SimpleInfoRow>
-          <SimpleInfoLabel>Okres kredytowania</SimpleInfoLabel>
-          <SimpleInfoValue data-narration-key="loanPeriod">{loanPeriod} lat</SimpleInfoValue>
-        </SimpleInfoRow>
+        {detailsData.map((item, index) => (
+          <SimpleInfoRow
+            key={item.key}
+            className={clsx(index === 0 && 'border-blue-200 border-b-2 bg-blue-50')}
+          >
+            <SimpleInfoLabel className={clsx(index === 0 && 'text-blue-700')} data-narration-key={item.key}>
+              {item.label}
+            </SimpleInfoLabel>
+            <SimpleInfoValue
+              className={clsx(index === 0 && 'text-blue-600', item.highlight && 'font-bold')}
+              data-narration-key={item.key}
+            >
+              {item.value}
+            </SimpleInfoValue>
+          </SimpleInfoRow>
+        ))}
       </SimpleInfoTable>
 
       {/* Harmonogram spłat - wykres w sekcji wyżej */}
@@ -1694,16 +1691,27 @@ const SimpleInfoValue = tw.div`
   text-right
 `
 
-const TabsWrapper = tw.div`mb-4 flex justify-end gap-2`
-const TabButton = tw.button`
-  inline-flex items-center justify-center gap-2
-  rounded-lg border border-slate-300 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-semibold text-slate-700
-  shadow-sm transition-all duration-200 ease-out
-  hover:border-slate-400 hover:bg-slate-100 hover:text-slate-900 hover:shadow-md
-  focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
-  [&.is-active]:border-slate-500 [&.is-active]:bg-slate-100 [&.is-active]:text-slate-900 [&.is-active]:shadow-inner
-  disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:bg-white
-  cursor-pointer
+const TabsWrapper = tw.div`mb-4 flex justify-end`
+
+const ViewToggle = tw.div`
+  flex items-center gap-2
+  bg-gray-100
+  rounded-lg
+  p-1
+  shrink-0
+`
+
+const ViewToggleButton = tw.button`
+  flex items-center gap-2
+  px-3 py-2
+  rounded-md
+  text-sm font-medium
+  text-gray-600
+  transition-all duration-200
+  hover:text-gray-900 hover:bg-white
+  focus:outline-none focus:ring-2 focus:ring-gray-300
+  [&.active]:bg-white [&.active]:text-gray-900 [&.active]:shadow-sm
+  disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-gray-100 disabled:hover:text-gray-600
 `
 const NarrationStickyContainer = tw.div`
   pointer-events-none sticky bottom-0 inset-x-0 z-30 mt-4 flex justify-center -mx-4 sm:bottom-4 sm:mx-0
