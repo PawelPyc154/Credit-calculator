@@ -16,26 +16,24 @@ import { getPostRobotsMetadata } from 'utils/blog-posts'
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
 export const metadata: Metadata = {
-  title: 'Kredyt hipoteczny 2025 - zmiany w przepisach i nowe regulacje',
-  description:
-    'Poznaj najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2025: nowe regulacje, wymagania i wpływ na kredytobiorców. Sprawdź aktualne oferty w kalkulatorze.',
+  title: 'Kredyt hipoteczny 2026 - zmiany w przepisach i nowe regulacje',
+  description: 'Poznaj najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026: nowe regulacje, wymagania i wpływ na kredytobiorców. Sprawdź aktualne oferty w kalkulatorze.',
   robots: getPostRobotsMetadata('kredyt-hipoteczny-2025-zmiany-przepisy'),
   alternates: {
     canonical: `${siteUrl}/blog/kredyt-hipoteczny-2025-zmiany-przepisy`,
   },
   keywords: [
-    'kredyt hipoteczny 2025',
+    'kredyt hipoteczny 2026',
     'zmiany w przepisach kredyt',
     'nowe regulacje kredyt hipoteczny',
-    'kredyt hipoteczny przepisy 2025',
+    'kredyt hipoteczny przepisy 2026',
     'zmiany prawne kredyt',
     'nowe wymagania kredyt hipoteczny',
-    'kredyt hipoteczny 2025 zmiany',
+    'kredyt hipoteczny 2026 zmiany',
   ],
   openGraph: {
-    title: 'Kredyt hipoteczny 2025 - zmiany w przepisach i nowe regulacje',
-    description:
-      'Kompletny przewodnik po zmianach w przepisach dotyczących kredytów hipotecznych w 2025: nowe regulacje i wpływ na kredytobiorców.',
+    title: 'Kredyt hipoteczny 2026 - zmiany w przepisach i nowe regulacje',
+    description: 'Kompletny przewodnik po zmianach w przepisach dotyczących kredytów hipotecznych w 2026: nowe regulacje i wpływ na kredytobiorców.',
     url: `${siteUrl}/blog/kredyt-hipoteczny-2025-zmiany-przepisy`,
     type: 'article',
     images: [
@@ -43,14 +41,14 @@ export const metadata: Metadata = {
         url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Kredyt hipoteczny 2025 - zmiany w przepisach',
+        alt: 'Kredyt hipoteczny 2026 - zmiany w przepisach',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kredyt hipoteczny 2025 - zmiany w przepisach',
-    description: 'Poznaj najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2025.',
+    title: 'Kredyt hipoteczny 2026 - zmiany w przepisach',
+    description: 'Poznaj najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026.',
     images: [`${siteUrl}/og-image.jpg`],
   },
 }
@@ -58,8 +56,7 @@ export const metadata: Metadata = {
 const changes = [
   {
     change: 'Nowe wymagania dotyczące zdolności kredytowej',
-    description:
-      'W 2025 wprowadzono nowe wymagania dotyczące oceny zdolności kredytowej. Banki muszą uwzględniać więcej czynników i stosować bardziej rygorystyczne kryteria oceny.',
+    description: 'W 2026 wprowadzono nowe wymagania dotyczące oceny zdolności kredytowej. Banki muszą uwzględniać więcej czynników i stosować bardziej rygorystyczne kryteria oceny.',
     impact: 'Może wpłynąć na dostępność kredytu',
     details: [
       'Bardziej szczegółowa ocena dochodu',
@@ -139,9 +136,9 @@ const impacts = [
 
 const faqData = [
   {
-    question: 'Jakie są najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2025?',
+    question: 'Jakie są najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026?',
     answer:
-      'Najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2025 to: nowe wymagania dotyczące zdolności kredytowej, zmiany w wymaganiach dotyczących wkładu własnego, nowe regulacje dotyczące oprocentowania i zmiany w przepisach dotyczących ubezpieczeń. Wszystkie zmiany mają na celu lepszą ochronę konsumentów i większą przejrzystość.',
+      'Najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026 to: nowe wymagania dotyczące zdolności kredytowej, zmiany w wymaganiach dotyczących wkładu własnego, nowe regulacje dotyczące oprocentowania i zmiany w przepisach dotyczących ubezpieczeń. Wszystkie zmiany mają na celu lepszą ochronę konsumentów i większą przejrzystość.',
   },
   {
     question: 'Czy zmiany w przepisach wpływają na dostępność kredytu?',
@@ -185,9 +182,8 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Kredyt hipoteczny 2025 - zmiany w przepisach i nowe regulacje',
-  description:
-    'Kompletny przewodnik po zmianach w przepisach dotyczących kredytów hipotecznych w 2025: nowe regulacje i wpływ na kredytobiorców.',
+  headline: 'Kredyt hipoteczny 2026 - zmiany w przepisach i nowe regulacje',
+  description: 'Kompletny przewodnik po zmianach w przepisach dotyczących kredytów hipotecznych w 2026: nowe regulacje i wpływ na kredytobiorców.',
   author: {
     '@type': 'Organization',
     name: 'Kalkulator Kredytowy',
@@ -200,7 +196,7 @@ const articleStructuredData = {
   },
   datePublished: '2026-05-19',
   dateModified: '2026-05-19',
-  mainEntityOfPage: `${siteUrl}/blog/kredyt-hipoteczny-2025-zmiany-przepisy`,
+  mainEntityOfPage: `${siteUrl}/blog/kredyt-hipoteczny-2026-zmiany-przepisy`,
   articleSection: ['Zmiany w przepisach', 'Kredyt hipoteczny', 'Poradniki'],
   keywords: metadata.keywords,
 }
@@ -237,16 +233,16 @@ const breadcrumbStructuredData = {
     {
       '@type': 'ListItem',
       position: 3,
-      name: 'Kredyt hipoteczny 2025 - zmiany w przepisach',
-      item: `${siteUrl}/blog/kredyt-hipoteczny-2025-zmiany-przepisy`,
+      name: 'Kredyt hipoteczny 2026 - zmiany w przepisach',
+      item: `${siteUrl}/blog/kredyt-hipoteczny-2026-zmiany-przepisy`,
     },
   ],
 }
 
 const relatedArticles = [
   {
-    slug: 'stopy-procentowe-kredyt-hipoteczny-2025',
-    title: 'Stopy procentowe a kredyt hipoteczny 2025',
+    slug: 'stopy-procentowe-kredyt-hipoteczny-2026',
+    title: 'Stopy procentowe a kredyt hipoteczny 2026',
     description: 'Poznaj wpływ stóp procentowych na kredyt.',
   },
   {
@@ -296,18 +292,18 @@ export default function Regulations2025Page() {
             </BreadcrumbItem>
             <BreadcrumbSeparator>/</BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbCurrent>Kredyt hipoteczny 2025 - zmiany w przepisach</BreadcrumbCurrent>
+              <BreadcrumbCurrent>Kredyt hipoteczny 2026 - zmiany w przepisach</BreadcrumbCurrent>
             </BreadcrumbItem>
           </BreadcrumbList>
         </BreadcrumbNav>
 
         <HeroSection>
           <HeroEyebrow>Zmiany w przepisach</HeroEyebrow>
-          <HeroTitle>Kredyt hipoteczny 2025 - zmiany w przepisach i nowe regulacje</HeroTitle>
+          <HeroTitle>Kredyt hipoteczny 2026 - zmiany w przepisach i nowe regulacje</HeroTitle>
           <HeroLead>
-            W 2025 wprowadzono ważne zmiany w przepisach dotyczących kredytów hipotecznych. Nowe regulacje mają
+            W 2026 wprowadzono ważne zmiany w przepisach dotyczących kredytów hipotecznych. Nowe regulacje mają
             na celu lepszą ochronę konsumentów, większą przejrzystość i poprawę jakości usług bankowych. W tym
-            przewodniku poznasz najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2025 i
+            przewodniku poznasz najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026 i
             dowiesz się, jak wpływają na kredytobiorców. Sprawdź aktualne oferty w naszym kalkulatorze.
           </HeroLead>
           <HeroActions>
@@ -351,9 +347,9 @@ export default function Regulations2025Page() {
               <HiOutlineDocumentText size={18} />
               Zmiany
             </SectionBadge>
-            <SectionTitle>Najważniejsze zmiany w przepisach 2025</SectionTitle>
+            <SectionTitle>Najważniejsze zmiany w przepisach 2026</SectionTitle>
             <SectionSubtitle>
-              Oto najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2025 i ich wpływ na
+              Oto najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026 i ich wpływ na
               kredytobiorców.
             </SectionSubtitle>
           </SectionHeader>
@@ -443,7 +439,7 @@ export default function Regulations2025Page() {
             <SectionTitle>Najczęściej zadawane pytania o zmiany w przepisach</SectionTitle>
             <SectionSubtitle>
               Odpowiedzi na najpopularniejsze pytania dotyczące zmian w przepisach dotyczących kredytów
-              hipotecznych w 2025.
+              hipotecznych w 2026.
             </SectionSubtitle>
           </SectionHeader>
           <FaqList role="list">
@@ -485,7 +481,7 @@ export default function Regulations2025Page() {
           <SummaryContent>
             <SummaryTitle>Podsumowanie</SummaryTitle>
             <SummaryText>
-              W 2025 wprowadzono ważne zmiany w przepisach dotyczących kredytów hipotecznych. Najważniejsze
+              W 2026 wprowadzono ważne zmiany w przepisach dotyczących kredytów hipotecznych. Najważniejsze
               zmiany to: nowe wymagania dotyczące zdolności kredytowej, zmiany w wymaganiach dotyczących wkładu
               własnego, nowe regulacje dotyczące oprocentowania i zmiany w przepisach dotyczących ubezpieczeń.
               Wszystkie zmiany mają na celu lepszą ochronę konsumentów i większą przejrzystość.
@@ -497,7 +493,7 @@ export default function Regulations2025Page() {
               sprawdzić aktualne oferty w kalkulatorze kredytu hipotecznego i porównać warunki przed podjęciem
               decyzji. Przeczytaj też nasze przewodniki o{' '}
               <Link
-                href="/blog/stopy-procentowe-kredyt-hipoteczny-2025"
+                href="/blog/stopy-procentowe-kredyt-hipoteczny-2026"
                 className="text-white underline hover:text-emerald-50"
               >
                 stopach procentowych a kredyt hipoteczny

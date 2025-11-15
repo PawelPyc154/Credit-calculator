@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Favicony - Kalkulator Kredytowy</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #059669;
+      margin-top: 0;
+    }
+    .preview {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    .preview-item {
+      text-align: center;
+    }
+    .preview-item h3 {
+      font-size: 12px;
+      color: #666;
+      margin: 8px 0 4px;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+    }
+    .download-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+    }
+    button {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #047857;
+    }
+    .info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧮 Generator Favicony - Kalkulator Kredytowy</h1>
+    
+    <div class="info">
+      <strong>Instrukcja:</strong> Ta strona generuje wszystkie potrzebne rozmiary favicony na podstawie ikony kalkulatora. 
+      Kliknij przyciski poniżej, aby pobrać poszczególne pliki PNG.
+    </div>
+
+    <div class="preview" id="preview">
+      <!-- Podglądy będą tutaj -->
+    </div>
+
+    <div class="download-section">
+      <h2>Pobierz pliki favicony</h2>
+      <button onclick="downloadFavicon(16)">favicon-16x16.png</button>
+      <button onclick="downloadFavicon(32)">favicon-32x32.png</button>
+      <button onclick="downloadFavicon(180)">apple-touch-icon.png (180x180)</button>
+      <button onclick="downloadFavicon(192)">android-chrome-192x192.png</button>
+      <button onclick="downloadFavicon(512)">android-chrome-512x512.png</button>
+      <button onclick="downloadFaviconICO()">favicon.ico</button>
+    </div>
+  </div>
+
+  <script>
+    // Funkcja rysująca faviconę
+    function drawFavicon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+      
+      // Tło z gradientem emerald
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#059669');
+      gradient.addColorStop(1, '#10b981');
+      
+      // Rysuj tło z zaokrąglonymi rogami
+      const radius = size * 0.15; // ~15% zaokrąglenia
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.quadraticCurveTo(size, 0, size, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.quadraticCurveTo(size, size, size - radius, size);
+      ctx.lineTo(radius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Margines dla kalkulatora
+      const margin = size * 0.15;
+      const calcSize = size - (margin * 2);
+      const calcX = margin;
+      const calcY = margin;
+      const calcRadius = size * 0.05;
+      
+      // Rysuj prostokąt kalkulatora (biały)
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.moveTo(calcX + calcRadius, calcY);
+      ctx.lineTo(calcX + calcSize - calcRadius, calcY);
+      ctx.quadraticCurveTo(calcX + calcSize, calcY, calcX + calcSize, calcY + calcRadius);
+      ctx.lineTo(calcX + calcSize, calcY + calcSize - calcRadius);
+      ctx.quadraticCurveTo(calcX + calcSize, calcY + calcSize, calcX + calcSize - calcRadius, calcY + calcSize);
+      ctx.lineTo(calcX + calcRadius, calcY + calcSize);
+      ctx.quadraticCurveTo(calcX, calcY + calcSize, calcX, calcY + calcSize - calcRadius);
+      ctx.lineTo(calcX, calcY + calcRadius);
+      ctx.quadraticCurveTo(calcX, calcY, calcX + calcRadius, calcY);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Rysuj linie siatki kalkulatora (emerald)
+      const lineWidth = Math.max(1, size * 0.02);
+      ctx.strokeStyle = '#059669';
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = 'round';
+      
+      // Pionowa linia (środek)
+      ctx.beginPath();
+      ctx.moveTo(calcX + calcSize / 2, calcY);
+      ctx.lineTo(calcX + calcSize / 2, calcY + calcSize);
+      ctx.stroke();
+      
+      // Pozioma linia (środek)
+      ctx.beginPath();
+      ctx.moveTo(calcX, calcY + calcSize / 2);
+      ctx.lineTo(calcX + calcSize, calcY + calcSize / 2);
+      ctx.stroke();
+    }
+    
+    // Generuj podglądy
+    const sizes = [16, 32, 180, 192, 512];
+    const preview = document.getElementById('preview');
+    
+    sizes.forEach(size => {
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      
+      const canvas = document.createElement('canvas');
+      drawFavicon(canvas, size);
+      
+      const label = document.createElement('h3');
+      label.textContent = `${size}x${size}px`;
+      
+      item.appendChild(label);
+      item.appendChild(canvas);
+      preview.appendChild(item);
+    });
+    
+    // Funkcja pobierania PNG
+    function downloadFavicon(size) {
+      const canvas = document.createElement('canvas');
+      drawFavicon(canvas, size);
+      
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        let filename;
+        if (size === 180) {
+          filename = 'apple-touch-icon.png';
+        } else if (size === 192) {
+          filename = 'android-chrome-192x192.png';
+        } else if (size === 512) {
+          filename = 'android-chrome-512x512.png';
+        } else {
+          filename = `favicon-${size}x${size}.png`;
+        }
+        
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    }
+    
+    // Funkcja pobierania ICO (uproszczona - jako PNG)
+    function downloadFaviconICO() {
+      // Dla ICO potrzebujemy wielu rozmiarów w jednym pliku
+      // Tutaj generujemy podstawowy 32x32 jako ICO
+      const canvas = document.createElement('canvas');
+      drawFavicon(canvas, 32);
+      
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'favicon.ico';
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    }
+  </script>
+</body>
+</html>
+

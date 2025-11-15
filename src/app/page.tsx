@@ -16,6 +16,8 @@ import {
 } from 'react-icons/hi'
 import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
 import tw from 'tw-tailwind'
+import { filterPublishedPosts, sortPostsByDate } from 'utils/blog-posts'
+import { allBlogPosts } from 'utils/blog-posts-data'
 
 const features = [
   {
@@ -137,17 +139,11 @@ const faqs = [
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
-const blogPosts = [
-  {
-    slug: 'zagrozenia-kredytowe',
-    title: 'Zagrożenia kredytowe',
-    description:
-      'Poznaj najczęstsze zagrożenia związane z kredytami: rosnące raty, ukryte koszty, zmienne oprocentowanie i ryzyko utraty płynności.',
-    category: 'Ryzyka kredytowe',
-    icon: HiOutlineExclamationTriangle,
-    readTime: '8 min',
-  },
-]
+// Pobierz ostatnie 3 opublikowane artykuły dla strony głównej
+const getLatestBlogPosts = () => {
+  const published = sortPostsByDate(filterPublishedPosts(allBlogPosts))
+  return published.slice(0, 3)
+}
 
 export const metadata: Metadata = {
   title: 'Kalkulator kredytu hipotecznego | Porównaj raty i oferty banków',
@@ -228,6 +224,7 @@ const howToStructuredData = {
 export default function LandingPage() {
   const faqJsonLd = toJsonLd(faqStructuredData)
   const howToJsonLd = toJsonLd(howToStructuredData)
+  const blogPosts = getLatestBlogPosts()
 
   return (
     <MainWrapper>

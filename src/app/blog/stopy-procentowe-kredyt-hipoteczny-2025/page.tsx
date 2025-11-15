@@ -17,13 +17,13 @@ import { getPostRobotsMetadata } from 'utils/blog-posts'
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.pl'
 
-export const metadata: Metadata = {  robots: getPostRobotsMetadata('stopy-procentowe-kredyt-hipoteczny-2025'),
+export const metadata: Metadata = {  robots: getPostRobotsMetadata('stopy-procentowe-kredyt-hipoteczny-2026'),
 
-  title: 'Stopy procentowe a kredyt hipoteczny 2025 - przewodnik',
+  title: 'Stopy procentowe a kredyt hipoteczny 2026 - przewodnik',
   description:
     'Dowiedz się, jak stopy procentowe wpływają na kredyt hipoteczny: WIBOR, stopy NBP, zmiany stóp i ich wpływ na ratę. Sprawdź aktualne stopy w kalkulatorze.',
   alternates: {
-    canonical: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2025`,
+    canonical: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2026`,
   },
   keywords: [
     'stopy procentowe kredyt hipoteczny',
@@ -32,13 +32,13 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('stopy-procen
     'jak stopy procentowe wpływają na kredyt',
     'zmiany stóp procentowych',
     'oprocentowanie kredytu a stopy',
-    'stopy procentowe 2025',
+    'stopy procentowe 2026',
   ],
   openGraph: {
-    title: 'Stopy procentowe a kredyt hipoteczny 2025 - przewodnik',
+    title: 'Stopy procentowe a kredyt hipoteczny 2026 - przewodnik',
     description:
       'Kompletny przewodnik po stopach procentowych i ich wpływie na kredyt hipoteczny: WIBOR, stopy NBP i praktyczne wskazówki.',
-    url: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2025`,
+    url: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2026`,
     type: 'article',
     images: [
       {
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('stopy-procen
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Stopy procentowe a kredyt hipoteczny 2025',
+    title: 'Stopy procentowe a kredyt hipoteczny 2026',
     description: 'Dowiedz się, jak stopy procentowe wpływają na kredyt hipoteczny.',
     images: [`${siteUrl}/og-image.jpg`],
   },
@@ -195,7 +195,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Stopy procentowe a kredyt hipoteczny 2025 - przewodnik',
+  headline: 'Stopy procentowe a kredyt hipoteczny 2026 - przewodnik',
   description:
     'Kompletny przewodnik po stopach procentowych i ich wpływie na kredyt hipoteczny: WIBOR, stopy NBP i praktyczne wskazówki.',
   author: {
@@ -210,7 +210,7 @@ const articleStructuredData = {
   },
   datePublished: '2026-04-07',
   dateModified: '2026-04-07',
-  mainEntityOfPage: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2025`,
+  mainEntityOfPage: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2026`,
   articleSection: ['Stopy procentowe', 'Kredyt hipoteczny', 'Poradniki'],
   keywords: metadata.keywords,
 }
@@ -247,8 +247,8 @@ const breadcrumbStructuredData = {
     {
       '@type': 'ListItem',
       position: 3,
-      name: 'Stopy procentowe a kredyt hipoteczny 2025',
-      item: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2025`,
+      name: 'Stopy procentowe a kredyt hipoteczny 2026',
+      item: `${siteUrl}/blog/stopy-procentowe-kredyt-hipoteczny-2026`,
     },
   ],
 }
@@ -270,8 +270,8 @@ const relatedArticles = [
     description: 'Na co uważać przy kredycie hipotecznym.',
   },
   {
-    slug: 'kredyt-hipoteczny-2025-zmiany-przepisy',
-    title: 'Kredyt hipoteczny 2025 - zmiany w przepisach',
+    slug: 'kredyt-hipoteczny-2026-zmiany-przepisy',
+    title: 'Kredyt hipoteczny 2026 - zmiany w przepisach',
     description: 'Najnowsze zmiany w przepisach dotyczących kredytów.',
   }
 ]
@@ -306,14 +306,14 @@ export default function InterestRatesPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator>/</BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbCurrent>Stopy procentowe a kredyt hipoteczny 2025</BreadcrumbCurrent>
+              <BreadcrumbCurrent>Stopy procentowe a kredyt hipoteczny 2026</BreadcrumbCurrent>
             </BreadcrumbItem>
           </BreadcrumbList>
         </BreadcrumbNav>
 
         <HeroSection>
           <HeroEyebrow>Stopy procentowe</HeroEyebrow>
-          <HeroTitle>Stopy procentowe a kredyt hipoteczny 2025 - przewodnik</HeroTitle>
+          <HeroTitle>Stopy procentowe a kredyt hipoteczny 2026 - przewodnik</HeroTitle>
           <HeroLead>
             Stopy procentowe mają kluczowy wpływ na kredyt hipoteczny, szczególnie na kredyty ze zmiennym
             oprocentowaniem. WIBOR, stopy NBP i marża banku decydują o wysokości raty i całkowitym koszcie

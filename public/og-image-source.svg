@@ -1,0 +1,61 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient tła -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Cień dla kalkulatora -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="20"/>
+      <feOffset dx="0" dy="10" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Tło z gradientem -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Dekoracyjne elementy tła -->
+  <circle cx="100" cy="100" r="80" fill="white" opacity="0.1"/>
+  <circle cx="1100" cy="530" r="120" fill="white" opacity="0.1"/>
+  
+  <!-- Główny kalkulator -->
+  <g transform="translate(400, 200)" filter="url(#shadow)">
+    <!-- Biały prostokąt kalkulatora -->
+    <rect x="0" y="0" width="400" height="230" rx="20" fill="white"/>
+    
+    <!-- Linie siatki kalkulatora - emerald -->
+    <line x1="200" y1="0" x2="200" y2="230" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
+    <line x1="0" y1="115" x2="400" y2="115" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Dodatkowe linie dla efektu siatki -->
+    <line x1="100" y1="0" x2="100" y2="230" stroke="#10b981" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round"/>
+    <line x1="300" y1="0" x2="300" y2="230" stroke="#10b981" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round"/>
+    <line x1="0" y1="57.5" x2="400" y2="57.5" stroke="#10b981" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round"/>
+    <line x1="0" y1="172.5" x2="400" y2="172.5" stroke="#10b981" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Tekst główny -->
+  <text x="600" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="bold" fill="white" text-anchor="middle">
+    Kalkulator Kredytowy
+  </text>
+  
+  <!-- Podtytuł -->
+  <text x="600" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="white" text-anchor="middle" opacity="0.9">
+    Oblicz ratę i porównaj oferty banków
+  </text>
+  
+  <!-- URL strony -->
+  <text x="600" y="600" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="white" text-anchor="middle" opacity="0.8">
+    www.kredytanaliza.pl
+  </text>
+</svg>
+

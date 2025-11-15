@@ -19,7 +19,7 @@ const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.p
 
 export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-wybrac-najlepszy-kredyt-hipoteczny'),
 
-  title: 'Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2025',
+  title: 'Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2026',
   description:
     'Dowiedz się, jak wybrać najlepszy kredyt hipoteczny: na co zwrócić uwagę, jak porównać oferty i jakie kryteria są najważniejsze. Porównaj oferty w kalkulatorze.',
   alternates: {
@@ -30,12 +30,12 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-wybrac-n
     'wybór kredytu hipotecznego',
     'porównanie kredytów hipotecznych',
     'kryteria wyboru kredytu',
-    'najlepszy kredyt hipoteczny 2025',
+    'najlepszy kredyt hipoteczny 2026',
     'jak porównać oferty kredytowe',
     'wybór banku kredyt hipoteczny',
   ],
   openGraph: {
-    title: 'Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2025',
+    title: 'Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2026',
     description:
       'Kompletny przewodnik po wyborze najlepszego kredytu hipotecznego: kryteria, porównanie ofert i praktyczne wskazówki.',
     url: `${siteUrl}/blog/jak-wybrac-najlepszy-kredyt-hipoteczny`,
@@ -222,7 +222,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2025',
+  headline: 'Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2026',
   description:
     'Kompletny przewodnik po wyborze najlepszego kredytu hipotecznego: kryteria, porównanie ofert i praktyczne wskazówki.',
   author: {
@@ -292,8 +292,8 @@ const relatedArticles = [
     description: 'Poznaj RRSO i dowiedz się, jak porównać pełne koszty kredytu.',
   },
   {
-    slug: 'ranking-bankow-kredytow-hipotecznych-2025',
-    title: 'Ranking banków kredytów hipotecznych 2025',
+    slug: 'ranking-bankow-kredytow-hipotecznych-2026',
+    title: 'Ranking banków kredytów hipotecznych 2026',
     description: 'Porównaj oferty banków i znajdź najlepszy kredyt dla siebie.',
   },
   {
@@ -340,7 +340,7 @@ export default function HowToChoosePage() {
 
         <HeroSection>
           <HeroEyebrow>Wybór kredytu</HeroEyebrow>
-          <HeroTitle>Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2025</HeroTitle>
+          <HeroTitle>Jak wybrać najlepszy kredyt hipoteczny? Poradnik 2026</HeroTitle>
           <HeroLead>
             Wybór najlepszego kredytu hipotecznego to jedna z najważniejszych decyzji finansowych w życiu.
             Na rynku jest wiele ofert, a wybór odpowiedniej może zaoszczędzić dziesiątki tysięcy złotych. W
@@ -554,7 +554,7 @@ export default function HowToChoosePage() {
                 RRSO kredytu hipotecznego
               </Link>
               ,{' '}
-              <Link href="/blog/ranking-bankow-kredytow-hipotecznych-2025" className="text-white underline hover:text-emerald-50">
+              <Link href="/blog/ranking-bankow-kredytow-hipotecznych-2026" className="text-white underline hover:text-emerald-50">
                 rankingu banków kredytów hipotecznych
               </Link>
               {' '}i{' '}

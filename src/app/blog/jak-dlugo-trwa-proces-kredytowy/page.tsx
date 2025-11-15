@@ -16,9 +16,8 @@ const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.p
 
 export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-dlugo-trwa-proces-kredytowy'),
 
-  title: 'Jak długo trwa proces kredytowy? Terminy 2025',
-  description:
-    'Dowiedz się, ile trwa proces kredytowy: od złożenia wniosku do podpisania umowy. Sprawdź terminy i etapy procesu kredytowego w 2025.',
+  title: 'Jak długo trwa proces kredytowy? Terminy 2026',
+  description: 'Dowiedz się, ile trwa proces kredytowy: od złożenia wniosku do podpisania umowy. Sprawdź terminy i etapy procesu kredytowego w 2026.',
   alternates: {
     canonical: `${siteUrl}/blog/jak-dlugo-trwa-proces-kredytowy`,
   },
@@ -32,7 +31,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-dlugo-tr
     'ile czasu trwa kredyt hipoteczny',
   ],
   openGraph: {
-    title: 'Jak długo trwa proces kredytowy? Terminy 2025',
+    title: 'Jak długo trwa proces kredytowy? Terminy 2026',
     description:
       'Kompletny przewodnik po czasie trwania procesu kredytowego: etapy, terminy i czynniki wpływające na czas.',
     url: `${siteUrl}/blog/jak-dlugo-trwa-proces-kredytowy`,
@@ -216,7 +215,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Jak długo trwa proces kredytowy? Terminy 2025',
+  headline: 'Jak długo trwa proces kredytowy? Terminy 2026',
   description:
     'Kompletny przewodnik po czasie trwania procesu kredytowego: etapy, terminy i czynniki wpływające na czas.',
   author: {
@@ -334,7 +333,7 @@ export default function ProcessDurationPage() {
 
         <HeroSection>
           <HeroEyebrow>Proces kredytowy</HeroEyebrow>
-          <HeroTitle>Jak długo trwa proces kredytowy? Terminy 2025</HeroTitle>
+          <HeroTitle>Jak długo trwa proces kredytowy? Terminy 2026</HeroTitle>
           <HeroLead>
             Proces kredytowy może wydawać się długi i skomplikowany, ale odpowiednie przygotowanie może go
             znacznie przyspieszyć. W tym przewodniku dowiesz się, ile trwa proces kredytowy, jakie są jego

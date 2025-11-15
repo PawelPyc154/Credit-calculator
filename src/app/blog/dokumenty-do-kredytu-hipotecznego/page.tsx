@@ -18,9 +18,8 @@ const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.p
 export const metadata: Metadata = {
   robots: getPostRobotsMetadata('dokumenty-do-kredytu-hipotecznego'),
 
-  title: 'Dokumenty do kredytu hipotecznego - kompletna lista 2025',
-  description:
-    'Sprawdź, jakie dokumenty są potrzebne do kredytu hipotecznego: dokumenty tożsamości, dochód, nieruchomość i inne. Kompletna lista dokumentów 2025.',
+  title: 'Dokumenty do kredytu hipotecznego - kompletna lista 2026',
+  description: 'Sprawdź, jakie dokumenty są potrzebne do kredytu hipotecznego: dokumenty tożsamości, dochód, nieruchomość i inne. Kompletna lista dokumentów 2026.',
   alternates: {
     canonical: `${siteUrl}/blog/dokumenty-do-kredytu-hipotecznego`,
   },
@@ -28,13 +27,13 @@ export const metadata: Metadata = {
     'dokumenty do kredytu hipotecznego',
     'jakie dokumenty są potrzebne do kredytu hipotecznego',
     'lista dokumentów kredyt hipoteczny',
-    'dokumenty kredyt hipoteczny 2025',
+    'dokumenty kredyt hipoteczny 2026',
     'zaświadczenie o dochodach kredyt hipoteczny',
     'dokumenty do wniosku kredytowego',
     'co jest potrzebne do kredytu hipotecznego',
   ],
   openGraph: {
-    title: 'Dokumenty do kredytu hipotecznego - kompletna lista 2025',
+    title: 'Dokumenty do kredytu hipotecznego - kompletna lista 2026',
     description:
       'Kompletna lista dokumentów potrzebnych do kredytu hipotecznego: dokumenty tożsamości, dochód, nieruchomość i inne.',
     url: `${siteUrl}/blog/dokumenty-do-kredytu-hipotecznego`,
@@ -50,7 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Dokumenty do kredytu hipotecznego - lista 2025',
+    title: 'Dokumenty do kredytu hipotecznego - lista 2026',
     description: 'Sprawdź, jakie dokumenty są potrzebne do kredytu hipotecznego.',
     images: [`${siteUrl}/og-image.jpg`],
   },
@@ -239,7 +238,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Dokumenty do kredytu hipotecznego - kompletna lista 2025',
+  headline: 'Dokumenty do kredytu hipotecznego - kompletna lista 2026',
   description:
     'Kompletna lista dokumentów potrzebnych do kredytu hipotecznego: dokumenty tożsamości, dochód, nieruchomość i inne.',
   author: {
@@ -357,7 +356,7 @@ export default function DocumentsPage() {
 
         <HeroSection>
           <HeroEyebrow>Proces kredytowy</HeroEyebrow>
-          <HeroTitle>Dokumenty do kredytu hipotecznego - kompletna lista 2025</HeroTitle>
+          <HeroTitle>Dokumenty do kredytu hipotecznego - kompletna lista 2026</HeroTitle>
           <HeroLead>
             Przygotowanie dokumentów to kluczowy etap procesu składania wniosku o kredyt hipoteczny.
             Kompletna lista dokumentów może wydawać się długa, ale odpowiednie przygotowanie

@@ -17,7 +17,7 @@ const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.p
 
 export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipoteczny-dla-przedsiebiorcy'),
 
-  title: 'Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2025',
+  title: 'Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2026',
   description:
     'Dowiedz się, jak wziąć kredyt hipoteczny jako przedsiębiorca: wymagania, dokumenty, zdolność kredytowa i wskazówki. Sprawdź swoją zdolność w kalkulatorze.',
   alternates: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     'jak wziąć kredyt jako przedsiębiorca',
   ],
   openGraph: {
-    title: 'Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2025',
+    title: 'Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2026',
     description:
       'Kompletny przewodnik po kredycie hipotecznym dla przedsiębiorców: wymagania, dokumenty i praktyczne wskazówki.',
     url: `${siteUrl}/blog/kredyt-hipoteczny-dla-przedsiebiorcy`,
@@ -193,7 +193,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2025',
+  headline: 'Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2026',
   description:
     'Kompletny przewodnik po kredycie hipotecznym dla przedsiębiorców: wymagania, dokumenty i praktyczne wskazówki.',
   author: {
@@ -311,7 +311,7 @@ export default function EntrepreneurPage() {
 
         <HeroSection>
           <HeroEyebrow>Dla przedsiębiorców</HeroEyebrow>
-          <HeroTitle>Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2025</HeroTitle>
+          <HeroTitle>Kredyt hipoteczny dla przedsiębiorcy - wymagania i warunki 2026</HeroTitle>
           <HeroLead>
             Wzięcie kredytu hipotecznego jako przedsiębiorca może być bardziej skomplikowane niż dla
             pracowników, ale jest możliwe. Banki mogą mieć bardziej rygorystyczne wymagania i wymagać

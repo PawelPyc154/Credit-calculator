@@ -17,7 +17,7 @@ const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.p
 
 export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipoteczny-dla-mlodych-programy-wsparcia'),
 
-  title: 'Kredyt hipoteczny dla młodych - programy wsparcia 2025',
+  title: 'Kredyt hipoteczny dla młodych - programy wsparcia 2026',
   description:
     'Poznaj programy wsparcia dla młodych przy zakupie mieszkania: mdM, Rodzina na Swoim i inne. Sprawdź warunki i możliwości kredytu hipotecznego dla młodych.',
   alternates: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     'kredyt dla młodych do 45 roku życia',
   ],
   openGraph: {
-    title: 'Kredyt hipoteczny dla młodych - programy wsparcia 2025',
+    title: 'Kredyt hipoteczny dla młodych - programy wsparcia 2026',
     description:
       'Kompletny przewodnik po programach wsparcia dla młodych: mdM, Rodzina na Swoim i inne. Sprawdź warunki i możliwości.',
     url: `${siteUrl}/blog/kredyt-hipoteczny-dla-mlodych-programy-wsparcia`,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kredyt hipoteczny dla młodych - programy wsparcia 2025',
+    title: 'Kredyt hipoteczny dla młodych - programy wsparcia 2026',
     description: 'Poznaj programy wsparcia dla młodych przy zakupie mieszkania i sprawdź warunki kredytu.',
     images: [`${siteUrl}/og-image.jpg`],
   },
@@ -196,7 +196,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Kredyt hipoteczny dla młodych - programy wsparcia 2025',
+  headline: 'Kredyt hipoteczny dla młodych - programy wsparcia 2026',
   description:
     'Kompletny przewodnik po programach wsparcia dla młodych: mdM, Rodzina na Swoim, lokalne programy i warunki kwalifikacji.',
   author: {
@@ -257,7 +257,7 @@ const breadcrumbStructuredData = {
 const relatedArticles = [
   {
     slug: 'wklad-wlasny-kredyt-hipoteczny',
-    title: 'Wkład własny na kredyt hipoteczny 2025',
+    title: 'Wkład własny na kredyt hipoteczny 2026',
     description: 'Dowiedz się, ile wynosi minimalny wkład własny i jak go obliczyć.',
   },
   {
@@ -314,7 +314,7 @@ export default function YoungPeopleProgramsPage() {
 
         <HeroSection>
           <HeroEyebrow>Programy wsparcia</HeroEyebrow>
-          <HeroTitle>Kredyt hipoteczny dla młodych - programy wsparcia 2025</HeroTitle>
+          <HeroTitle>Kredyt hipoteczny dla młodych - programy wsparcia 2026</HeroTitle>
           <HeroLead>
             Młodzi ludzie mają dostęp do specjalnych programów wsparcia przy zakupie pierwszego mieszkania.
             Program mdM (Mieszkanie dla Młodych) pozwala na kredyt hipoteczny z wkładem własnym zaledwie 10%

@@ -17,7 +17,7 @@ const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://www.kredytanaliza.p
 
 export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipoteczny-dla-singla'),
 
-  title: 'Kredyt hipoteczny dla singla - poradnik 2025',
+  title: 'Kredyt hipoteczny dla singla - poradnik 2026',
   description:
     'Dowiedz się, jak wziąć kredyt hipoteczny jako singiel: wymagania, zdolność kredytowa, wkład własny i wskazówki. Sprawdź swoją zdolność kredytową w kalkulatorze.',
   alternates: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     'jak wziąć kredyt jako singiel',
   ],
   openGraph: {
-    title: 'Kredyt hipoteczny dla singla - poradnik 2025',
+    title: 'Kredyt hipoteczny dla singla - poradnik 2026',
     description:
       'Kompletny przewodnik po kredycie hipotecznym dla singli: wymagania, zdolność kredytowa i praktyczne wskazówki.',
     url: `${siteUrl}/blog/kredyt-hipoteczny-dla-singla`,
@@ -169,7 +169,7 @@ const toJsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c'
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Kredyt hipoteczny dla singla - poradnik 2025',
+  headline: 'Kredyt hipoteczny dla singla - poradnik 2026',
   description:
     'Kompletny przewodnik po kredycie hipotecznym dla singli: wymagania, zdolność kredytowa i praktyczne wskazówki.',
   author: {
@@ -235,7 +235,7 @@ const relatedArticles = [
   },
   {
     slug: 'wklad-wlasny-kredyt-hipoteczny',
-    title: 'Wkład własny na kredyt hipoteczny 2025',
+    title: 'Wkład własny na kredyt hipoteczny 2026',
     description: 'Dowiedz się, ile wynosi minimalny wkład własny i jak go obliczyć.',
   },
   {
@@ -287,7 +287,7 @@ export default function SinglePersonPage() {
 
         <HeroSection>
           <HeroEyebrow>Dla singli</HeroEyebrow>
-          <HeroTitle>Kredyt hipoteczny dla singla - poradnik 2025</HeroTitle>
+          <HeroTitle>Kredyt hipoteczny dla singla - poradnik 2026</HeroTitle>
           <HeroLead>
             Wzięcie kredytu hipotecznego jako singiel może wydawać się trudniejsze niż dla par, ale jest
             możliwe. Jako singiel masz zazwyczaj niższą zdolność kredytową niż para, ponieważ bank bierze
