@@ -4,10 +4,9 @@
  * Czyta metadata z plików page.tsx i generuje dedykowane obrazki OG
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'fs'
-import { join } from 'path'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -60,12 +59,20 @@ async function generateOGImage(article: ArticleInfo) {
 function getIconForArticle(slug: string, title: string): string {
   const lowerSlug = slug.toLowerCase()
   const lowerTitle = title.toLowerCase()
-  
+
   // Mapowanie ikon na podstawie słów kluczowych
-  if (lowerSlug.includes('zagrozenia') || lowerSlug.includes('pulapki') || lowerSlug.includes('ostrzezenie')) {
+  if (
+    lowerSlug.includes('zagrozenia') ||
+    lowerSlug.includes('pulapki') ||
+    lowerSlug.includes('ostrzezenie')
+  ) {
     return getWarningIcon()
   }
-  if (lowerSlug.includes('ukryte-koszty') || lowerSlug.includes('koszty') || lowerSlug.includes('prowizja')) {
+  if (
+    lowerSlug.includes('ukryte-koszty') ||
+    lowerSlug.includes('koszty') ||
+    lowerSlug.includes('prowizja')
+  ) {
     return getMoneyIcon()
   }
   if (lowerSlug.includes('ranking') || lowerSlug.includes('bankow')) {
@@ -89,10 +96,18 @@ function getIconForArticle(slug: string, title: string): string {
   if (lowerSlug.includes('negocjowac') || lowerSlug.includes('wybrac')) {
     return getHandshakeIcon()
   }
-  if (lowerSlug.includes('rozwod') || lowerSlug.includes('smierc') || lowerSlug.includes('nie-mozesz-splacac')) {
+  if (
+    lowerSlug.includes('rozwod') ||
+    lowerSlug.includes('smierc') ||
+    lowerSlug.includes('nie-mozesz-splacac')
+  ) {
     return getHelpIcon()
   }
-  if (lowerSlug.includes('mlodych') || lowerSlug.includes('singla') || lowerSlug.includes('przedsiebiorcy')) {
+  if (
+    lowerSlug.includes('mlodych') ||
+    lowerSlug.includes('singla') ||
+    lowerSlug.includes('przedsiebiorcy')
+  ) {
     return getUsersIcon()
   }
   if (lowerSlug.includes('budowe-domu') || lowerSlug.includes('wklad-wlasny')) {
@@ -104,7 +119,7 @@ function getIconForArticle(slug: string, title: string): string {
   if (lowerSlug.includes('jak-') || lowerSlug.includes('poradnik')) {
     return getGuideIcon()
   }
-  
+
   // Domyślnie kalkulator
   return getCalculatorIcon()
 }
@@ -235,7 +250,7 @@ function wrapText(text: string, maxLength: number, maxLines: number = 2): string
   const words = text.split(' ')
   const lines: string[] = []
   let currentLine = ''
-  
+
   for (const word of words) {
     const testLine = currentLine ? `${currentLine} ${word}` : word
     if (testLine.length <= maxLength) {
@@ -252,21 +267,23 @@ function wrapText(text: string, maxLength: number, maxLines: number = 2): string
       if (lines.length >= maxLines) break
     }
   }
-  
+
   if (currentLine && lines.length < maxLines) {
     lines.push(currentLine)
   }
-  
+
   return lines
 }
 
 function generateSVG(article: ArticleInfo): string {
   // Podziel tytuł na linie (max 2 linie, max 45 znaków na linię)
   const titleLines = wrapText(article.title, 45, 2)
-  
+
   // Skróć podtytuł jeśli jest za długi
-  const subtitle = article.description 
-    ? (article.description.length > 70 ? article.description.substring(0, 67) + '...' : article.description)
+  const subtitle = article.description
+    ? article.description.length > 70
+      ? article.description.substring(0, 67) + '...'
+      : article.description
     : 'Poznaj najważniejsze informacje o kredytach hipotecznych'
 
   // Wybierz ikonę na podstawie tematu
@@ -276,9 +293,9 @@ function generateSVG(article: ArticleInfo): string {
   let titleSVG = ''
   const startY = titleLines.length === 1 ? 380 : 360
   const lineHeight = 60
-  
+
   titleLines.forEach((line, index) => {
-    const y = startY + (index * lineHeight)
+    const y = startY + index * lineHeight
     titleSVG += `<text x="600" y="${y}" font-family="system-ui, -apple-system, sans-serif" font-size="${titleLines.length === 1 ? '52' : '46'}" font-weight="bold" fill="white" text-anchor="middle" filter="url(#textShadow)">${escapeXml(line)}</text>\n  `
   })
 
@@ -336,25 +353,25 @@ function escapeXml(text: string): string {
 function extractArticleInfo(filePath: string): ArticleInfo | null {
   try {
     const content = readFileSync(filePath, 'utf-8')
-    
+
     // Wyciągnij slug z ścieżki
-    const slugMatch = filePath.match(/blog\/([^\/]+)\/page\.tsx$/)
-    if (!slugMatch) return null
-    
+    const slugMatch = filePath.match(/blog\/([^/]+)\/page\.tsx$/)
+    if (!slugMatch || !slugMatch[1]) return null
+
     const slug = slugMatch[1]
-    
+
     // Wyciągnij tytuł z metadata
     const titleMatch = content.match(/title:\s*['"]([^'"]+)['"]/)
-    if (!titleMatch) return null
-    
+    if (!titleMatch || !titleMatch[1]) return null
+
     let title = titleMatch[1]
     // Usuń suffix "| Kalkulator Kredytowy" jeśli istnieje
     title = title.replace(/\s*\|\s*Kalkulator Kredytowy\s*$/, '').trim()
-    
+
     // Wyciągnij opis z openGraph jeśli istnieje
     const ogDescMatch = content.match(/openGraph:\s*\{[^}]*description:\s*['"]([^'"]+)['"]/)
     const description = ogDescMatch ? ogDescMatch[1] : undefined
-    
+
     return { slug, title, description }
   } catch (error) {
     console.error(`Błąd przy czytaniu ${filePath}:`, error)
@@ -367,10 +384,10 @@ async function main() {
 
   const blogDir = join(__dirname, '../src/app/blog')
   const outputDir = join(__dirname, '../public/images/blog')
-  
+
   // Upewnij się, że folder istnieje
   if (!existsSync(outputDir)) {
-    const { mkdirSync } = await import('fs')
+    const { mkdirSync } = await import('node:fs')
     mkdirSync(outputDir, { recursive: true })
   }
 
@@ -379,14 +396,14 @@ async function main() {
 
   // Znajdź wszystkie artykuły
   const entries = readdirSync(blogDir, { withFileTypes: true })
-  
+
   for (const entry of entries) {
     if (!entry.isDirectory()) continue
     if (entry.name === 'page.tsx') continue // Pomiń główny folder blog
-    
+
     const pagePath = join(blogDir, entry.name, 'page.tsx')
     if (!existsSync(pagePath)) continue
-    
+
     const info = extractArticleInfo(pagePath)
     if (info) {
       articles.push(info)
@@ -403,7 +420,7 @@ async function main() {
 
   for (const article of articles) {
     const jpgPath = join(outputDir, `${article.slug}-og.jpg`)
-    
+
     // Pomiń jeśli już istnieje (opcjonalnie - możesz usunąć tę linię, aby regenerować wszystkie)
     if (existsSync(jpgPath)) {
       console.log(`⏭️  Pomijam ${article.slug} (już istnieje)`)
@@ -413,7 +430,7 @@ async function main() {
 
     console.log(`🖼️  Generuję obrazek dla: ${article.title}`)
     const result = await generateOGImage(article)
-    
+
     if (result.success) {
       console.log(`   ✅ ${article.slug}-og.jpg (${result.size} KB)\n`)
       successCount++
@@ -429,7 +446,7 @@ async function main() {
   console.log(`   ✅ Wygenerowano: ${successCount}`)
   console.log(`   ⏭️  Pominięto: ${skipCount}`)
   console.log(`   ❌ Błędy: ${errors.length}`)
-  
+
   if (errors.length > 0) {
     console.log('\n❌ Artykuły z błędami:')
     errors.forEach(({ slug, error }) => {
@@ -444,4 +461,3 @@ async function main() {
 }
 
 main().catch(console.error)
-
