@@ -550,6 +550,7 @@ export default function NoDownPaymentPage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">

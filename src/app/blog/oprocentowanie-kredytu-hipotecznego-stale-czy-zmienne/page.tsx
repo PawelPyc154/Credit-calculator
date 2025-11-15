@@ -571,6 +571,7 @@ export default function InterestRateTypePage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">

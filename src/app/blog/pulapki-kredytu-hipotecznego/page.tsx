@@ -406,6 +406,7 @@ export default function TrapsPage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">

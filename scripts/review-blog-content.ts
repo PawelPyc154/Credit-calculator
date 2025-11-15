@@ -25,6 +25,7 @@ async function reviewArticle(slug: string): Promise<ContentIssue[]> {
     // 1. Sprawdź czy są zbyt krótkie sekcje ArticleText (mniej niż 100 znaków)
     const articleTextMatches = content.matchAll(/<ArticleText>([\s\S]*?)<\/ArticleText>/g)
     for (const match of articleTextMatches) {
+      if (!match[1]) continue
       const text = match[1].replace(/<[^>]+>/g, '').trim()
       if (text.length < 100 && text.length > 0) {
         const lineNum = content.substring(0, match.index).split('\n').length
@@ -40,6 +41,7 @@ async function reviewArticle(slug: string): Promise<ContentIssue[]> {
     const ctaTexts: string[] = []
     const ctaMatches = content.matchAll(/<CtaButton[^>]*>([\s\S]*?)<\/CtaButton>/g)
     for (const match of ctaMatches) {
+      if (!match[1]) continue
       const text = match[1].replace(/<[^>]+>/g, '').trim()
       if (text) ctaTexts.push(text)
     }
@@ -69,6 +71,7 @@ async function reviewArticle(slug: string): Promise<ContentIssue[]> {
 
     const subtitleMatches = content.matchAll(/<SectionSubtitle>([\s\S]*?)<\/SectionSubtitle>/g)
     for (const match of subtitleMatches) {
+      if (!match[1]) continue
       const text = match[1].trim()
       if (genericPhrases.some((phrase) => phrase.test(text)) && text.length < 80) {
         const lineNum = content.substring(0, match.index).split('\n').length
@@ -99,6 +102,7 @@ async function reviewArticle(slug: string): Promise<ContentIssue[]> {
     // 6. Sprawdź czy SummaryText nie jest zbyt krótki
     const summaryMatches = content.matchAll(/<SummaryText>([\s\S]*?)<\/SummaryText>/g)
     for (const match of summaryMatches) {
+      if (!match[1]) continue
       const text = match[1].replace(/<[^>]+>/g, '').trim()
       if (text.length < 150) {
         const lineNum = content.substring(0, match.index).split('\n').length

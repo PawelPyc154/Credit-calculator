@@ -493,6 +493,7 @@ export default function ConstructionLoanPage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">

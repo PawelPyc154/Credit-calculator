@@ -426,6 +426,7 @@ export default function NegotiationPage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">

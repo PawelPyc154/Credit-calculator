@@ -454,6 +454,7 @@ export default function CalculatorGuidePage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">

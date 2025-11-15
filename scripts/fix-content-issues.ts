@@ -43,8 +43,9 @@ async function fixContentIssues(slug: string) {
           let replaced = false
           for (let i = 1; i < matches.length; i++) {
             const match = matches[i]
-            const before = content.substring(0, match.index!)
-            const after = content.substring(match.index! + match[0].length)
+            if (!match || match.index === undefined) continue
+            const before = content.substring(0, match.index)
+            const after = content.substring(match.index + match[0].length)
             content = before + replacement.replacement + after
             replaced = true
           }

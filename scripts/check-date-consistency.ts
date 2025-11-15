@@ -32,7 +32,7 @@ async function checkArticle(slug: string): Promise<ArticleIssue | null> {
     const title = titleMatch ? titleMatch[1] : ''
 
     // Znajdź rok w tytule (2025, 2026, itp.)
-    const yearMatch = title.match(/\b(20\d{2})\b/)
+    const yearMatch = title ? title.match(/\b(20\d{2})\b/) : null
     const titleYear = yearMatch ? yearMatch[1] : null
 
     // Sprawdź czy jest problem

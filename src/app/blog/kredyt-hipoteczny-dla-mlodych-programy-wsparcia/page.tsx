@@ -504,6 +504,7 @@ export default function YoungPeopleProgramsPage() {
               </FaqItem>
             ))}
           </FaqList>
+        </Section>
         <Section>
           <SectionHeader>
             <SectionBadge aria-hidden="true">
