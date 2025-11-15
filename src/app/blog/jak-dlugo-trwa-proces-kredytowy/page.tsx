@@ -38,7 +38,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-dlugo-tr
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/jak-dlugo-trwa-proces-kredytowy-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Jak długo trwa proces kredytowy',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-dlugo-tr
     card: 'summary_large_image',
     title: 'Jak długo trwa proces kredytowy?',
     description: 'Dowiedz się, ile trwa proces kredytowy od wniosku do podpisania umowy.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/jak-dlugo-trwa-proces-kredytowy-og.jpg`],
   },
 }
 

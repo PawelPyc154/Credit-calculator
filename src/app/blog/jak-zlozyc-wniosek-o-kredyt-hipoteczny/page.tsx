@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-zlozyc-w
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/jak-zlozyc-wniosek-o-kredyt-hipoteczny-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Jak złożyć wniosek o kredyt hipoteczny',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-zlozyc-w
     card: 'summary_large_image',
     title: 'Jak złożyć wniosek o kredyt hipoteczny?',
     description: 'Dowiedz się, jak złożyć wniosek o kredyt hipoteczny krok po kroku.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/jak-zlozyc-wniosek-o-kredyt-hipoteczny-og.jpg`],
   },
 }
 

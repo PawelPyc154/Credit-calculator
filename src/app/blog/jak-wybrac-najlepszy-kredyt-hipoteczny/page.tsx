@@ -42,7 +42,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-wybrac-n
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/jak-wybrac-najlepszy-kredyt-hipoteczny-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Jak wybrać najlepszy kredyt hipoteczny',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-wybrac-n
     card: 'summary_large_image',
     title: 'Jak wybrać najlepszy kredyt hipoteczny?',
     description: 'Dowiedz się, jak wybrać najlepszy kredyt hipoteczny i porównać oferty.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/jak-wybrac-najlepszy-kredyt-hipoteczny-og.jpg`],
   },
 }
 

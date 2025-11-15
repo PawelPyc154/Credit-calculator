@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('wczesniejsza
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/wczesniejsza-splata-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Wcześniejsza spłata kredytu hipotecznego',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('wczesniejsza
     card: 'summary_large_image',
     title: 'Wcześniejsza spłata kredytu hipotecznego',
     description: 'Dowiedz się, czy warto spłacić kredyt hipoteczny wcześniej i jakie są opłaty.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/wczesniejsza-splata-kredytu-hipotecznego-og.jpg`],
   },
 }
 

@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-negocjow
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/jak-negocjowac-warunki-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Jak negocjować warunki kredytu hipotecznego',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-negocjow
     card: 'summary_large_image',
     title: 'Jak negocjować warunki kredytu hipotecznego?',
     description: 'Dowiedz się, jak negocjować warunki kredytu hipotecznego i obniżyć koszty.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/jak-negocjowac-warunki-kredytu-hipotecznego-og.jpg`],
   },
 }
 

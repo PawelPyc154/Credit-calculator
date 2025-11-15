@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/kredyt-hipoteczny-dla-singla-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Kredyt hipoteczny dla singla',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     card: 'summary_large_image',
     title: 'Kredyt hipoteczny dla singla - poradnik',
     description: 'Dowiedz się, jak wziąć kredyt hipoteczny jako singiel.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/kredyt-hipoteczny-dla-singla-og.jpg`],
   },
 }
 

@@ -43,7 +43,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('oprocentowan
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/oprocentowanie-kredytu-hipotecznego-stale-czy-zmienne-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Oprocentowanie kredytu hipotecznego - stałe czy zmienne',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('oprocentowan
     card: 'summary_large_image',
     title: 'Oprocentowanie kredytu hipotecznego - stałe czy zmienne?',
     description: 'Dowiedz się, które oprocentowanie wybrać: stałe czy zmienne?',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/oprocentowanie-kredytu-hipotecznego-stale-czy-zmienne-og.jpg`],
   },
 }
 

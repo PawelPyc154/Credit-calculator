@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('co-zrobic-gd
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/co-zrobic-gdy-nie-mozesz-splacac-kredytu-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Co zrobić, gdy nie możesz spłacać kredytu',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('co-zrobic-gd
     card: 'summary_large_image',
     title: 'Co zrobić, gdy nie możesz spłacać kredytu?',
     description: 'Dowiedz się, co zrobić, gdy nie możesz spłacać kredytu hipotecznego.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/co-zrobic-gdy-nie-mozesz-splacac-kredytu-og.jpg`],
   },
 }
 

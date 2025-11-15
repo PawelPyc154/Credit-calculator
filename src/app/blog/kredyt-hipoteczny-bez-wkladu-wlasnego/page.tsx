@@ -41,7 +41,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/kredyt-hipoteczny-bez-wkladu-wlasnego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Kredyt hipoteczny bez wkładu własnego - przewodnik',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     card: 'summary_large_image',
     title: 'Kredyt hipoteczny bez wkładu własnego - czy to możliwe?',
     description: 'Dowiedz się, czy można wziąć kredyt hipoteczny bez wkładu własnego i jakie są warunki.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/kredyt-hipoteczny-bez-wkladu-wlasnego-og.jpg`],
   },
 }
 

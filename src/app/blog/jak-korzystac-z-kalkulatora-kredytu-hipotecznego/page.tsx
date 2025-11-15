@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-korzysta
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/jak-korzystac-z-kalkulatora-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Kalkulator kredytu hipotecznego',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('jak-korzysta
     card: 'summary_large_image',
     title: 'Kalkulator kredytu hipotecznego - jak korzystać?',
     description: 'Dowiedz się, jak korzystać z kalkulatora kredytu hipotecznego.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/jak-korzystac-z-kalkulatora-kredytu-hipotecznego-og.jpg`],
   },
 }
 

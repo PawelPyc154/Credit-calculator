@@ -44,7 +44,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('ranking-bank
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/ranking-bankow-kredytow-hipotecznych-2025-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Ranking banków kredytów hipotecznych 2025',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('ranking-bank
     card: 'summary_large_image',
     title: 'Ranking banków kredytów hipotecznych 2025',
     description: 'Porównaj oferty kredytów hipotecznych i znajdź najlepszą ofertę dla siebie.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/ranking-bankow-kredytow-hipotecznych-2025-og.jpg`],
   },
 }
 

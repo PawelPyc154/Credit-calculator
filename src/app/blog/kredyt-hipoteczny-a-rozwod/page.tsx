@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/kredyt-hipoteczny-a-rozwod-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Kredyt hipoteczny a rozwód',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('kredyt-hipot
     card: 'summary_large_image',
     title: 'Kredyt hipoteczny a rozwód',
     description: 'Dowiedz się, co się dzieje z kredytem hipotecznym przy rozwodzie.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/kredyt-hipoteczny-a-rozwod-og.jpg`],
   },
 }
 

@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/kredyt-hipoteczny-2025-zmiany-przepisy-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Kredyt hipoteczny 2026 - zmiany w przepisach',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Kredyt hipoteczny 2026 - zmiany w przepisach',
     description: 'Poznaj najważniejsze zmiany w przepisach dotyczących kredytów hipotecznych w 2026.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/kredyt-hipoteczny-2025-zmiany-przepisy-og.jpg`],
   },
 }
 

@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('prowizja-kre
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/prowizja-kredyt-hipoteczny-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Prowizja za udzielenie kredytu hipotecznego',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('prowizja-kre
     card: 'summary_large_image',
     title: 'Prowizja za udzielenie kredytu hipotecznego',
     description: 'Dowiedz się, ile wynosi prowizja za udzielenie kredytu hipotecznego i jak ją uniknąć.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/prowizja-kredyt-hipoteczny-og.jpg`],
   },
 }
 

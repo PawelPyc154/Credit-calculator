@@ -17,6 +17,8 @@
     "cron:start": "ENABLE_CRON=true tsx scripts/cron-update-banks.ts",
     "og:zagrozenia": "tsx scripts/generate-zagrozenia-og-png.ts",
     "og:main": "tsx scripts/generate-main-og-image.ts",
+    "og:all": "tsx scripts/generate-all-blog-og-images.ts",
+    "og:update": "tsx scripts/update-blog-og-images-metadata.ts",
     "dev": "next dev --turbo",
     "postinstall": "prisma generate",
     "preview": "next build && next start",

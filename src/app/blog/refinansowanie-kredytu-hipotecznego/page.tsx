@@ -41,7 +41,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('refinansowan
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/refinansowanie-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Refinansowanie kredytu hipotecznego',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('refinansowan
     card: 'summary_large_image',
     title: 'Refinansowanie kredytu hipotecznego - czy warto?',
     description: 'Dowiedz się, czy warto refinansować kredyt hipoteczny i jakie są korzyści.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/refinansowanie-kredytu-hipotecznego-og.jpg`],
   },
 }
 

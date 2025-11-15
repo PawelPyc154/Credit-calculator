@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/ukryte-koszty-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Ukryte koszty kredytu hipotecznego',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Ukryte koszty kredytu hipotecznego - przewodnik',
     description: 'Dowiedz się, jakie ukryte koszty mogą Cię zaskoczyć przy kredycie hipotecznym.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/ukryte-koszty-kredytu-hipotecznego-og.jpg`],
   },
 }
 

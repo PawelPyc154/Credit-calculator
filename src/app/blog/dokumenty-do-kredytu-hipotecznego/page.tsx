@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/dokumenty-do-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Dokumenty do kredytu hipotecznego',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Dokumenty do kredytu hipotecznego - lista 2026',
     description: 'Sprawdź, jakie dokumenty są potrzebne do kredytu hipotecznego.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/dokumenty-do-kredytu-hipotecznego-og.jpg`],
   },
 }
 

@@ -42,7 +42,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('ubezpieczeni
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/ubezpieczenie-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Ubezpieczenie kredytu hipotecznego',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('ubezpieczeni
     card: 'summary_large_image',
     title: 'Ubezpieczenie kredytu hipotecznego - przewodnik',
     description: 'Dowiedz się, jakie ubezpieczenia są wymagane przy kredycie hipotecznym i ile kosztują.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/ubezpieczenie-kredytu-hipotecznego-og.jpg`],
   },
 }
 

@@ -43,7 +43,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('wklad-wlasny
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/wklad-wlasny-kredyt-hipoteczny-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Wkład własny na kredyt hipoteczny - przewodnik',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('wklad-wlasny
     card: 'summary_large_image',
     title: 'Wkład własny na kredyt hipoteczny 2025',
     description: 'Dowiedz się, ile wynosi minimalny wkład własny i jak go obliczyć przed zakupem nieruchomości.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/wklad-wlasny-kredyt-hipoteczny-og.jpg`],
   },
 }
 

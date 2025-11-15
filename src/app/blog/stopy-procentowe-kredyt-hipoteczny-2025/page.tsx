@@ -42,7 +42,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('stopy-procen
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/stopy-procentowe-kredyt-hipoteczny-2025-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Stopy procentowe a kredyt hipoteczny',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('stopy-procen
     card: 'summary_large_image',
     title: 'Stopy procentowe a kredyt hipoteczny 2026',
     description: 'Dowiedz się, jak stopy procentowe wpływają na kredyt hipoteczny.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/stopy-procentowe-kredyt-hipoteczny-2025-og.jpg`],
   },
 }
 

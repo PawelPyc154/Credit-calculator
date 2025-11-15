@@ -42,7 +42,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('rrso-kredyt-
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/rrso-kredyt-hipoteczny-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'RRSO kredytu hipotecznego - przewodnik',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('rrso-kredyt-
     card: 'summary_large_image',
     title: 'RRSO kredytu hipotecznego - przewodnik',
     description: 'Dowiedz się, co to jest RRSO i dlaczego jest ważne przy wyborze kredytu hipotecznego.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/rrso-kredyt-hipoteczny-og.jpg`],
   },
 }
 

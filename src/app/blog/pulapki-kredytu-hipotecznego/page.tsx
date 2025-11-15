@@ -40,7 +40,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('pulapki-kred
     type: 'article',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/images/blog/pulapki-kredytu-hipotecznego-og.jpg`,
         width: 1200,
         height: 630,
         alt: 'Pułapki kredytu hipotecznego',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {  robots: getPostRobotsMetadata('pulapki-kred
     card: 'summary_large_image',
     title: 'Pułapki kredytu hipotecznego',
     description: 'Poznaj najczęstsze pułapki kredytu hipotecznego i jak ich uniknąć.',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/images/blog/pulapki-kredytu-hipotecznego-og.jpg`],
   },
 }
 
