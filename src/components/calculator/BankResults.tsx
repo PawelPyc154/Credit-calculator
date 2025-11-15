@@ -291,6 +291,12 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
                           loanPeriod: formData.loanPeriod,
                         }}
                         formData={formData}
+                        allResults={results.map((r) => ({
+                          bankId: r.bankId,
+                          monthlyPayment: r.monthlyPayment,
+                          totalCost: r.totalCost,
+                          rrso: r.rrso,
+                        }))}
                       />
                     </ExpandedSection>
                   )}

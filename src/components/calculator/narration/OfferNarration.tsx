@@ -6,16 +6,17 @@ import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   HiOutlineCalendar,
   HiOutlineChartBar,
+  HiOutlineCollection,
   HiOutlineCreditCard,
   HiOutlineCurrencyDollar,
   HiOutlineGift,
   HiOutlineShieldCheck,
   HiOutlineTrendingUp,
-  HiOutlineCollection,
 } from 'react-icons/hi'
 import { IoStar } from 'react-icons/io5'
 import { MdPause, MdPlayArrow, MdReplay } from 'react-icons/md'
 import tw from 'tw-tailwind'
+import { PaymentScheduleChart } from './PaymentScheduleChart'
 
 export type NarrationOffer = {
   bankId: string
@@ -31,6 +32,51 @@ export type NarrationOffer = {
   totalInterest?: number
   insurance?: number
   benefits: string[]
+  // Opcjonalne dane do analizy
+  monthlyIncome?: number
+  // Dane do harmonogramu spłat
+  paymentSchedule?: Array<{
+    month: number
+    payment: number
+    principal: number
+    interest: number
+    remaining: number
+  }>
+  // Wady i zalety
+  advantages?: string[]
+  disadvantages?: string[]
+  analysis?: {
+    affordability: {
+      dtiPercentage: number
+      affordabilityLevel: 'excellent' | 'good' | 'moderate' | 'risky' | 'critical'
+      remainingIncome: number
+      recommendation: string
+    }
+    comparison: {
+      rank: number
+      totalOffers: number
+      isTopOffer: boolean
+      recommendation: string
+    }
+    risks: {
+      hasVariableRate: boolean
+      interestRateRisk: 'low' | 'medium' | 'high'
+      riskScenarios: Array<{
+        scenario: string
+        newRate: number
+        newMonthlyPayment: number
+        increase: number
+        isAffordable: boolean
+      }>
+      recommendations: string[]
+    }
+    overall: {
+      score: number
+      matchLevel: 'excellent' | 'good' | 'moderate' | 'poor'
+      summary: string
+      finalRecommendation: string
+    }
+  }
 }
 
 export type NarrationCta = {
@@ -83,7 +129,12 @@ const formatCurrency = (value: number) =>
   value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })
 
 const formatCurrencyNoCents = (value: number) =>
-  value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN', minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  value.toLocaleString('pl-PL', {
+    style: 'currency',
+    currency: 'PLN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
 
 const formatPercent = (value: number) =>
   `${value.toLocaleString('pl-PL', { maximumFractionDigits: 2 })}%`
@@ -114,45 +165,55 @@ const normalizeBenefit = (benefit: string): string => {
 const areBenefitsSimilar = (benefit1: string, benefit2: string): boolean => {
   const normalized1 = normalizeBenefit(benefit1)
   const normalized2 = normalizeBenefit(benefit2)
-  
+
   // Jeśli są identyczne po normalizacji
   if (normalized1 === normalized2) return true
-  
+
   // Wyciągnij kluczowe informacje (liczby, procenty, kluczowe słowa)
   const extractKeyInfo = (text: string): string => {
     // Znajdź liczby i procenty
     const numbers = text.match(/\d+%?/g) || []
     // Znajdź kluczowe słowa związane z korzyściami
-    const keyWords = ['prowizji', 'prowizja', 'koszt', 'opłata', 'karencji', 'karencja', 'wkład', 'marża', 'rrso']
+    const keyWords = [
+      'prowizji',
+      'prowizja',
+      'koszt',
+      'opłata',
+      'karencji',
+      'karencja',
+      'wkład',
+      'marża',
+      'rrso',
+    ]
     const foundKeyWords = keyWords.filter((kw) => text.includes(kw))
-    
+
     return [...numbers, ...foundKeyWords].join(' ')
   }
-  
+
   const keyInfo1 = extractKeyInfo(normalized1)
   const keyInfo2 = extractKeyInfo(normalized2)
-  
+
   // Jeśli kluczowe informacje są identyczne, to są duplikatami
   if (keyInfo1 && keyInfo2 && keyInfo1 === keyInfo2) {
     return true
   }
-  
+
   // Sprawdź czy jedna zawiera drugą (dla przypadków jak "0% prowizji" vs "0% prowizji za udzielenie")
   // ale tylko jeśli różnica jest w dodatkowych słowach na końcu
   const words1 = normalized1.split(' ')
   const words2 = normalized2.split(' ')
-  
+
   // Jeśli jedna jest znacznie krótsza (co najmniej 2 słowa różnicy)
   if (Math.abs(words1.length - words2.length) >= 2) {
     const shorter = words1.length < words2.length ? normalized1 : normalized2
     const longer = words1.length >= words2.length ? normalized1 : normalized2
-    
+
     // Jeśli krótsza jest zawarta w dłuższej i zaczyna się tak samo
     if (longer.startsWith(shorter) || shorter.split(' ').every((w) => longer.includes(w))) {
       return true
     }
   }
-  
+
   return false
 }
 
@@ -162,7 +223,9 @@ const filterRealBenefits = (benefits: string[]): string[] => {
   const filtered = benefits
     .map((benefit) => {
       // Usuń informacje w nawiasach typu "(przy spełnieniu warunków)", "(dla klientów...)" itp.
-      return benefit.replace(/\s*\([^)]*(?:przy|warunk|spełnieni|dla klient|wymagani)[^)]*\)/gi, '').trim()
+      return benefit
+        .replace(/\s*\([^)]*(?:przy|warunk|spełnieni|dla klient|wymagani)[^)]*\)/gi, '')
+        .trim()
     })
     .filter((benefit) => {
       // Wzorce wskazujące na informacje o terminach ważności, a nie korzyści
@@ -175,12 +238,12 @@ const filterRealBenefits = (benefits: string[]): string[] => {
         /oferta\s+specjalna.*obowiązuje/i,
         /obowiązuje.*od.*do/i,
       ]
-      
+
       // Jeśli tekst pasuje do wzorca informacji o terminie, pomiń go
       return !nonBenefitPatterns.some((pattern) => pattern.test(benefit))
     })
     .filter((benefit) => benefit.length > 0) // Usuń puste po usunięciu nawiasów
-  
+
   // Następnie usuń duplikaty i podobne korzyści
   const uniqueBenefits: string[] = []
   for (const benefit of filtered) {
@@ -189,7 +252,7 @@ const filterRealBenefits = (benefits: string[]): string[] => {
       uniqueBenefits.push(benefit)
     }
   }
-  
+
   return uniqueBenefits
 }
 
@@ -221,6 +284,33 @@ const getHighlightKeyIcon = (highlightKey: string, size: 'sm' | 'md' | 'lg' = 'm
       return <HiOutlineCollection {...iconProps} />
     case 'benefits':
       return <HiOutlineGift {...iconProps} />
+    case 'affordability':
+    case 'affordabilityLevel':
+      return <HiOutlineShieldCheck {...iconProps} />
+    case 'remainingIncome':
+      return <HiOutlineCurrencyDollar {...iconProps} />
+    case 'rank':
+    case 'comparison':
+      return <HiOutlineTrendingUp {...iconProps} />
+    case 'score':
+    case 'matchLevel':
+    case 'overall':
+      return <HiOutlineChartBar {...iconProps} />
+    case 'risk':
+    case 'riskScenarios':
+      return <HiOutlineShieldCheck {...iconProps} />
+    case 'schedule':
+    case 'payment':
+    case 'firstPayment':
+    case 'firstPrincipal':
+    case 'firstInterest':
+    case 'midPayment':
+    case 'lastPayment':
+      return <HiOutlineCalendar {...iconProps} />
+    case 'advantages':
+      return <HiOutlineGift {...iconProps} />
+    case 'disadvantages':
+      return <HiOutlineShieldCheck {...iconProps} />
     default:
       return <HiOutlineChartBar {...iconProps} />
   }
@@ -236,6 +326,18 @@ const getPropertyComponentForSection = (sectionId: string) => {
       return CostPropertyCard
     case 'benefits':
       return BenefitPropertyCard
+    case 'affordability':
+      return AffordabilityPropertyCard
+    case 'comparison':
+      return ComparisonPropertyCard
+    case 'risks':
+      return RisksPropertyCard
+    case 'overall':
+      return OverallPropertyCard
+    case 'schedule':
+      return SchedulePropertyCard
+    case 'prosCons':
+      return ProsConsPropertyCard
     case 'summary':
       return SummaryPropertyCard
     default:
@@ -243,7 +345,10 @@ const getPropertyComponentForSection = (sectionId: string) => {
   }
 }
 
-const renderPropertyContent = (sectionId: string, item: { label: string; value: string; highlightKey: string }) => {
+const renderPropertyContent = (
+  sectionId: string,
+  item: { label: string; value: string; highlightKey: string },
+) => {
   switch (sectionId) {
     case 'basics':
       return (
@@ -285,9 +390,109 @@ const renderPropertyContent = (sectionId: string, item: { label: string; value: 
       return (
         <>
           <BenefitPropertyIcon>
-            <IoStar className="w-4 h-4 text-gray-400 fill-current" />
+            <IoStar className="h-4 w-4 fill-current text-gray-400" />
           </BenefitPropertyIcon>
           <BenefitPropertyValue>{item.value}</BenefitPropertyValue>
+        </>
+      )
+    case 'affordability':
+      return (
+        <>
+          <AffordabilityPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </AffordabilityPropertyIconWrapper>
+          <AffordabilityPropertyContent>
+            <AffordabilityPropertyLabel>{item.label}</AffordabilityPropertyLabel>
+            <AffordabilityPropertyValue>{item.value}</AffordabilityPropertyValue>
+          </AffordabilityPropertyContent>
+        </>
+      )
+    case 'comparison':
+      return (
+        <>
+          <ComparisonPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </ComparisonPropertyIconWrapper>
+          <ComparisonPropertyContent>
+            <ComparisonPropertyLabel>{item.label}</ComparisonPropertyLabel>
+            <ComparisonPropertyValue>{item.value}</ComparisonPropertyValue>
+          </ComparisonPropertyContent>
+        </>
+      )
+    case 'risks':
+      return (
+        <>
+          <RisksPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </RisksPropertyIconWrapper>
+          <RisksPropertyContent>
+            <RisksPropertyLabel>{item.label}</RisksPropertyLabel>
+            <RisksPropertyValue>{item.value}</RisksPropertyValue>
+          </RisksPropertyContent>
+        </>
+      )
+    case 'overall':
+      return (
+        <>
+          <OverallPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </OverallPropertyIconWrapper>
+          <OverallPropertyContent>
+            <OverallPropertyLabel>{item.label}</OverallPropertyLabel>
+            <OverallPropertyValue>{item.value}</OverallPropertyValue>
+          </OverallPropertyContent>
+        </>
+      )
+    case 'schedule':
+      return (
+        <>
+          <SchedulePropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </SchedulePropertyIconWrapper>
+          <SchedulePropertyContent>
+            <SchedulePropertyLabel>{item.label}</SchedulePropertyLabel>
+            <SchedulePropertyValue>{item.value}</SchedulePropertyValue>
+          </SchedulePropertyContent>
+        </>
+      )
+    case 'prosCons':
+      return (
+        <>
+          <ProsConsPropertyIcon>
+            {item.highlightKey === 'advantages' ? (
+              <svg
+                className="h-4 w-4 text-green-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-label="Zaleta"
+              >
+                <title>Zaleta</title>
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="h-4 w-4 text-red-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-label="Wada"
+              >
+                <title>Wada</title>
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </ProsConsPropertyIcon>
+          <ProsConsPropertyContent>
+            <ProsConsPropertyLabel>{item.label}</ProsConsPropertyLabel>
+            <ProsConsPropertyValue>{item.value}</ProsConsPropertyValue>
+          </ProsConsPropertyContent>
         </>
       )
     case 'summary':
@@ -306,7 +511,9 @@ const renderPropertyContent = (sectionId: string, item: { label: string; value: 
       return (
         <>
           <ListVariantPropertyHeader>
-            <ListVariantPropertyIcon>{getHighlightKeyIcon(item.highlightKey)}</ListVariantPropertyIcon>
+            <ListVariantPropertyIcon>
+              {getHighlightKeyIcon(item.highlightKey)}
+            </ListVariantPropertyIcon>
             <ListVariantPropertyLabel>{item.label}</ListVariantPropertyLabel>
           </ListVariantPropertyHeader>
           <ListVariantPropertyValue>{item.value}</ListVariantPropertyValue>
@@ -335,9 +542,7 @@ export const createNarrationSections = (
       title: 'Podstawowe parametry',
       script: `Kwota finansowania to ${formatCurrencyNoCents(offer.loanAmount)}, spłacana przez ${formatLoanTermYears(
         offer.loanPeriodYears,
-      )}. Szacunkowa rata wynosi około ${formatCurrencyNoCents(
-        offer.monthlyPayment,
-      )} miesięcznie.`,
+      )}. Szacunkowa rata wynosi około ${formatCurrencyNoCents(offer.monthlyPayment)} miesięcznie.`,
       highlights: ['loanAmount', 'loanPeriod', 'monthlyPayment'],
     },
     {
@@ -366,6 +571,181 @@ export const createNarrationSections = (
       : 'Bank nie zadeklarował dodatkowych benefitów w tej ofercie, ale podstawowe warunki pozostają korzystne.',
     highlights: ['benefits'],
   })
+
+  // Dodaj sekcje analizy, jeśli dostępna
+  if (offer.analysis && offer.monthlyIncome) {
+    const analysis = offer.analysis
+
+    // Sekcja 1: Zdolność kredytowa
+    const affordabilityLevelText = {
+      excellent: 'doskonała',
+      good: 'dobra',
+      moderate: 'umiarkowana',
+      risky: 'ryzykowna',
+      critical: 'krytyczna',
+    }[analysis.affordability.affordabilityLevel]
+
+    const affordabilityScript = `Zdolność kredytowa. Rata stanowi ${formatPercentForNarration(
+      analysis.affordability.dtiPercentage,
+    )} Twojego dochodu, co oznacza ${affordabilityLevelText} zdolność kredytową. Po spłacie raty pozostanie Ci około ${formatCurrencyNoCents(
+      analysis.affordability.remainingIncome,
+    )} miesięcznie. ${analysis.affordability.recommendation}`
+
+    sections.push({
+      id: 'affordability',
+      title: 'Zdolność kredytowa',
+      script: affordabilityScript,
+      highlights: ['affordability', 'affordabilityLevel', 'remainingIncome'],
+    })
+
+    // Sekcja 2: Porównanie z innymi ofertami
+    let comparisonScript = `Porównanie z innymi ofertami. `
+    if (analysis.comparison.isTopOffer) {
+      comparisonScript += `Ta oferta jest w top ${analysis.comparison.rank} najlepszych ofert spośród ${analysis.comparison.totalOffers} dostępnych. `
+    } else {
+      comparisonScript += `Ta oferta zajmuje ${analysis.comparison.rank}. miejsce spośród ${analysis.comparison.totalOffers} dostępnych ofert. `
+    }
+    comparisonScript += analysis.comparison.recommendation
+
+    sections.push({
+      id: 'comparison',
+      title: 'Porównanie z innymi ofertami',
+      script: comparisonScript,
+      highlights: ['rank', 'comparison'],
+    })
+
+    // Sekcja 3: Analiza ryzyk
+    let risksScript = `Analiza ryzyk. `
+    if (analysis.risks.hasVariableRate) {
+      const riskText = {
+        low: 'niskie',
+        medium: 'średnie',
+        high: 'wysokie',
+      }[analysis.risks.interestRateRisk]
+
+      risksScript += `Kredyt ze zmiennym oprocentowaniem oznacza ${riskText} ryzyko związane ze zmianami stóp procentowych. `
+
+      if (analysis.risks.riskScenarios.length > 0) {
+        const worstCase = analysis.risks.riskScenarios[analysis.risks.riskScenarios.length - 1]
+        if (worstCase && !worstCase.isAffordable) {
+          const pointsText = worstCase.scenario.includes('3')
+            ? '3'
+            : worstCase.scenario.includes('2')
+              ? '2'
+              : '1'
+          risksScript += `W przypadku wzrostu stóp o ${pointsText} punkty procentowe, rata może wzrosnąć do około ${formatCurrencyNoCents(
+            worstCase.newMonthlyPayment,
+          )}. `
+        }
+      }
+
+      if (analysis.risks.recommendations.length > 0) {
+        risksScript += analysis.risks.recommendations[0]
+      }
+    } else {
+      risksScript += `Kredyt ze stałym oprocentowaniem zapewnia stabilność raty przez cały okres kredytowania. Nie musisz się martwić o zmiany stóp procentowych.`
+    }
+
+    sections.push({
+      id: 'risks',
+      title: 'Analiza ryzyk',
+      script: risksScript,
+      highlights: ['risk', 'riskScenarios'],
+    })
+
+    // Sekcja 4: Ocena dopasowania oferty
+    const matchLevelText = {
+      excellent: 'bardzo dobrze',
+      good: 'dobrze',
+      moderate: 'umiarkowanie',
+      poor: 'słabo',
+    }[analysis.overall.matchLevel]
+
+    const overallScript = `Ocena dopasowania oferty. Ogólna ocena dopasowania: ${analysis.overall.score} na 100 punktów, co oznacza że oferta pasuje ${matchLevelText} do Twojej sytuacji finansowej. ${analysis.overall.summary} ${analysis.overall.finalRecommendation}`
+
+    sections.push({
+      id: 'overall',
+      title: 'Ocena dopasowania oferty',
+      script: overallScript,
+      highlights: ['score', 'matchLevel', 'overall'],
+    })
+  }
+
+  // Sekcja harmonogramu spłat
+  if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
+    const schedule = offer.paymentSchedule
+    const firstYear = schedule.slice(0, 12)
+    const midYear = schedule[Math.floor(schedule.length / 2)]
+    const lastYear = schedule.slice(-12)
+    const firstPayment = firstYear[0]
+    const lastPayment = lastYear[lastYear.length - 1]
+
+    if (firstPayment) {
+      let scheduleScript = `Harmonogram spłat. W pierwszym roku rata wynosi ${formatCurrencyNoCents(
+        firstPayment.payment,
+      )} miesięcznie, z czego około ${formatCurrencyNoCents(
+        firstPayment.principal,
+      )} to spłata kapitału, a ${formatCurrencyNoCents(firstPayment.interest)} to odsetki. `
+
+      if (midYear) {
+        scheduleScript += `W połowie okresu kredytowania rata pozostaje taka sama, ale proporcje się zmieniają: około ${formatCurrencyNoCents(
+          midYear.principal,
+        )} kapitału i ${formatCurrencyNoCents(midYear.interest)} odsetek. `
+      }
+
+      if (lastPayment) {
+        scheduleScript += `W ostatnim roku rata wynosi ${formatCurrencyNoCents(
+          lastPayment.payment,
+        )}, z czego większość to już spłata kapitału. `
+      }
+
+      scheduleScript += `Z czasem udział odsetek w racie maleje, a udział spłaty kapitału rośnie.`
+
+      sections.push({
+        id: 'schedule',
+        title: 'Harmonogram spłat',
+        script: scheduleScript,
+        highlights: [
+          'firstPayment',
+          'firstPrincipal',
+          'firstInterest',
+          'midPayment',
+          'lastPayment',
+        ],
+      })
+    }
+  }
+
+  // Sekcja wad i zalet
+  const hasAdvantages = offer.advantages && offer.advantages.length > 0
+  const hasDisadvantages = offer.disadvantages && offer.disadvantages.length > 0
+
+  if (hasAdvantages || hasDisadvantages) {
+    let prosConsScript = `Wady i zalety oferty. `
+
+    if (hasAdvantages && offer.advantages) {
+      const filteredAdvantages = filterRealBenefits(offer.advantages)
+      if (filteredAdvantages.length > 0) {
+        prosConsScript += `Zalety tej oferty to: ${filteredAdvantages.join(', ')}. `
+      }
+    }
+
+    if (hasDisadvantages && offer.disadvantages) {
+      const filteredDisadvantages = filterRealBenefits(offer.disadvantages)
+      if (filteredDisadvantages.length > 0) {
+        prosConsScript += `Wady to: ${filteredDisadvantages.join(', ')}. `
+      }
+    }
+
+    prosConsScript += `Warto rozważyć wszystkie aspekty przed podjęciem decyzji.`
+
+    sections.push({
+      id: 'prosCons',
+      title: 'Wady i zalety',
+      script: prosConsScript,
+      highlights: ['advantages', 'disadvantages'],
+    })
+  }
 
   sections.push({
     id: 'summary',
@@ -491,7 +871,7 @@ export const createNarrationDisplaySteps = (offer: NarrationOffer): NarrationDis
             },
           ],
         }
-      case 'benefits':
+      case 'benefits': {
         const realBenefits = filterRealBenefits(offer.benefits)
         return {
           id: section.id,
@@ -512,6 +892,256 @@ export const createNarrationDisplaySteps = (offer: NarrationOffer): NarrationDis
                   },
                 ],
         }
+      }
+      case 'affordability':
+        if (!offer.analysis || !offer.monthlyIncome) {
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [],
+          }
+        }
+        {
+          const analysis = offer.analysis
+          const affordabilityLevelText = {
+            excellent: 'Doskonała',
+            good: 'Dobra',
+            moderate: 'Umiarkowana',
+            risky: 'Ryzykowna',
+            critical: 'Krytyczna',
+          }[analysis.affordability.affordabilityLevel]
+
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [
+              {
+                label: 'Rata / Dochód',
+                value: `${formatPercent(analysis.affordability.dtiPercentage)}`,
+                highlightKey: 'affordability',
+              },
+              {
+                label: 'Poziom bezpieczeństwa',
+                value: affordabilityLevelText,
+                highlightKey: 'affordabilityLevel',
+              },
+              {
+                label: 'Pozostały dochód',
+                value: formatCurrency(analysis.affordability.remainingIncome),
+                highlightKey: 'remainingIncome',
+              },
+            ],
+          }
+        }
+      case 'comparison':
+        if (!offer.analysis) {
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [],
+          }
+        }
+        {
+          const analysis = offer.analysis
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [
+              {
+                label: 'Pozycja w rankingu',
+                value: `${analysis.comparison.rank}. / ${analysis.comparison.totalOffers}`,
+                highlightKey: 'rank',
+              },
+              {
+                label: 'Status',
+                value: analysis.comparison.isTopOffer ? 'Top oferta' : 'Standardowa',
+                highlightKey: 'comparison',
+              },
+            ],
+          }
+        }
+      case 'risks':
+        if (!offer.analysis) {
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [],
+          }
+        }
+        {
+          const analysis = offer.analysis
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [
+              ...(analysis.risks.hasVariableRate
+                ? [
+                    {
+                      label: 'Ryzyko stóp procentowych',
+                      value:
+                        analysis.risks.interestRateRisk === 'low'
+                          ? 'Niskie'
+                          : analysis.risks.interestRateRisk === 'medium'
+                            ? 'Średnie'
+                            : 'Wysokie',
+                      highlightKey: 'risk',
+                    },
+                    ...(analysis.risks.riskScenarios.length > 0
+                      ? analysis.risks.riskScenarios
+                          .filter((s) => !s.isAffordable)
+                          .slice(0, 1)
+                          .map((scenario) => ({
+                            label: 'Najgorszy scenariusz',
+                            value: `+${formatPercent(scenario.newRate - offer.interestRate)} → ${formatCurrency(
+                              scenario.newMonthlyPayment,
+                            )}`,
+                            highlightKey: 'riskScenarios',
+                          }))
+                      : []),
+                  ]
+                : [
+                    {
+                      label: 'Ryzyko stóp procentowych',
+                      value: 'Brak (stałe oprocentowanie)',
+                      highlightKey: 'risk',
+                    },
+                  ]),
+            ],
+          }
+        }
+      case 'overall':
+        if (!offer.analysis) {
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [],
+          }
+        }
+        {
+          const analysis = offer.analysis
+          const matchLevelText = {
+            excellent: 'Bardzo dobra',
+            good: 'Dobra',
+            moderate: 'Umiarkowana',
+            poor: 'Słaba',
+          }[analysis.overall.matchLevel]
+
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [
+              {
+                label: 'Ocena dopasowania',
+                value: `${analysis.overall.score}/100`,
+                highlightKey: 'score',
+              },
+              {
+                label: 'Poziom dopasowania',
+                value: matchLevelText,
+                highlightKey: 'matchLevel',
+              },
+            ],
+          }
+        }
+      case 'schedule':
+        if (!offer.paymentSchedule || offer.paymentSchedule.length === 0) {
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [],
+          }
+        }
+        {
+          const schedule = offer.paymentSchedule
+          const firstPayment = schedule[0]
+          const midPayment = schedule[Math.floor(schedule.length / 2)]
+          const lastPayment = schedule[schedule.length - 1]
+
+          if (!firstPayment) {
+            return {
+              id: section.id,
+              title: section.title,
+              description: section.script,
+              items: [],
+            }
+          }
+
+          return {
+            id: section.id,
+            title: section.title,
+            description: section.script,
+            items: [
+              {
+                label: 'Pierwsza rata',
+                value: formatCurrency(firstPayment.payment),
+                highlightKey: 'firstPayment',
+              },
+              {
+                label: 'Kapitał w pierwszej racie',
+                value: formatCurrency(firstPayment.principal),
+                highlightKey: 'firstPrincipal',
+              },
+              {
+                label: 'Odsetki w pierwszej racie',
+                value: formatCurrency(firstPayment.interest),
+                highlightKey: 'firstInterest',
+              },
+              ...(midPayment
+                ? [
+                    {
+                      label: 'Średnia rata',
+                      value: formatCurrency(midPayment.payment),
+                      highlightKey: 'midPayment',
+                    },
+                  ]
+                : []),
+              ...(lastPayment
+                ? [
+                    {
+                      label: 'Ostatnia rata',
+                      value: formatCurrency(lastPayment.payment),
+                      highlightKey: 'lastPayment',
+                    },
+                  ]
+                : []),
+            ],
+          }
+        }
+      case 'prosCons': {
+        const realAdvantages = offer.advantages ? filterRealBenefits(offer.advantages) : []
+        const realDisadvantages = offer.disadvantages ? filterRealBenefits(offer.disadvantages) : []
+
+        return {
+          id: section.id,
+          title: section.title,
+          description: section.script,
+          items: [
+            ...(realAdvantages.length > 0
+              ? realAdvantages.slice(0, 3).map((advantage) => ({
+                  label: 'Zaleta',
+                  value: advantage,
+                  highlightKey: 'advantages',
+                }))
+              : []),
+            ...(realDisadvantages.length > 0
+              ? realDisadvantages.slice(0, 3).map((disadvantage) => ({
+                  label: 'Wada',
+                  value: disadvantage,
+                  highlightKey: 'disadvantages',
+                }))
+              : []),
+          ],
+        }
+      }
       case 'summary':
         return {
           id: section.id,
@@ -765,19 +1395,22 @@ export function OfferNarration({
 
   // Mapowanie highlight keys do zakresów słów w transkrypcji (całe fragmenty zdań)
   const highlightKeyToWordRanges = useMemo(() => {
-    const map = new Map<string, Array<{ sectionId: string; startIndex: number; endIndex: number }>>()
-    
+    const map = new Map<
+      string,
+      Array<{ sectionId: string; startIndex: number; endIndex: number }>
+    >()
+
     sections.forEach((section) => {
       // Użyj tej samej metody liczenia słów co w createNarrationWordEntries
       const words = section.script
         .split(/\s+/)
         .map((word) => word.trim())
         .filter(Boolean)
-      
+
       // Dla każdego highlight key znajdź odpowiadający mu fragment zdania
       section.highlights.forEach((highlightKey) => {
         let phraseToFind: string | null = null
-        
+
         // Znajdź fragment zdania odpowiadający highlightKey
         switch (highlightKey) {
           case 'loanAmount':
@@ -834,29 +1467,155 @@ export function OfferNarration({
             // "możesz liczyć na dodatkowe korzyści"
             phraseToFind = 'możesz liczyć na dodatkowe korzyści'
             break
+          case 'affordability':
+            // "Rata stanowi [wartość] Twojego dochodu"
+            if (offer.analysis && offer.monthlyIncome) {
+              phraseToFind = `Rata stanowi ${formatPercentForNarration(offer.analysis.affordability.dtiPercentage)} Twojego dochodu`
+            }
+            break
+          case 'affordabilityLevel':
+            // "co oznacza [poziom] zdolność kredytową"
+            if (offer.analysis) {
+              const levelText = {
+                excellent: 'doskonała',
+                good: 'dobra',
+                moderate: 'umiarkowana',
+                risky: 'ryzykowna',
+                critical: 'krytyczna',
+              }[offer.analysis.affordability.affordabilityLevel]
+              phraseToFind = `co oznacza ${levelText} zdolność kredytową`
+            }
+            break
+          case 'remainingIncome':
+            // "Po spłacie raty pozostanie Ci około [wartość] miesięcznie"
+            if (offer.analysis) {
+              phraseToFind = `Po spłacie raty pozostanie Ci około ${formatCurrencyNoCents(offer.analysis.affordability.remainingIncome)} miesięcznie`
+            }
+            break
+          case 'rank':
+          case 'comparison':
+            // "Ta oferta jest w top [rank] najlepszych" lub "Ta oferta zajmuje [rank]. miejsce"
+            if (offer.analysis) {
+              if (offer.analysis.comparison.isTopOffer) {
+                phraseToFind = `Ta oferta jest w top ${offer.analysis.comparison.rank} najlepszych ofert`
+              } else {
+                phraseToFind = `Ta oferta zajmuje ${offer.analysis.comparison.rank}. miejsce`
+              }
+            }
+            break
+          case 'risk':
+          case 'riskScenarios':
+            // "Kredyt ze zmiennym oprocentowaniem oznacza [poziom] ryzyko" lub "Kredyt ze stałym oprocentowaniem zapewnia stabilność"
+            if (offer.analysis) {
+              if (offer.analysis.risks.hasVariableRate) {
+                const riskText = {
+                  low: 'niskie',
+                  medium: 'średnie',
+                  high: 'wysokie',
+                }[offer.analysis.risks.interestRateRisk]
+                phraseToFind = `Kredyt ze zmiennym oprocentowaniem oznacza ${riskText} ryzyko`
+              } else {
+                phraseToFind = 'Kredyt ze stałym oprocentowaniem zapewnia stabilność raty'
+              }
+            }
+            break
+          case 'score':
+          case 'overall':
+            // "Ogólna ocena dopasowania: [score] na 100 punktów"
+            if (offer.analysis) {
+              phraseToFind = `Ogólna ocena dopasowania: ${offer.analysis.overall.score} na 100 punktów`
+            }
+            break
+          case 'matchLevel':
+            // "co oznacza że oferta pasuje [poziom] do Twojej sytuacji finansowej"
+            if (offer.analysis) {
+              const levelText = {
+                excellent: 'bardzo dobrze',
+                good: 'dobrze',
+                moderate: 'umiarkowanie',
+                poor: 'słabo',
+              }[offer.analysis.overall.matchLevel]
+              phraseToFind = `co oznacza że oferta pasuje ${levelText} do Twojej sytuacji finansowej`
+            }
+            break
+          case 'firstPayment':
+            // "W pierwszym roku rata wynosi [wartość] miesięcznie"
+            if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
+              const firstPayment = offer.paymentSchedule[0]
+              if (firstPayment) {
+                phraseToFind = `W pierwszym roku rata wynosi ${formatCurrencyNoCents(firstPayment.payment)} miesięcznie`
+              }
+            }
+            break
+          case 'firstPrincipal':
+            // "z czego około [wartość] to spłata kapitału"
+            if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
+              const firstPayment = offer.paymentSchedule[0]
+              if (firstPayment) {
+                phraseToFind = `z czego około ${formatCurrencyNoCents(firstPayment.principal)} to spłata kapitału`
+              }
+            }
+            break
+          case 'firstInterest':
+            // "a [wartość] to odsetki"
+            if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
+              const firstPayment = offer.paymentSchedule[0]
+              if (firstPayment) {
+                phraseToFind = `a ${formatCurrencyNoCents(firstPayment.interest)} to odsetki`
+              }
+            }
+            break
+          case 'midPayment':
+            // "W połowie okresu kredytowania rata pozostaje taka sama"
+            if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
+              phraseToFind = 'W połowie okresu kredytowania rata pozostaje taka sama'
+            }
+            break
+          case 'lastPayment':
+            // "W ostatnim roku rata wynosi [wartość]"
+            if (offer.paymentSchedule && offer.paymentSchedule.length > 0) {
+              const lastYear = offer.paymentSchedule.slice(-12)
+              const lastPayment = lastYear[lastYear.length - 1]
+              if (lastPayment) {
+                phraseToFind = `W ostatnim roku rata wynosi ${formatCurrencyNoCents(lastPayment.payment)}`
+              }
+            }
+            break
+          case 'advantages':
+            // "Zalety tej oferty to:"
+            if (offer.advantages && offer.advantages.length > 0) {
+              phraseToFind = 'Zalety tej oferty to'
+            }
+            break
+          case 'disadvantages':
+            // "Wady to:"
+            if (offer.disadvantages && offer.disadvantages.length > 0) {
+              phraseToFind = 'Wady to'
+            }
+            break
         }
-        
+
         if (!phraseToFind) return
-        
+
         // Znajdź pozycję frazy w transkrypcji - użyj tej samej metody
         const phraseWords = phraseToFind
           .split(/\s+/)
           .map((word) => word.trim())
           .filter(Boolean)
           .map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
-        
+
         if (phraseWords.length === 0) return
-        
+
         // Normalizuj słowa w transkrypcji (bez znaków interpunkcyjnych)
         const normalizedWords = words.map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
-        
+
         // Znajdź wystąpienie frazy w słowach - dokładne dopasowanie
         for (let i = 0; i <= normalizedWords.length - phraseWords.length; i++) {
           const match = phraseWords.every((pw, idx) => {
             const normalizedWord = normalizedWords[i + idx] ?? ''
             return normalizedWord === pw
           })
-          
+
           if (match) {
             const ranges = map.get(highlightKey) ?? []
             ranges.push({
@@ -870,7 +1629,7 @@ export function OfferNarration({
         }
       })
     })
-    
+
     return map
   }, [sections, offer])
 
@@ -878,27 +1637,27 @@ export function OfferNarration({
   const isHighlightKeyActive = useCallback(
     (highlightKey: string, itemValue?: string, sectionId?: string): boolean => {
       if (!activeWordEntry || !isPlaying) return false
-      
+
       // Dla sekcji benefits sprawdzamy pozycję słowa w transkrypcji względem korzyści
       if (sectionId === 'benefits' && itemValue && activeWordEntry.sectionId === 'benefits') {
         const currentSection = sections.find((s) => s.id === 'benefits')
         if (!currentSection) return false
-        
+
         const script = currentSection.script
         const scriptWords = script
           .split(/\s+/)
           .map((word) => word.trim())
           .filter(Boolean)
-        
+
         // Znajdź pozycję korzyści w transkrypcji
         const benefitWords = itemValue
           .split(/\s+/)
           .map((word) => word.trim())
           .filter(Boolean)
           .map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
-        
+
         if (benefitWords.length === 0) return false
-        
+
         // Znajdź gdzie zaczyna się ta korzyść w transkrypcji
         let benefitStartIndex = -1
         for (let i = 0; i <= scriptWords.length - benefitWords.length; i++) {
@@ -911,27 +1670,70 @@ export function OfferNarration({
             break
           }
         }
-        
+
         if (benefitStartIndex === -1) return false
-        
+
         // Sprawdź czy aktualnie czytane słowo jest w zakresie tej korzyści
         const currentWordIndex = activeWordEntry.wordIndex
         const benefitEndIndex = benefitStartIndex + benefitWords.length - 1
-        
+
         return currentWordIndex >= benefitStartIndex && currentWordIndex <= benefitEndIndex
       }
-      
+
+      // Dla sekcji prosCons sprawdzamy pozycję słowa w transkrypcji względem zalet/wad
+      if (sectionId === 'prosCons' && itemValue && activeWordEntry.sectionId === 'prosCons') {
+        const currentSection = sections.find((s) => s.id === 'prosCons')
+        if (!currentSection) return false
+
+        const script = currentSection.script
+        const scriptWords = script
+          .split(/\s+/)
+          .map((word) => word.trim())
+          .filter(Boolean)
+
+        // Znajdź pozycję zalety/wady w transkrypcji
+        const prosConsWords = itemValue
+          .split(/\s+/)
+          .map((word) => word.trim())
+          .filter(Boolean)
+          .map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
+
+        if (prosConsWords.length === 0) return false
+
+        // Znajdź gdzie zaczyna się ta zaleta/wada w transkrypcji
+        let prosConsStartIndex = -1
+        for (let i = 0; i <= scriptWords.length - prosConsWords.length; i++) {
+          // Sprawdź dopasowanie pierwszych 3-4 słów dla lepszej dokładności
+          const wordsToCheck = Math.min(4, prosConsWords.length)
+          const match = prosConsWords.slice(0, wordsToCheck).every((pcw, idx) => {
+            const sw = scriptWords[i + idx]?.replace(/[.,!?;:]+$/g, '').toLowerCase() ?? ''
+            return sw === pcw
+          })
+          if (match) {
+            prosConsStartIndex = i
+            break
+          }
+        }
+
+        if (prosConsStartIndex === -1) return false
+
+        // Sprawdź czy aktualnie czytane słowo jest w zakresie tej zalety/wady
+        const currentWordIndex = activeWordEntry.wordIndex
+        const prosConsEndIndex = prosConsStartIndex + prosConsWords.length - 1
+
+        return currentWordIndex >= prosConsStartIndex && currentWordIndex <= prosConsEndIndex
+      }
+
       const ranges = highlightKeyToWordRanges.get(highlightKey) ?? []
       const matchingRange = ranges.find((range) => range.sectionId === activeWordEntry.sectionId)
-      
+
       if (!matchingRange) return false
-      
+
       // wordIndex w activeWordEntry odpowiada pozycji w tablicy słów po filtrowaniu
       const currentWordIndex = activeWordEntry.wordIndex
-      
+
       return (
-        currentWordIndex >= matchingRange.startIndex &&
-        currentWordIndex <= matchingRange.endIndex
+        currentWordIndex >= matchingRange.startIndex && currentWordIndex <= matchingRange.endIndex
       )
     },
     [activeWordEntry, isPlaying, highlightKeyToWordRanges, sections],
@@ -1115,55 +1917,199 @@ export function OfferNarration({
                     </ListVariantPlayButton>
                   </ListVariantHeader>
                 </ListVariantCard>
-                {step.items.length > 0 && (
-                  <ListVariantProperties
-                    className={clsx({
-                      'grid-cols-1 md:grid-cols-3': step.id !== 'benefits' && step.id !== 'summary',
-                      'grid-cols-1 md:grid-cols-2': step.id === 'summary',
-                      'flex flex-col gap-2': step.id === 'benefits',
-                    })}
-                  >
-                    {step.items.map((item) => {
-                      const isItemActive = isHighlightKeyActive(item.highlightKey, item.value, step.id)
-                      const PropertyComponent = getPropertyComponentForSection(step.id)
-                      return (
-                        <PropertyComponent
-                          key={`${step.id}-${item.label}`}
-                          className={clsx({
-                            'border-sky-200 bg-sky-50 text-sky-900 shadow-sky-100': isActive,
-                            'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-100':
-                              isCompleted,
-                            'border-sky-400 bg-sky-100 scale-110 shadow-xl shadow-sky-200/50 ring-2 ring-sky-300/50 z-10':
-                              isItemActive,
-                            'opacity-60': !isItemActive && isActive && isPlaying,
+                {/* Wykres harmonogramu spłat dla sekcji schedule */}
+                {step.id === 'schedule' &&
+                  offer.paymentSchedule &&
+                  offer.paymentSchedule.length > 0 && (
+                    <ScheduleChartWrapper>
+                      <PaymentScheduleChart
+                        schedule={offer.paymentSchedule}
+                        loanTermMonths={offer.loanTermMonths}
+                      />
+                    </ScheduleChartWrapper>
+                  )}
+                {/* Sekcja wad i zalet - specjalne renderowanie */}
+                {step.id === 'prosCons' ? (
+                  <ProsConsComparisonGrid>
+                    {offer.advantages && offer.advantages.length > 0 && (
+                      <ProsConsAdvantagesSection>
+                        <ProsConsComparisonHeader className="border-green-200 bg-linear-to-r from-green-50 to-emerald-50">
+                          <ProsConsComparisonIcon className="bg-green-100 text-green-600">
+                            <svg
+                              className="h-5 w-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </ProsConsComparisonIcon>
+                          <ProsConsComparisonTitle className="text-green-800">
+                            ZALETY
+                          </ProsConsComparisonTitle>
+                        </ProsConsComparisonHeader>
+                        <ProsConsComparisonList>
+                          {filterRealBenefits(offer.advantages).map((advantage: string) => {
+                            const isItemActive = isHighlightKeyActive(
+                              'advantages',
+                              advantage,
+                              'prosCons',
+                            )
+                            return (
+                              <ProsConsComparisonItem
+                                key={advantage}
+                                className={clsx({
+                                  'scale-[1.02] transition-all duration-200': isItemActive,
+                                })}
+                              >
+                                <ProsConsComparisonBullet
+                                  className={clsx({
+                                    'bg-green-100 text-green-600': !isItemActive,
+                                    'scale-110 bg-green-200 text-green-700': isItemActive,
+                                  })}
+                                >
+                                  +
+                                </ProsConsComparisonBullet>
+                                <ProsConsComparisonText
+                                  className={clsx({
+                                    'text-green-900': !isItemActive,
+                                    'font-semibold text-green-950': isItemActive,
+                                  })}
+                                >
+                                  {advantage}
+                                </ProsConsComparisonText>
+                              </ProsConsComparisonItem>
+                            )
                           })}
-                          onClick={() => {
-                            if (!canPlaySection || sectionEntries.length === 0) return
-                            const firstEntry = sectionEntries[0]
-                            if (firstEntry) {
-                              onSectionSelect?.(step.id)
-                              onWordSelect?.(firstEntry.globalIndex)
-                            }
-                          }}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(event) => {
-                            if (!canPlaySection || sectionEntries.length === 0) return
-                            if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault()
+                        </ProsConsComparisonList>
+                      </ProsConsAdvantagesSection>
+                    )}
+                    {offer.disadvantages && offer.disadvantages.length > 0 && (
+                      <ProsConsDisadvantagesSection>
+                        <ProsConsComparisonHeader className="border-red-200 bg-linear-to-r from-red-50 to-orange-50">
+                          <ProsConsComparisonIcon className="bg-red-100 text-red-600">
+                            <svg
+                              className="h-5 w-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                              />
+                            </svg>
+                          </ProsConsComparisonIcon>
+                          <ProsConsComparisonTitle className="text-red-800">
+                            WADY
+                          </ProsConsComparisonTitle>
+                        </ProsConsComparisonHeader>
+                        <ProsConsComparisonList>
+                          {filterRealBenefits(offer.disadvantages).map((disadvantage: string) => {
+                            const isItemActive = isHighlightKeyActive(
+                              'disadvantages',
+                              disadvantage,
+                              'prosCons',
+                            )
+                            return (
+                              <ProsConsComparisonItem
+                                key={disadvantage}
+                                className={clsx({
+                                  'scale-[1.02] transition-all duration-200': isItemActive,
+                                })}
+                              >
+                                <ProsConsComparisonBullet
+                                  className={clsx({
+                                    'bg-red-100 text-red-600': !isItemActive,
+                                    'scale-110 bg-red-200 text-red-700': isItemActive,
+                                  })}
+                                >
+                                  −
+                                </ProsConsComparisonBullet>
+                                <ProsConsComparisonText
+                                  className={clsx({
+                                    'text-red-900': !isItemActive,
+                                    'font-semibold text-red-950': isItemActive,
+                                  })}
+                                >
+                                  {disadvantage}
+                                </ProsConsComparisonText>
+                              </ProsConsComparisonItem>
+                            )
+                          })}
+                        </ProsConsComparisonList>
+                      </ProsConsDisadvantagesSection>
+                    )}
+                  </ProsConsComparisonGrid>
+                ) : (
+                  step.items.length > 0 && (
+                    <ListVariantProperties
+                      className={clsx({
+                        'grid-cols-1 md:grid-cols-3':
+                          step.id !== 'benefits' &&
+                          step.id !== 'summary' &&
+                          step.id !== 'schedule' &&
+                          step.id !== 'prosCons',
+                        'grid-cols-1 md:grid-cols-2': step.id === 'summary',
+                        'grid-cols-1 md:grid-cols-5': step.id === 'schedule',
+                        'flex flex-col gap-2': step.id === 'benefits',
+                      })}
+                    >
+                      {step.items.map((item) => {
+                        const isItemActive = isHighlightKeyActive(
+                          item.highlightKey,
+                          item.value,
+                          step.id,
+                        )
+                        const PropertyComponent = getPropertyComponentForSection(step.id)
+                        return (
+                          <PropertyComponent
+                            key={`${step.id}-${item.label}`}
+                            className={clsx({
+                              'border-sky-200 bg-sky-50 text-sky-900 shadow-sky-100': isActive,
+                              'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-100':
+                                isCompleted,
+                              'z-10 scale-110 border-sky-400 bg-sky-100 shadow-sky-200/50 shadow-xl ring-2 ring-sky-300/50':
+                                isItemActive,
+                              'opacity-60': !isItemActive && isActive && isPlaying,
+                            })}
+                            onClick={() => {
+                              if (!canPlaySection || sectionEntries.length === 0) return
                               const firstEntry = sectionEntries[0]
                               if (firstEntry) {
                                 onSectionSelect?.(step.id)
                                 onWordSelect?.(firstEntry.globalIndex)
                               }
-                            }
-                          }}
-                        >
-                          {renderPropertyContent(step.id, item)}
-                        </PropertyComponent>
-                      )
-                    })}
-                  </ListVariantProperties>
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(event) => {
+                              if (!canPlaySection || sectionEntries.length === 0) return
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                const firstEntry = sectionEntries[0]
+                                if (firstEntry) {
+                                  onSectionSelect?.(step.id)
+                                  onWordSelect?.(firstEntry.globalIndex)
+                                }
+                              }
+                            }}
+                          >
+                            {renderPropertyContent(step.id, item)}
+                          </PropertyComponent>
+                        )
+                      })}
+                    </ListVariantProperties>
+                  )
                 )}
               </ListVariantInteractive>
             </ListVariantItem>
@@ -1373,6 +2319,63 @@ const CostPropertyValue = tw.span`text-2xl font-bold text-gray-900`
 const BenefitPropertyCard = tw.li`flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md`
 const BenefitPropertyIcon = tw.div`shrink-0 flex items-center justify-center mt-0.5`
 const BenefitPropertyValue = tw.span`text-sm text-gray-700 leading-relaxed flex-1`
+
+// Affordability section (Zdolność kredytowa) - zielony styl
+const AffordabilityPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-green-200 bg-linear-to-br from-green-50 to-emerald-50 p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-green-300`
+const AffordabilityPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 shrink-0 transition-colors duration-200`
+const AffordabilityPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const AffordabilityPropertyLabel = tw.span`text-xs font-semibold text-green-700 uppercase tracking-wide`
+const AffordabilityPropertyValue = tw.span`text-xl font-bold text-green-900`
+
+// Comparison section (Porównanie z innymi ofertami) - niebieski styl
+const ComparisonPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-blue-200 bg-linear-to-br from-blue-50 to-indigo-50 p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-blue-300`
+const ComparisonPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 transition-colors duration-200`
+const ComparisonPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const ComparisonPropertyLabel = tw.span`text-xs font-semibold text-blue-700 uppercase tracking-wide`
+const ComparisonPropertyValue = tw.span`text-xl font-bold text-blue-900`
+
+// Risks section (Analiza ryzyk) - pomarańczowy/żółty styl
+const RisksPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-orange-200 bg-linear-to-br from-orange-50 to-amber-50 p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-orange-300`
+const RisksPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0 transition-colors duration-200`
+const RisksPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const RisksPropertyLabel = tw.span`text-xs font-semibold text-orange-700 uppercase tracking-wide`
+const RisksPropertyValue = tw.span`text-xl font-bold text-orange-900`
+
+// Overall section (Ocena dopasowania oferty) - fioletowy/purpurowy styl
+const OverallPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-purple-200 bg-linear-to-br from-purple-50 to-indigo-50 p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-purple-300`
+const OverallPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 shrink-0 transition-colors duration-200`
+const OverallPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const OverallPropertyLabel = tw.span`text-xs font-semibold text-purple-700 uppercase tracking-wide`
+const OverallPropertyValue = tw.span`text-xl font-bold text-purple-900`
+
+// Schedule section (Harmonogram spłat) - szary/neutralny styl
+const SchedulePropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-linear-to-br from-gray-50 to-slate-50 p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-300`
+const SchedulePropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 shrink-0 transition-colors duration-200`
+const SchedulePropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const SchedulePropertyLabel = tw.span`text-xs font-semibold text-gray-700 uppercase tracking-wide`
+const SchedulePropertyValue = tw.span`text-xl font-bold text-gray-900`
+
+// ProsCons section (Wady i zalety) - mieszany styl zielony/czerwony
+const ProsConsPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5`
+const ProsConsPropertyIcon = tw.div`shrink-0 flex items-center justify-center mt-0.5`
+const ProsConsPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const ProsConsPropertyLabel = tw.span`text-xs font-semibold text-gray-600 uppercase tracking-wide`
+const ProsConsPropertyValue = tw.span`text-sm text-gray-700 leading-relaxed`
+
+// Schedule chart wrapper
+const ScheduleChartWrapper = tw.div`mt-4 mb-4`
+
+// ProsCons section (Wady i zalety) - styl jak w szczegółach
+const ProsConsComparisonGrid = tw.div`grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4`
+const ProsConsAdvantagesSection = tw.div`bg-white rounded border border-gray-200`
+const ProsConsDisadvantagesSection = tw.div`bg-white rounded border border-gray-200`
+const ProsConsComparisonHeader = tw.div`px-3 py-2 border-b border-gray-200 flex items-center gap-2 bg-gray-50`
+const ProsConsComparisonIcon = tw.div`w-5 h-5 flex items-center justify-center rounded`
+const ProsConsComparisonTitle = tw.h5`font-medium text-xs uppercase tracking-wide`
+const ProsConsComparisonList = tw.ul`p-3 space-y-2`
+const ProsConsComparisonItem = tw.li`flex items-start gap-2`
+const ProsConsComparisonBullet = tw.span`w-5 h-5 flex items-center justify-center rounded text-xs font-bold shrink-0`
+const ProsConsComparisonText = tw.span`text-sm text-gray-700 flex-1`
 
 // Summary section (Podsumowanie) - styl jak reszta sekcji z ikonami
 const SummaryPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5`

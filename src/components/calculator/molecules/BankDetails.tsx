@@ -26,6 +26,8 @@ import {
 import { OfferNarrationStickyBar } from 'components/calculator/narration/OfferNarrationStickyBar'
 import { Tooltip } from 'components/common/tooltip'
 import { useNarrationSpeech } from 'hooks/useNarrationSpeech'
+import { CreditAnalysis } from './CreditAnalysis'
+import { analyzeCreditMatch } from 'utils/credit-analysis'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Chart } from 'react-chartjs-2'
 import {
@@ -70,8 +72,16 @@ export type BankDetailsProps = {
     loanAmount?: number
     loanPeriod?: number
     bank?: BankOffer
+    bankId?: string
+    bankName?: string
   }
   formData?: CalculatorFormData
+  allResults?: Array<{
+    bankId: string
+    monthlyPayment: number
+    totalCost: number
+    rrso: number
+  }>
 }
 
 type BankNarrationState = {
@@ -94,7 +104,7 @@ type BankNarrationState = {
 
 const PLAYBACK_INTERVAL_MS = 200
 
-export const BankDetails = ({ result, formData }: BankDetailsProps) => {
+export const BankDetails = ({ result, formData, allResults = [] }: BankDetailsProps) => {
   const loanAmount = result.loanAmount ?? formData?.loanAmount ?? 0
   const loanPeriod = result.loanPeriod ?? formData?.loanPeriod ?? 0
   const totalPayments = loanPeriod * 12
@@ -102,13 +112,87 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const bankId = bank?.id ?? null
   const bankName = bank?.name ?? bankId ?? 'Niezidentyfikowany bank'
 
-  const [activeTab, setActiveTab] = useState<'details' | 'narration'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'narration' | 'analysis'>('details')
   const [activeWordIndex, setActiveWordIndex] = useState(0)
   const [isNarrationPlaying, setIsNarrationPlaying] = useState(false)
   const [pendingAutoPlay, setPendingAutoPlay] = useState(false)
   const detailsRef = useRef<HTMLDivElement>(null)
 
   const hasNarrationData = loanAmount > 0 && loanPeriod > 0 && result.monthlyPayment > 0
+
+  // Oblicz analizę, jeśli mamy wszystkie potrzebne dane
+  const creditAnalysis = useMemo(() => {
+    if (!formData || !allResults.length || !result.bankId) return null
+    
+    try {
+      return analyzeCreditMatch(
+        {
+          bankId: result.bankId,
+          monthlyPayment: result.monthlyPayment,
+          totalCost: result.totalCost,
+          interestRate: result.interestRate,
+          rrso: result.rrso,
+        },
+        formData,
+        allResults.map((r) => ({
+          bankId: r.bankId,
+          monthlyPayment: r.monthlyPayment,
+          totalCost: r.totalCost,
+          rrso: r.rrso,
+        })),
+      )
+    } catch {
+      return null
+    }
+  }, [formData, allResults, result])
+
+  // Oblicz wszystkie raty dla wykresu i narracji
+  const calculateAllPayments = useMemo(() => {
+    if (!loanAmount || !loanPeriod || !result.monthlyPayment) return null
+
+    const monthlyRate = (bank?.baseInterestRate ?? 0) / 100 / 12
+    let remainingBalance = loanAmount
+    const allPayments: Array<{
+      month: number
+      payment: number
+      principal: number
+      interest: number
+      remaining: number
+    }> = []
+
+    // Zaokrąglij miesięczną ratę do 2 miejsc po przecinku
+    const roundedMonthlyPayment = Math.round(result.monthlyPayment * 100) / 100
+
+    for (let month = 1; month <= totalPayments; month++) {
+      const interest = Math.round(remainingBalance * monthlyRate * 100) / 100
+      let principal = roundedMonthlyPayment - interest
+
+      // Ostatnia rata - dostosuj kwotę do pozostałego salda
+      if (month === totalPayments) {
+        principal = Math.round(remainingBalance * 100) / 100
+      } else {
+        principal = Math.round(principal * 100) / 100
+      }
+
+      remainingBalance = Math.max(0, Math.round((remainingBalance - principal) * 100) / 100)
+
+      // Ostatnia rata - użyj rzeczywistej kwoty raty
+      const actualPayment =
+        month === totalPayments
+          ? Math.round((principal + interest) * 100) / 100
+          : roundedMonthlyPayment
+
+      allPayments.push({
+        month,
+        payment: Math.round(actualPayment * 100) / 100,
+        principal: Math.round(principal * 100) / 100,
+        interest: Math.round(interest * 100) / 100,
+        remaining: Math.round(remainingBalance * 100) / 100,
+      })
+    }
+
+    return allPayments
+  }, [loanAmount, loanPeriod, result.monthlyPayment, bank?.baseInterestRate, totalPayments])
 
   const narrationOffer: NarrationOffer | null = useMemo(() => {
     if (!hasNarrationData) return null
@@ -123,7 +207,10 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       benefits.push(...bank.advantages.filter((value): value is string => Boolean(value)))
     }
 
-    return {
+    // Oblicz harmonogram spłat dla narracji
+    const paymentSchedule = calculateAllPayments ?? null
+    
+    const offer: NarrationOffer = {
       bankId: bankId ?? 'unknown-bank',
       bankName,
       loanAmount,
@@ -137,7 +224,49 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
       totalInterest: result.totalInterest,
       insurance: result.insurance,
       benefits,
+      advantages: bank?.advantages,
+      disadvantages: bank?.disadvantages,
+      paymentSchedule: paymentSchedule ?? undefined,
     }
+
+    // Dodaj dane analizy, jeśli dostępne
+    if (creditAnalysis && formData) {
+      offer.monthlyIncome = formData.monthlyIncome
+      offer.analysis = {
+        affordability: {
+          dtiPercentage: creditAnalysis.affordability.dtiPercentage,
+          affordabilityLevel: creditAnalysis.affordability.affordabilityLevel,
+          remainingIncome: creditAnalysis.affordability.remainingIncome,
+          recommendation: creditAnalysis.affordability.recommendation,
+        },
+        comparison: {
+          rank: creditAnalysis.comparison.rank,
+          totalOffers: creditAnalysis.comparison.totalOffers,
+          isTopOffer: creditAnalysis.comparison.isTopOffer,
+          recommendation: creditAnalysis.comparison.recommendation,
+        },
+        risks: {
+          hasVariableRate: creditAnalysis.risks.hasVariableRate,
+          interestRateRisk: creditAnalysis.risks.interestRateRisk,
+          riskScenarios: creditAnalysis.risks.riskScenarios.map((s) => ({
+            scenario: s.scenario,
+            newRate: s.newRate,
+            newMonthlyPayment: s.newMonthlyPayment,
+            increase: s.increase,
+            isAffordable: s.isAffordable,
+          })),
+          recommendations: creditAnalysis.risks.recommendations,
+        },
+        overall: {
+          score: creditAnalysis.overall.score,
+          matchLevel: creditAnalysis.overall.matchLevel,
+          summary: creditAnalysis.overall.summary,
+          finalRecommendation: creditAnalysis.overall.finalRecommendation,
+        },
+      }
+    }
+
+    return offer
   }, [
     bank,
     bankId,
@@ -152,7 +281,10 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     result.rrso,
     result.totalCost,
     result.totalInterest,
+    result.bankId,
     totalPayments,
+    creditAnalysis,
+    formData,
   ])
 
   const narrationSections = useMemo(() => {
@@ -392,58 +524,10 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
     stopNarrationPlayback()
   }, [narrationOffer, stopNarrationPlayback])
 
-  // Oblicz wszystkie raty dla wykresu
-  const calculateAllPayments = () => {
-    if (!loanAmount || !loanPeriod || !result.monthlyPayment) return null
-
-    const monthlyRate = (bank?.baseInterestRate ?? 0) / 100 / 12
-    let remainingBalance = loanAmount
-    const allPayments: Array<{
-      month: number
-      payment: number
-      principal: number
-      interest: number
-      remaining: number
-    }> = []
-
-    // Zaokrąglij miesięczną ratę do 2 miejsc po przecinku
-    const roundedMonthlyPayment = Math.round(result.monthlyPayment * 100) / 100
-
-    for (let month = 1; month <= totalPayments; month++) {
-      const interest = Math.round(remainingBalance * monthlyRate * 100) / 100
-      let principal = roundedMonthlyPayment - interest
-
-      // Ostatnia rata - dostosuj kwotę do pozostałego salda
-      if (month === totalPayments) {
-        principal = Math.round(remainingBalance * 100) / 100
-      } else {
-        principal = Math.round(principal * 100) / 100
-      }
-
-      remainingBalance = Math.max(0, Math.round((remainingBalance - principal) * 100) / 100)
-
-      // Ostatnia rata - użyj rzeczywistej kwoty raty
-      const actualPayment =
-        month === totalPayments
-          ? Math.round((principal + interest) * 100) / 100
-          : roundedMonthlyPayment
-
-      allPayments.push({
-        month,
-        payment: Math.round(actualPayment * 100) / 100,
-        principal: Math.round(principal * 100) / 100,
-        interest: Math.round(interest * 100) / 100,
-        remaining: remainingBalance,
-      })
-    }
-
-    return allPayments
-  }
-
   // Generuj harmonogram spłat z tym samym przeskokiem co wykres
   const getPaymentSchedule = () => {
-    const allPayments = calculateAllPayments()
-    if (!allPayments) return null
+    if (!calculateAllPayments) return null
+    const allPayments = calculateAllPayments
 
     // Użyj tego samego kroku co wykres
     const step = totalPayments > 60 ? 6 : totalPayments > 24 ? 3 : 1
@@ -470,8 +554,8 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
 
   // Przygotuj dane do wykresu
   const getChartData = () => {
-    const allPayments = calculateAllPayments()
-    if (!allPayments) return null
+    if (!calculateAllPayments) return null
+    const allPayments = calculateAllPayments
 
     // Dla wykresu liniowego - pokazujemy co 6 miesiąc (lub częściej dla krótszych kredytów)
     const step = totalPayments > 60 ? 6 : totalPayments > 24 ? 3 : 1
@@ -552,7 +636,7 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
   const targetAudience = getTargetAudience()
   const paymentSchedule = getPaymentSchedule()
   const chartData = getChartData()
-  const allPaymentsForChart = calculateAllPayments()
+  const allPaymentsForChart = calculateAllPayments
 
   // Stan dla modalu z tabelą harmonogramu
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -831,6 +915,24 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
           onClick={() => narration && setActiveTab('narration')}
           className={clsx(activeTab === 'narration' && 'active')}
           disabled={!narration}
+          aria-label="Narracja"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <title>Ikona narracji</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+            />
+          </svg>
+          <span className="hidden sm:inline">Narracja</span>
+        </ViewToggleButton>
+        <ViewToggleButton
+          type="button"
+          onClick={() => formData && setActiveTab('analysis')}
+          className={clsx(activeTab === 'analysis' && 'active')}
+          disabled={!formData}
           aria-label="Analiza"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -882,6 +984,37 @@ export const BankDetails = ({ result, formData }: BankDetailsProps) => {
             </NarrationStickyInner>
           </NarrationStickyContainer>
         )}
+      </DetailsSection>
+    )
+  }
+
+  if (activeTab === 'analysis' && formData) {
+    return (
+      <DetailsSection ref={detailsRef} className="relative pb-4 md:pb-6">
+        {tabsHeader}
+        <div className="mt-4">
+          <CreditAnalysis
+            result={{
+              bankId: result.bankId ?? bankId ?? 'unknown',
+              bankName: result.bankName ?? bankName,
+              monthlyPayment: result.monthlyPayment,
+              totalCost: result.totalCost,
+              interestRate: result.interestRate,
+              totalInterest: result.totalInterest,
+              commission: result.commission,
+              insurance: result.insurance,
+              rrso: result.rrso,
+              bank: result.bank,
+            }}
+            formData={formData}
+            allResults={allResults.map((r) => ({
+              bankId: r.bankId,
+              monthlyPayment: r.monthlyPayment,
+              totalCost: r.totalCost,
+              rrso: r.rrso,
+            }))}
+          />
+        </div>
       </DetailsSection>
     )
   }
