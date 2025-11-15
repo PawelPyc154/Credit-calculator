@@ -3,6 +3,17 @@
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react'
+import {
+  HiOutlineCalendar,
+  HiOutlineChartBar,
+  HiOutlineCreditCard,
+  HiOutlineCurrencyDollar,
+  HiOutlineGift,
+  HiOutlineShieldCheck,
+  HiOutlineTrendingUp,
+  HiOutlineCollection,
+} from 'react-icons/hi'
+import { IoStar } from 'react-icons/io5'
 import { MdPause, MdPlayArrow, MdReplay } from 'react-icons/md'
 import tw from 'tw-tailwind'
 
@@ -71,8 +82,14 @@ type DetailCardProps = {
 const formatCurrency = (value: number) =>
   value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })
 
+const formatCurrencyNoCents = (value: number) =>
+  value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN', minimumFractionDigits: 0, maximumFractionDigits: 0 })
+
 const formatPercent = (value: number) =>
   `${value.toLocaleString('pl-PL', { maximumFractionDigits: 2 })}%`
+
+const formatPercentForNarration = (value: number) =>
+  `${value.toLocaleString('pl-PL', { maximumFractionDigits: 1 })}%`
 
 const formatLoanTermYears = (years: number) => {
   const suffix =
@@ -84,26 +101,241 @@ const formatLoanTermYears = (years: number) => {
   return `${years} ${suffix}`
 }
 
+// Funkcja normalizująca tekst korzyści do porównywania
+const normalizeBenefit = (benefit: string): string => {
+  return benefit
+    .toLowerCase()
+    .replace(/[.,!?;:()"]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+// Funkcja sprawdzająca czy dwie korzyści są podobne (duplikaty)
+const areBenefitsSimilar = (benefit1: string, benefit2: string): boolean => {
+  const normalized1 = normalizeBenefit(benefit1)
+  const normalized2 = normalizeBenefit(benefit2)
+  
+  // Jeśli są identyczne po normalizacji
+  if (normalized1 === normalized2) return true
+  
+  // Wyciągnij kluczowe informacje (liczby, procenty, kluczowe słowa)
+  const extractKeyInfo = (text: string): string => {
+    // Znajdź liczby i procenty
+    const numbers = text.match(/\d+%?/g) || []
+    // Znajdź kluczowe słowa związane z korzyściami
+    const keyWords = ['prowizji', 'prowizja', 'koszt', 'opłata', 'karencji', 'karencja', 'wkład', 'marża', 'rrso']
+    const foundKeyWords = keyWords.filter((kw) => text.includes(kw))
+    
+    return [...numbers, ...foundKeyWords].join(' ')
+  }
+  
+  const keyInfo1 = extractKeyInfo(normalized1)
+  const keyInfo2 = extractKeyInfo(normalized2)
+  
+  // Jeśli kluczowe informacje są identyczne, to są duplikatami
+  if (keyInfo1 && keyInfo2 && keyInfo1 === keyInfo2) {
+    return true
+  }
+  
+  // Sprawdź czy jedna zawiera drugą (dla przypadków jak "0% prowizji" vs "0% prowizji za udzielenie")
+  // ale tylko jeśli różnica jest w dodatkowych słowach na końcu
+  const words1 = normalized1.split(' ')
+  const words2 = normalized2.split(' ')
+  
+  // Jeśli jedna jest znacznie krótsza (co najmniej 2 słowa różnicy)
+  if (Math.abs(words1.length - words2.length) >= 2) {
+    const shorter = words1.length < words2.length ? normalized1 : normalized2
+    const longer = words1.length >= words2.length ? normalized1 : normalized2
+    
+    // Jeśli krótsza jest zawarta w dłuższej i zaczyna się tak samo
+    if (longer.startsWith(shorter) || shorter.split(' ').every((w) => longer.includes(w))) {
+      return true
+    }
+  }
+  
+  return false
+}
+
+// Funkcja filtrująca korzyści - pomija informacje o terminach ważności ofert i duplikaty
+const filterRealBenefits = (benefits: string[]): string[] => {
+  // Najpierw usuń informacje o terminach ważności i warunkach
+  const filtered = benefits
+    .map((benefit) => {
+      // Usuń informacje w nawiasach typu "(przy spełnieniu warunków)", "(dla klientów...)" itp.
+      return benefit.replace(/\s*\([^)]*(?:przy|warunk|spełnieni|dla klient|wymagani)[^)]*\)/gi, '').trim()
+    })
+    .filter((benefit) => {
+      // Wzorce wskazujące na informacje o terminach ważności, a nie korzyści
+      const nonBenefitPatterns = [
+        /obowiązuje\s+od/i,
+        /od\s+\d{1,2}\s+(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)\s+\d{4}/i,
+        /do\s+odwołania/i,
+        /od\s+\d{1,2}\.\d{1,2}\.\d{4}/i,
+        /do\s+\d{1,2}\.\d{1,2}\.\d{4}/i,
+        /oferta\s+specjalna.*obowiązuje/i,
+        /obowiązuje.*od.*do/i,
+      ]
+      
+      // Jeśli tekst pasuje do wzorca informacji o terminie, pomiń go
+      return !nonBenefitPatterns.some((pattern) => pattern.test(benefit))
+    })
+    .filter((benefit) => benefit.length > 0) // Usuń puste po usunięciu nawiasów
+  
+  // Następnie usuń duplikaty i podobne korzyści
+  const uniqueBenefits: string[] = []
+  for (const benefit of filtered) {
+    const isDuplicate = uniqueBenefits.some((existing) => areBenefitsSimilar(benefit, existing))
+    if (!isDuplicate) {
+      uniqueBenefits.push(benefit)
+    }
+  }
+  
+  return uniqueBenefits
+}
+
+const getHighlightKeyIcon = (highlightKey: string, size: 'sm' | 'md' | 'lg' = 'md'): ReactNode => {
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
+  }
+  const iconProps = { className: `${sizeClasses[size]} text-gray-600` }
+  switch (highlightKey) {
+    case 'loanAmount':
+      return <HiOutlineCollection {...iconProps} />
+    case 'loanPeriod':
+      return <HiOutlineCalendar {...iconProps} />
+    case 'monthlyPayment':
+      return <HiOutlineCurrencyDollar {...iconProps} />
+    case 'interestRate':
+      return <HiOutlineChartBar {...iconProps} />
+    case 'apr':
+      return <HiOutlineTrendingUp {...iconProps} />
+    case 'totalInterest':
+      return <HiOutlineCurrencyDollar {...iconProps} />
+    case 'commission':
+      return <HiOutlineCreditCard {...iconProps} />
+    case 'insurance':
+      return <HiOutlineShieldCheck {...iconProps} />
+    case 'totalCost':
+      return <HiOutlineCollection {...iconProps} />
+    case 'benefits':
+      return <HiOutlineGift {...iconProps} />
+    default:
+      return <HiOutlineChartBar {...iconProps} />
+  }
+}
+
+const getPropertyComponentForSection = (sectionId: string) => {
+  switch (sectionId) {
+    case 'basics':
+      return BasicPropertyCard
+    case 'interest':
+      return InterestPropertyCard
+    case 'costs':
+      return CostPropertyCard
+    case 'benefits':
+      return BenefitPropertyCard
+    case 'summary':
+      return SummaryPropertyCard
+    default:
+      return ListVariantProperty
+  }
+}
+
+const renderPropertyContent = (sectionId: string, item: { label: string; value: string; highlightKey: string }) => {
+  switch (sectionId) {
+    case 'basics':
+      return (
+        <>
+          <BasicPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'lg')}
+          </BasicPropertyIconWrapper>
+          <BasicPropertyContent>
+            <BasicPropertyLabel>{item.label}</BasicPropertyLabel>
+            <BasicPropertyValue>{item.value}</BasicPropertyValue>
+          </BasicPropertyContent>
+        </>
+      )
+    case 'interest':
+      return (
+        <>
+          <InterestPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </InterestPropertyIconWrapper>
+          <InterestPropertyContent>
+            <InterestPropertyLabel>{item.label}</InterestPropertyLabel>
+            <InterestPropertyValue>{item.value}</InterestPropertyValue>
+          </InterestPropertyContent>
+        </>
+      )
+    case 'costs':
+      return (
+        <>
+          <CostPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'lg')}
+          </CostPropertyIconWrapper>
+          <CostPropertyContent>
+            <CostPropertyLabel>{item.label}</CostPropertyLabel>
+            <CostPropertyValue>{item.value}</CostPropertyValue>
+          </CostPropertyContent>
+        </>
+      )
+    case 'benefits':
+      return (
+        <>
+          <BenefitPropertyIcon>
+            <IoStar className="w-4 h-4 text-gray-400 fill-current" />
+          </BenefitPropertyIcon>
+          <BenefitPropertyValue>{item.value}</BenefitPropertyValue>
+        </>
+      )
+    case 'summary':
+      return (
+        <>
+          <SummaryPropertyIconWrapper>
+            {getHighlightKeyIcon(item.highlightKey, 'md')}
+          </SummaryPropertyIconWrapper>
+          <SummaryPropertyContent>
+            <SummaryPropertyLabel>{item.label}</SummaryPropertyLabel>
+            <SummaryPropertyValue>{item.value}</SummaryPropertyValue>
+          </SummaryPropertyContent>
+        </>
+      )
+    default:
+      return (
+        <>
+          <ListVariantPropertyHeader>
+            <ListVariantPropertyIcon>{getHighlightKeyIcon(item.highlightKey)}</ListVariantPropertyIcon>
+            <ListVariantPropertyLabel>{item.label}</ListVariantPropertyLabel>
+          </ListVariantPropertyHeader>
+          <ListVariantPropertyValue>{item.value}</ListVariantPropertyValue>
+        </>
+      )
+  }
+}
+
 export const createNarrationSections = (
   offer: NarrationOffer,
   includeBenefits: boolean,
   hasCta: boolean,
 ): NarrationSection[] => {
-  const hasBenefits = includeBenefits && offer.benefits.length > 0
+  const realBenefits = filterRealBenefits(offer.benefits)
+  const hasBenefits = includeBenefits && realBenefits.length > 0
   const insurancePart = offer.insurance
-    ? `, a ubezpieczenia wynoszą ${formatCurrency(offer.insurance)}`
+    ? `, a ubezpieczenia wynoszą ${formatCurrencyNoCents(offer.insurance)}`
     : ''
   const interestPart = offer.totalInterest
-    ? `, co oznacza około ${formatCurrency(offer.totalInterest)} odsetek`
+    ? `, co oznacza około ${formatCurrencyNoCents(offer.totalInterest)} odsetek`
     : ''
 
   const sections: NarrationSection[] = [
     {
       id: 'basics',
       title: 'Podstawowe parametry',
-      script: `Kwota finansowania to ${formatCurrency(offer.loanAmount)}, spłacana przez ${formatLoanTermYears(
+      script: `Kwota finansowania to ${formatCurrencyNoCents(offer.loanAmount)}, spłacana przez ${formatLoanTermYears(
         offer.loanPeriodYears,
-      )}, czyli ${offer.loanTermMonths} miesięcy. Szacunkowa rata wynosi około ${formatCurrency(
+      )}. Szacunkowa rata wynosi około ${formatCurrencyNoCents(
         offer.monthlyPayment,
       )} miesięcznie.`,
       highlights: ['loanAmount', 'loanPeriod', 'monthlyPayment'],
@@ -111,7 +343,7 @@ export const createNarrationSections = (
     {
       id: 'interest',
       title: 'Oprocentowanie',
-      script: `Oprocentowanie nominalne to ${formatPercent(offer.interestRate)}, a RRSO wynosi ${formatPercent(
+      script: `Oprocentowanie nominalne to ${formatPercentForNarration(offer.interestRate)}, a RRSO wynosi ${formatPercentForNarration(
         offer.apr,
       )}. Dzięki temu wiesz, jaki jest realny koszt finansowania${interestPart}.`,
       highlights: ['interestRate', 'apr', 'totalInterest'],
@@ -119,7 +351,7 @@ export const createNarrationSections = (
     {
       id: 'costs',
       title: 'Koszty i prowizje',
-      script: `Prowizja przy uruchomieniu kredytu to ${formatCurrency(offer.commission)}${insurancePart}. Całkowity koszt kredytu wraz z wszystkimi opłatami to ${formatCurrency(
+      script: `Prowizja przy uruchomieniu kredytu to ${formatCurrencyNoCents(offer.commission)}${insurancePart}. Całkowity koszt kredytu wraz z wszystkimi opłatami to ${formatCurrencyNoCents(
         offer.totalCost,
       )}.`,
       highlights: ['commission', 'insurance', 'totalCost'],
@@ -130,7 +362,7 @@ export const createNarrationSections = (
     id: 'benefits',
     title: 'Dodatkowe informacje',
     script: hasBenefits
-      ? `W tej ofercie możesz liczyć na dodatkowe korzyści: ${offer.benefits.join(', ')}.`
+      ? `W tej ofercie możesz liczyć na dodatkowe korzyści: ${realBenefits.join(', ')}.`
       : 'Bank nie zadeklarował dodatkowych benefitów w tej ofercie, ale podstawowe warunki pozostają korzystne.',
     highlights: ['benefits'],
   })
@@ -138,9 +370,9 @@ export const createNarrationSections = (
   sections.push({
     id: 'summary',
     title: 'Podsumowanie',
-    script: `Podsumowując: rata ${formatCurrency(offer.monthlyPayment)} przez ${formatLoanTermYears(
+    script: `Podsumowując: rata ${formatCurrencyNoCents(offer.monthlyPayment)} przez ${formatLoanTermYears(
       offer.loanPeriodYears,
-    )} daje całkowity koszt ${formatCurrency(offer.totalCost)}. ${hasCta ? 'Jeśli chcesz przejść dalej, użyj przycisku poniżej.' : 'Możesz porównać tę ofertę z innymi i wybrać najlepszą.'}`,
+    )} daje całkowity koszt ${formatCurrencyNoCents(offer.totalCost)}. ${hasCta ? 'Jeśli chcesz przejść dalej, użyj przycisku poniżej.' : 'Możesz porównać tę ofertę z innymi i wybrać najlepszą.'}`,
     highlights: ['monthlyPayment', 'totalCost'],
   })
 
@@ -260,20 +492,21 @@ export const createNarrationDisplaySteps = (offer: NarrationOffer): NarrationDis
           ],
         }
       case 'benefits':
+        const realBenefits = filterRealBenefits(offer.benefits)
         return {
           id: section.id,
           title: section.title,
           description: section.script,
           items:
-            offer.benefits.length > 0
-              ? offer.benefits.slice(0, 4).map((benefit, index) => ({
-                  label: `Korzyść ${index + 1}`,
+            realBenefits.length > 0
+              ? realBenefits.slice(0, 4).map((benefit) => ({
+                  label: '',
                   value: benefit,
                   highlightKey: 'benefits',
                 }))
               : [
                   {
-                    label: 'Informacja',
+                    label: '',
                     value: 'Brak deklarowanych benefitów',
                     highlightKey: 'benefits',
                   },
@@ -309,6 +542,7 @@ export const createNarrationDisplaySteps = (offer: NarrationOffer): NarrationDis
 }
 
 const detailCardsConfig = (offer: NarrationOffer) => {
+  const realBenefits = filterRealBenefits(offer.benefits)
   const cards: Array<Omit<DetailCardProps, 'isActive'>> = [
     {
       label: 'Kwota kredytu',
@@ -368,12 +602,12 @@ const detailCardsConfig = (offer: NarrationOffer) => {
     label: 'Korzyści dodatkowe',
     highlightKey: 'benefits',
     renderContent: () =>
-      offer.benefits.length > 0 ? (
+      realBenefits.length > 0 ? (
         <BenefitsList>
-          {offer.benefits.slice(0, 6).map((benefit) => (
+          {realBenefits.slice(0, 6).map((benefit) => (
             <li key={benefit}>{benefit}</li>
           ))}
-          {offer.benefits.length > 6 && <MoreBenefitsInfo>… i więcej</MoreBenefitsInfo>}
+          {realBenefits.length > 6 && <MoreBenefitsInfo>… i więcej</MoreBenefitsInfo>}
         </BenefitsList>
       ) : (
         <EmptyBenefits>Brak deklarowanych benefitów</EmptyBenefits>
@@ -527,6 +761,180 @@ export function OfferNarration({
   const activeHighlights = useMemo(
     () => new Set(currentSection?.highlights ?? []),
     [currentSection],
+  )
+
+  // Mapowanie highlight keys do zakresów słów w transkrypcji (całe fragmenty zdań)
+  const highlightKeyToWordRanges = useMemo(() => {
+    const map = new Map<string, Array<{ sectionId: string; startIndex: number; endIndex: number }>>()
+    
+    sections.forEach((section) => {
+      // Użyj tej samej metody liczenia słów co w createNarrationWordEntries
+      const words = section.script
+        .split(/\s+/)
+        .map((word) => word.trim())
+        .filter(Boolean)
+      
+      // Dla każdego highlight key znajdź odpowiadający mu fragment zdania
+      section.highlights.forEach((highlightKey) => {
+        let phraseToFind: string | null = null
+        
+        // Znajdź fragment zdania odpowiadający highlightKey
+        switch (highlightKey) {
+          case 'loanAmount':
+            // "Kwota finansowania to [wartość]"
+            phraseToFind = `Kwota finansowania to ${formatCurrencyNoCents(offer.loanAmount)}`
+            break
+          case 'loanPeriod':
+            // "spłacana przez [wartość]"
+            phraseToFind = `spłacana przez ${formatLoanTermYears(offer.loanPeriodYears)}`
+            break
+          case 'monthlyPayment':
+            // W sekcji basics: "Szacunkowa rata wynosi około [wartość] miesięcznie"
+            // W sekcji summary: "rata [wartość] przez"
+            if (section.id === 'basics') {
+              phraseToFind = `Szacunkowa rata wynosi około ${formatCurrencyNoCents(offer.monthlyPayment)} miesięcznie`
+            } else if (section.id === 'summary') {
+              phraseToFind = `rata ${formatCurrencyNoCents(offer.monthlyPayment)} przez`
+            }
+            break
+          case 'interestRate':
+            // "Oprocentowanie nominalne to [wartość]"
+            phraseToFind = `Oprocentowanie nominalne to ${formatPercentForNarration(offer.interestRate)}`
+            break
+          case 'apr':
+            // "a RRSO wynosi [wartość]"
+            phraseToFind = `a RRSO wynosi ${formatPercentForNarration(offer.apr)}`
+            break
+          case 'totalInterest':
+            // "co oznacza około [wartość] odsetek"
+            if (offer.totalInterest) {
+              phraseToFind = `co oznacza około ${formatCurrencyNoCents(offer.totalInterest)} odsetek`
+            }
+            break
+          case 'commission':
+            // "Prowizja przy uruchomieniu kredytu to [wartość]"
+            phraseToFind = `Prowizja przy uruchomieniu kredytu to ${formatCurrencyNoCents(offer.commission)}`
+            break
+          case 'insurance':
+            // ", a ubezpieczenia wynoszą [wartość]"
+            if (offer.insurance) {
+              phraseToFind = `a ubezpieczenia wynoszą ${formatCurrencyNoCents(offer.insurance)}`
+            }
+            break
+          case 'totalCost':
+            // W sekcji costs: "Całkowity koszt kredytu wraz z wszystkimi opłatami to [wartość]"
+            // W sekcji summary: "daje całkowity koszt [wartość]"
+            if (section.id === 'costs') {
+              phraseToFind = `Całkowity koszt kredytu wraz z wszystkimi opłatami to ${formatCurrencyNoCents(offer.totalCost)}`
+            } else if (section.id === 'summary') {
+              phraseToFind = `daje całkowity koszt ${formatCurrencyNoCents(offer.totalCost)}`
+            }
+            break
+          case 'benefits':
+            // "możesz liczyć na dodatkowe korzyści"
+            phraseToFind = 'możesz liczyć na dodatkowe korzyści'
+            break
+        }
+        
+        if (!phraseToFind) return
+        
+        // Znajdź pozycję frazy w transkrypcji - użyj tej samej metody
+        const phraseWords = phraseToFind
+          .split(/\s+/)
+          .map((word) => word.trim())
+          .filter(Boolean)
+          .map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
+        
+        if (phraseWords.length === 0) return
+        
+        // Normalizuj słowa w transkrypcji (bez znaków interpunkcyjnych)
+        const normalizedWords = words.map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
+        
+        // Znajdź wystąpienie frazy w słowach - dokładne dopasowanie
+        for (let i = 0; i <= normalizedWords.length - phraseWords.length; i++) {
+          const match = phraseWords.every((pw, idx) => {
+            const normalizedWord = normalizedWords[i + idx] ?? ''
+            return normalizedWord === pw
+          })
+          
+          if (match) {
+            const ranges = map.get(highlightKey) ?? []
+            ranges.push({
+              sectionId: section.id,
+              startIndex: i,
+              endIndex: i + phraseWords.length - 1,
+            })
+            map.set(highlightKey, ranges)
+            break // Znajdź tylko pierwsze wystąpienie w sekcji
+          }
+        }
+      })
+    })
+    
+    return map
+  }, [sections, offer])
+
+  // Funkcja sprawdzająca, czy aktualnie czytane słowo odpowiada danemu highlightKey
+  const isHighlightKeyActive = useCallback(
+    (highlightKey: string, itemValue?: string, sectionId?: string): boolean => {
+      if (!activeWordEntry || !isPlaying) return false
+      
+      // Dla sekcji benefits sprawdzamy pozycję słowa w transkrypcji względem korzyści
+      if (sectionId === 'benefits' && itemValue && activeWordEntry.sectionId === 'benefits') {
+        const currentSection = sections.find((s) => s.id === 'benefits')
+        if (!currentSection) return false
+        
+        const script = currentSection.script
+        const scriptWords = script
+          .split(/\s+/)
+          .map((word) => word.trim())
+          .filter(Boolean)
+        
+        // Znajdź pozycję korzyści w transkrypcji
+        const benefitWords = itemValue
+          .split(/\s+/)
+          .map((word) => word.trim())
+          .filter(Boolean)
+          .map((word) => word.replace(/[.,!?;:]+$/g, '').toLowerCase())
+        
+        if (benefitWords.length === 0) return false
+        
+        // Znajdź gdzie zaczyna się ta korzyść w transkrypcji
+        let benefitStartIndex = -1
+        for (let i = 0; i <= scriptWords.length - benefitWords.length; i++) {
+          const match = benefitWords.slice(0, 3).every((bw, idx) => {
+            const sw = scriptWords[i + idx]?.replace(/[.,!?;:]+$/g, '').toLowerCase() ?? ''
+            return sw === bw
+          })
+          if (match) {
+            benefitStartIndex = i
+            break
+          }
+        }
+        
+        if (benefitStartIndex === -1) return false
+        
+        // Sprawdź czy aktualnie czytane słowo jest w zakresie tej korzyści
+        const currentWordIndex = activeWordEntry.wordIndex
+        const benefitEndIndex = benefitStartIndex + benefitWords.length - 1
+        
+        return currentWordIndex >= benefitStartIndex && currentWordIndex <= benefitEndIndex
+      }
+      
+      const ranges = highlightKeyToWordRanges.get(highlightKey) ?? []
+      const matchingRange = ranges.find((range) => range.sectionId === activeWordEntry.sectionId)
+      
+      if (!matchingRange) return false
+      
+      // wordIndex w activeWordEntry odpowiada pozycji w tablicy słów po filtrowaniu
+      const currentWordIndex = activeWordEntry.wordIndex
+      
+      return (
+        currentWordIndex >= matchingRange.startIndex &&
+        currentWordIndex <= matchingRange.endIndex
+      )
+    },
+    [activeWordEntry, isPlaying, highlightKeyToWordRanges, sections],
   )
   const createHighlightedNodes = useCallback(
     (sectionId: string, script: string) => {
@@ -708,41 +1116,53 @@ export function OfferNarration({
                   </ListVariantHeader>
                 </ListVariantCard>
                 {step.items.length > 0 && (
-                  <ListVariantProperties>
-                    {step.items.map((item) => (
-                      <ListVariantProperty
-                        key={`${step.id}-${item.label}`}
-                        className={clsx({
-                          'border-sky-200 bg-sky-50 text-sky-900 shadow-sky-100': isActive,
-                          'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-100':
-                            isCompleted,
-                        })}
-                        onClick={() => {
-                          if (!canPlaySection || sectionEntries.length === 0) return
-                          const firstEntry = sectionEntries[0]
-                          if (firstEntry) {
-                            onSectionSelect?.(step.id)
-                            onWordSelect?.(firstEntry.globalIndex)
-                          }
-                        }}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(event) => {
-                          if (!canPlaySection || sectionEntries.length === 0) return
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault()
+                  <ListVariantProperties
+                    className={clsx({
+                      'grid-cols-1 md:grid-cols-3': step.id !== 'benefits' && step.id !== 'summary',
+                      'grid-cols-1 md:grid-cols-2': step.id === 'summary',
+                      'flex flex-col gap-2': step.id === 'benefits',
+                    })}
+                  >
+                    {step.items.map((item) => {
+                      const isItemActive = isHighlightKeyActive(item.highlightKey, item.value, step.id)
+                      const PropertyComponent = getPropertyComponentForSection(step.id)
+                      return (
+                        <PropertyComponent
+                          key={`${step.id}-${item.label}`}
+                          className={clsx({
+                            'border-sky-200 bg-sky-50 text-sky-900 shadow-sky-100': isActive,
+                            'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-100':
+                              isCompleted,
+                            'border-sky-400 bg-sky-100 scale-110 shadow-xl shadow-sky-200/50 ring-2 ring-sky-300/50 z-10':
+                              isItemActive,
+                            'opacity-60': !isItemActive && isActive && isPlaying,
+                          })}
+                          onClick={() => {
+                            if (!canPlaySection || sectionEntries.length === 0) return
                             const firstEntry = sectionEntries[0]
                             if (firstEntry) {
                               onSectionSelect?.(step.id)
                               onWordSelect?.(firstEntry.globalIndex)
                             }
-                          }
-                        }}
-                      >
-                        <ListVariantPropertyLabel>{item.label}</ListVariantPropertyLabel>
-                        <ListVariantPropertyValue>{item.value}</ListVariantPropertyValue>
-                      </ListVariantProperty>
-                    ))}
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(event) => {
+                            if (!canPlaySection || sectionEntries.length === 0) return
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              const firstEntry = sectionEntries[0]
+                              if (firstEntry) {
+                                onSectionSelect?.(step.id)
+                                onWordSelect?.(firstEntry.globalIndex)
+                              }
+                            }
+                          }}
+                        >
+                          {renderPropertyContent(step.id, item)}
+                        </PropertyComponent>
+                      )
+                    })}
                   </ListVariantProperties>
                 )}
               </ListVariantInteractive>
@@ -921,10 +1341,45 @@ const ListVariantBadge = tw.span`flex h-8 w-8 shrink-0 items-center justify-cent
 const ListVariantTitleWrapper = tw.div`flex flex-col gap-1`
 const ListVariantTitle = tw.span`text-base font-semibold text-slate-900`
 const ListVariantDescription = tw.span`text-sm leading-relaxed text-slate-600 whitespace-pre-wrap`
-const ListVariantProperties = tw.ul`mt-3 flex flex-col gap-2 pl-10`
-const ListVariantProperty = tw.li`flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white px-4 py-2 shadow-sm`
-const ListVariantPropertyLabel = tw.span`text-sm font-medium text-slate-600`
-const ListVariantPropertyValue = tw.span`text-sm font-semibold text-slate-900`
+const ListVariantProperties = tw.ul`mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 px-4`
+const ListVariantProperty = tw.li`flex flex-col gap-2 rounded-xl border-2 border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5`
+const ListVariantPropertyHeader = tw.div`flex items-center gap-2`
+const ListVariantPropertyIcon = tw.div`shrink-0 flex items-center justify-center`
+const ListVariantPropertyLabel = tw.span`text-xs font-semibold text-gray-600 uppercase tracking-wide`
+const ListVariantPropertyValue = tw.span`text-xl font-bold text-gray-900`
+
+// Basic section (Podstawowe parametry) - styl jak KeyMetricCard
+const BasicPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5`
+const BasicPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 shrink-0 transition-colors duration-200`
+const BasicPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const BasicPropertyLabel = tw.span`text-xs font-semibold text-gray-600 uppercase tracking-wide`
+const BasicPropertyValue = tw.span`text-2xl font-bold text-gray-900`
+
+// Interest section (Oprocentowanie) - standardowy styl z ikonami w tle
+const InterestPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5`
+const InterestPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 shrink-0`
+const InterestPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const InterestPropertyLabel = tw.span`text-xs font-semibold text-gray-600 uppercase tracking-wide`
+const InterestPropertyValue = tw.span`text-xl font-bold text-gray-900`
+
+// Costs section (Koszty i prowizje) - styl jak reszta sekcji
+const CostPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5`
+const CostPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 shrink-0 transition-colors duration-200`
+const CostPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const CostPropertyLabel = tw.span`text-xs font-semibold text-gray-600 uppercase tracking-wide`
+const CostPropertyValue = tw.span`text-2xl font-bold text-gray-900`
+
+// Benefits section (Dodatkowe informacje) - prostszy, bardziej kompaktowy z ikonami gwiazdek
+const BenefitPropertyCard = tw.li`flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md`
+const BenefitPropertyIcon = tw.div`shrink-0 flex items-center justify-center mt-0.5`
+const BenefitPropertyValue = tw.span`text-sm text-gray-700 leading-relaxed flex-1`
+
+// Summary section (Podsumowanie) - styl jak reszta sekcji z ikonami
+const SummaryPropertyCard = tw.li`flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5`
+const SummaryPropertyIconWrapper = tw.div`w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 shrink-0 transition-colors duration-200`
+const SummaryPropertyContent = tw.div`flex flex-col gap-1 flex-1 min-w-0`
+const SummaryPropertyLabel = tw.span`text-xs font-semibold text-gray-600 uppercase tracking-wide`
+const SummaryPropertyValue = tw.span`text-2xl font-bold text-gray-900`
 const ListVariantPlayButton = tw.button`
   inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition
   relative -translate-y-1 translate-x-1
