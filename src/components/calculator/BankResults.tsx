@@ -317,11 +317,13 @@ export const BankResults = ({ results, formData }: BankResultsProps) => {
 }
 
 const ResultsHeaderContainer = tw.div`
+  sticky top-0 z-10
   mx-auto
   w-full
   max-w-7xl
   px-4 sm:px-6 lg:px-8
-  py-6 sm:py-8 md:py-10
+  py-4 sm:py-5 md:py-6
+  bg-white
 `
 
 const ResultsContainer = tw.section`
@@ -329,12 +331,12 @@ const ResultsContainer = tw.section`
   w-full
   max-w-7xl
   px-4 sm:px-6 lg:px-8
-  pb-6 sm:pb-8 md:pb-10
+  pb-2 sm:pb-3
   flex flex-col gap-4
 `
 
 const ResultsHeader = tw.div`
-  flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4
+  flex flex-row items-center justify-between gap-4 flex-wrap
 `
 
 const ResultsTitleWrapper = tw.div`
@@ -578,10 +580,10 @@ const ExpandedSection = tw.div`
 `
 
 const UpdateInfo = tw.div`
-  text-xs text-gray-500 text-center
+  mt-2 pt-2
+  border-t border-gray-200
   flex items-center justify-center gap-2
-  mt-4 pt-4 border-t border-gray-200
-  italic
+  text-xs text-gray-500
 `
 
 const InterestRateTypeBadge = tw.span`

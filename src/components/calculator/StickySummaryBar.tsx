@@ -50,13 +50,13 @@ export const StickySummaryBar = ({ formData, onEditClick }: StickySummaryBarProp
       const scrollY = window.scrollY || window.pageYOffset
 
       // Pasek powinien być widoczny gdy:
-      // 1. Formularz (calculator) już zniknął (calculatorBottom < navHeight)
-      // 2. Użytkownik scrolluje w dół (scrollY > 100px - nie na samej górze)
+      // 1. Formularz (calculator) już zniknął (calculatorBottom < navHeight + 80px - wcześniej)
+      // 2. Użytkownik scrolluje w dół (scrollY > 50px - wcześniej)
       // 3. Sekcja results jest widoczna lub była widoczna (resultsBottom > 0 lub resultsTop < window.innerHeight)
       // Pasek pozostaje widoczny przez cały czas gdy scrollujemy przez wyniki
 
-      const formularzZniknal = calculatorBottom < navHeight
-      const scrollujeWDol = scrollY > 100
+      const formularzZniknal = calculatorBottom < navHeight + 80
+      const scrollujeWDol = scrollY > 50
       const wSekcjiWynikow = resultsBottom > 0 || resultsTop < window.innerHeight
 
       const shouldShow = formularzZniknal && scrollujeWDol && wSekcjiWynikow

@@ -56,7 +56,7 @@ const NavContainer = tw.nav`
 const NavContent = tw.div`
   mx-auto max-w-7xl
   px-4 sm:px-6 lg:px-8
-  py-4
+  py-2 sm:py-4
   flex items-center justify-between
   gap-4
 `
@@ -74,7 +74,7 @@ const LogoIcon = tw.span`
 `
 
 const LogoText = tw.span`
-  text-lg font-bold
+  text-sm sm:text-lg font-bold
   text-gray-900
 `
 
@@ -84,7 +84,7 @@ const NavLinks = tw.div`
 `
 
 const NavLink = tw(Link)<{ $active?: boolean }>`
-  inline-flex items-center rounded-full border px-4 py-2 font-medium transition-colors
+  inline-flex items-center rounded-full border px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-colors
   ${({ $active }) =>
     $active
       ? 'border-emerald-600 bg-emerald-50 text-emerald-700'

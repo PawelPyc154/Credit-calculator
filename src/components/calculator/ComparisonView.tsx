@@ -148,7 +148,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
           alt={offer.bankName}
           bankName={offer.bankName}
           size="sm"
-          className="h-12 w-12 sm:h-16 sm:w-16"
+          className="h-8 w-8 sm:h-16 sm:w-16"
         />
       ),
     },
@@ -470,7 +470,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
               <path d="M2 12.4V17a1 1 0 001 1h14a1 1 0 001-1v-4.6" />
               <path d="M18 9l-8 8-8-8" />
             </svg>
-            <span className="hidden md:inline">Aplikuj</span>
+            <span>Wniosek</span>
           </AffiliateLinkButton>
         )
       },
@@ -507,6 +507,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
               {comparisonFields.map((field) => (
                 <TableHeader
                   key={field.key}
+                  data-logo-column={field.key === 'logo'}
                   className={clsx(
                     field.highlight && 'highlight',
                     field.key === 'logo' && 'sticky-header',
@@ -567,6 +568,7 @@ export const ComparisonView = ({ offers, formData, onClose }: ComparisonViewProp
                 {comparisonFields.map((field) => (
                   <TableCell
                     key={field.key}
+                    data-logo-column={field.key === 'logo'}
                     className={clsx(
                       field.highlight && 'highlight-cell',
                       field.key === 'logo' && 'sticky-cell',
@@ -660,6 +662,7 @@ const TableHeader = tw.th`
   [&.highlight]:bg-emerald-50
   [&.sticky-header]:sticky [&.sticky-header]:left-0 [&.sticky-header]:z-10 [&.sticky-header]:bg-gray-50 [&.sticky-header]:shadow-[2px_0_4px_rgba(0,0,0,0.05)]
   [&.sortable-header]:cursor-pointer [&.sortable-header]:select-none [&.sortable-header]:hover:bg-gray-100 [&.sortable-header]:transition-colors
+  data-[logo-column="true"]:px-1 data-[logo-column="true"]:py-1.5 sm:data-[logo-column="true"]:px-3
 `
 
 const TableBody = tw.tbody`
@@ -676,6 +679,7 @@ const TableCell = tw.td`
   whitespace-nowrap
   [&.highlight-cell]:font-semibold
   [&.sticky-cell]:sticky left-0 bg-white [&.sticky-cell]:z-5 [&.sticky-cell]:shadow-[2px_0_4px_rgba(0,0,0,0.05)]
+  data-[logo-column="true"]:px-1 data-[logo-column="true"]:py-1.5 sm:data-[logo-column="true"]:px-3 sm:data-[logo-column="true"]:py-2
 `
 
 const AffiliateLinkButton = tw.a`

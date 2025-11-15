@@ -16,18 +16,26 @@ export const Disclaimer = () => {
   )
 }
 
-const Wrapper = tw.section`w-full`
+const Wrapper = tw.section`
+  w-full
+`
 
 const Card = tw.div`
   mx-auto
   max-w-4xl
-  rounded-xl
+  rounded-lg
   border border-gray-200
-  bg-white
-  px-4 py-3
-  text-sm text-gray-600
+  bg-gray-50
+  px-3 py-2.5 sm:px-4 sm:py-3
+  shadow-sm
 `
 
-const Title = tw.h3`mb-2 text-sm font-semibold text-gray-900`
+const Title = tw.h3`
+  mb-2
+  text-sm font-semibold text-gray-900
+`
 
-const Text = tw.p`leading-relaxed`
+const Text = tw.p`
+  text-sm text-gray-600
+  leading-relaxed
+`

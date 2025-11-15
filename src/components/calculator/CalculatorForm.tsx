@@ -128,7 +128,44 @@ export const CalculatorForm = ({
   )
 
   const scrollToResults = () => {
-    document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const resultsElement = document.getElementById('results')
+    if (!resultsElement) return
+
+    // Sprawdź czy sticky bar jest widoczny w DOM
+    const stickyBar = Array.from(document.querySelectorAll('div[class*="from-green-600"]')).find(
+      (el) => el.className.includes('fixed'),
+    ) as HTMLElement | undefined
+
+    // Zmierz wysokość sticky bara jeśli jest widoczny
+    // Jeśli nie jest widoczny, użyj stałej wartości zależnej od rozmiaru ekranu
+    let stickyBarHeight = 0
+    const isMobile = window.innerWidth < 640 // sm breakpoint
+    
+    if (stickyBar) {
+      const style = window.getComputedStyle(stickyBar)
+      if (style.display !== 'none' && style.visibility !== 'hidden') {
+        stickyBarHeight = stickyBar.offsetHeight
+      } else {
+        // Sticky bar pojawi się po scrollowaniu, więc użyj przybliżonej wysokości
+        // Na mobile jest mniejszy (około 50-60px), na desktop większy (około 70px)
+        stickyBarHeight = isMobile ? 55 : 70
+      }
+    } else {
+      // Sticky bar jeszcze nie istnieje w DOM, ale pojawi się po scrollowaniu
+      // Użyj przybliżonej wysokości na podstawie struktury (py-2 sm:py-3 + zawartość)
+      stickyBarHeight = isMobile ? 55 : 70
+    }
+
+    // Oblicz pozycję z offsetem dla sticky bara
+    // Na mobile scrollujemy nieco wyżej bo sticky bar jest mniejszy
+    const additionalOffset = isMobile ? -5 : 5
+    const elementPosition = resultsElement.getBoundingClientRect().top + window.pageYOffset
+    const offsetPosition = Math.max(0, elementPosition - stickyBarHeight - additionalOffset)
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth',
+    })
     trackScrollToResults()
   }
 

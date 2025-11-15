@@ -124,4 +124,4 @@ const MainContainer = tw.div`min-h-screen bg-linear-to-b from-gray-50 via-white 
 const ContentWrapper = tw.div`flex flex-col`
 const CalculatorSection = tw.section`w-full bg-linear-to-r from-green-600 to-emerald-600`
 const ResultsSection = tw.section`w-full`
-const DisclaimerSection = tw.section`w-full px-4 sm:px-6 lg:px-8 pt-2 pb-2 sm:pt-3 sm:pb-3 md:pt-4 md:pb-4`
+const DisclaimerSection = tw.section`w-full px-4 sm:px-6 lg:px-8 pt-2 pb-3 sm:pt-3 sm:pb-4`
